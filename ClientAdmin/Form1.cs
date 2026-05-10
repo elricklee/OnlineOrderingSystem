@@ -225,11 +225,11 @@ namespace ClientAdmin
             txtCategory.Text = string.Empty;
             txtPrice.Text = string.Empty;
         }
-    
 
-    //第二页 订单管理
 
-    private void InitOrderManagement()
+        //第二页 订单管理
+
+        private void InitOrderManagement()
         {
             dgvOrders.ReadOnly = true;
             dgvOrders.AllowUserToAddRows = false;
@@ -463,6 +463,11 @@ namespace ClientAdmin
             }
 
             return value;
+        }
+
+        private void tabMain_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
