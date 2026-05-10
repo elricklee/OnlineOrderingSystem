@@ -1,33 +1,28 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineOrdering.API.Data;
-using OnlineOrdering.API.Middleware;
+using OnlineOrdering.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new() { Title = "OnlineOrdering API", Version = "v1" });
-});
-
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 31))
-    ));
+    )
+);
 
-builder.Services.AddCors(options =>
+builder.Services.AddScoped<IDishService, DishService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddCors(opt =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    opt.AddPolicy("AllowAll", p =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
 
@@ -39,14 +34,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowAll");
-
-app.UseExceptionHandler();
-
-app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

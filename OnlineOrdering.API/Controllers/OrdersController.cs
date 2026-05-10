@@ -1,88 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OnlineOrdering.API.Data;
-using OnlineOrdering.API.Models;
+using OnlineOrdering.API.DTOs;
+using OnlineOrdering.API.Services;
 
 namespace OnlineOrdering.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/orders")]
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public OrdersController(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly IOrderService _orderService;
+        public OrdersController(IOrderService orderService) => _orderService = orderService;
 
         [HttpGet]
-        public async Task<ActionResult<List<Order>>> GetOrders()
-        {
-            var orders = await _context.Orders.Include(o => o.OrderItems).ToListAsync();
-            return Ok(orders);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
-        {
-            var order = await _context.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-            return Ok(order);
-        }
+        public async Task<IActionResult> GetAll() => Ok(await _orderService.GetAllOrdersAsync());
 
         [HttpPost]
-        public async Task<ActionResult<Order>> CreateOrder(Order order)
+        public async Task<IActionResult> Create(OrderCreateDto dto)
         {
-            order.CreatedAt = DateTime.Now;
-            order.Status = "Pending";
-            
-            foreach (var item in order.OrderItems)
-            {
-                var dish = await _context.Dishes.FindAsync(item.DishId);
-                if (dish != null)
-                {
-                    item.DishName = dish.Name;
-                    item.Price = dish.Price;
-                }
-            }
-            
-            order.TotalAmount = order.OrderItems.Sum(item => item.Price * item.Quantity);
-            
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
+            var order = await _orderService.CreateOrderAsync(dto);
+            return CreatedAtAction(nameof(GetAll), new { id = order.Id }, order);
         }
 
         [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] string status)
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] OrderUpdateStatusDto dto)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            order.Status = status;
-            await _context.SaveChangesAsync();
-            return Ok(order);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrder(int id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            var order = await _orderService.UpdateOrderStatusAsync(id, dto.Status);
+            return order == null ? NotFound() : Ok(order);
         }
     }
 }
