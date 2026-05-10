@@ -469,5 +469,10 @@ namespace ClientAdmin
         {
 
         }
+
+        private void lblDescription_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
