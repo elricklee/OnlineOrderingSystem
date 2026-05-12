@@ -1,6 +1,6 @@
 namespace ClientCustomer
 {
-    partial class Form1
+    partial class OrderStatusForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -17,11 +17,13 @@ namespace ClientCustomer
         {
             SuspendLayout();
             AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(1378, 844);
-            Name = "Form1";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "珞珈线上点餐系统-顾客端";
-            WindowState = FormWindowState.Maximized;
+            ClientSize = new Size(700, 550);
+            Name = "OrderStatusForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "订单状态查询";
+            MaximizeBox = false;
+            MinimizeBox = false;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             ResumeLayout(false);
         }
     }

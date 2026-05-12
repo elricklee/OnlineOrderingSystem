@@ -10,13 +10,15 @@ namespace ClientCustomer
         {
             ApplicationConfiguration.Initialize();
 
-            // 先显示点餐模式选择窗体
             using (var orderTypeForm = new OrderTypeForm())
             {
                 if (orderTypeForm.ShowDialog() == DialogResult.OK)
                 {
-                    // 选择成功后打开主窗体
-                    Application.Run(new Form1());
+                    Application.Run(new Form1(
+                        orderTypeForm.OrderType,
+                        orderTypeForm.TableNumber,
+                        orderTypeForm.DeliveryAddress
+                    ));
                 }
             }
         }

@@ -1,23 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ClientCustomer.Models
 {
     public class OrderCreateDto
     {
-        public string CustomerName { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public string OrderType { get; set; } = "DineIn"; // DineIn 或 Delivery
+        [JsonProperty("customerName")]
+        public string CustomerName { get; set; } = "";
+
+        [JsonProperty("phone")]
+        public string Phone { get; set; } = "";
+
+        [JsonProperty("orderType")]
+        public string OrderType { get; set; } = "DineIn";
+
+        [JsonProperty("tableNumber")]
         public string? TableNumber { get; set; }
+
+        [JsonProperty("address")]
         public string? Address { get; set; }
+
+        [JsonProperty("note")]
         public string? Note { get; set; }
-        public decimal DeliveryFee { get; set; } = 0.00m;
+
+        [JsonProperty("deliveryFee")]
+        public decimal DeliveryFee { get; set; }
+
+        [JsonProperty("orderItems")]
         public List<OrderItemDto> OrderItems { get; set; } = new();
     }
 
     public class OrderItemDto
     {
+        [JsonProperty("dishId")]
         public int DishId { get; set; }
+
+        [JsonProperty("quantity")]
         public int Quantity { get; set; }
     }
 }

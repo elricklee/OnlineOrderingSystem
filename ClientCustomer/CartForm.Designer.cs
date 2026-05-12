@@ -1,6 +1,6 @@
 namespace ClientCustomer
 {
-    partial class Form1
+    partial class CartForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -17,11 +17,13 @@ namespace ClientCustomer
         {
             SuspendLayout();
             AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(1378, 844);
-            Name = "Form1";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "珞珈线上点餐系统-顾客端";
-            WindowState = FormWindowState.Maximized;
+            ClientSize = new Size(800, 620);
+            Name = "CartForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "购物车";
+            MaximizeBox = false;
+            MinimizeBox = false;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             ResumeLayout(false);
         }
     }

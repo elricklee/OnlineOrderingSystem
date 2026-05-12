@@ -1,16 +1,9 @@
-﻿namespace ClientCustomer
+namespace ClientCustomer
 {
     partial class OrderTypeForm
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,47 +13,38 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             lblTitle = new Label();
             panelDineIn = new Panel();
-            picDineIn = new PictureBox();
-            lblDineInTitle = new Label();
-            lblDineInDesc = new Label();
-            lblTableNumberLabel = new Label();
             txtTableNumber = new TextBox();
+            lblTableNumberLabel = new Label();
+            lblDineInDesc = new Label();
+            lblDineInTitle = new Label();
+            picDineIn = new PictureBox();
             panelDelivery = new Panel();
-            picDelivery = new PictureBox();
             lblDeliveryTitle = new Label();
+            picDelivery = new PictureBox();
+            lblDeliveryDesc = new Label();
             lblAddress = new Label();
             txtAddress = new TextBox();
-            btnConfirm = new ReaLTaiizor.Controls.AirButton();
+            btnConfirm = new Sunny.UI.UIButton();
             panelDineIn.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picDineIn).BeginInit();
             panelDelivery.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picDelivery).BeginInit();
             SuspendLayout();
-            // 
-            // lblTitle
-            // 
+
             lblTitle.AutoSize = true;
-            lblTitle.Font = new Font("微软雅黑", 18F, FontStyle.Bold, GraphicsUnit.Point, 134);
+            lblTitle.Font = new Font("微软雅黑", 18F, FontStyle.Bold);
             lblTitle.ForeColor = Color.FromArgb(51, 51, 51);
-            lblTitle.Location = new Point(150, 30);
+            lblTitle.Location = new Point(277, 24);
             lblTitle.Name = "lblTitle";
             lblTitle.Size = new Size(272, 47);
             lblTitle.TabIndex = 0;
             lblTitle.Text = "请选择点餐模式";
             lblTitle.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // panelDineIn
-            // 
+
             panelDineIn.BackColor = Color.White;
             panelDineIn.BorderStyle = BorderStyle.FixedSingle;
             panelDineIn.Controls.Add(txtTableNumber);
@@ -69,138 +53,128 @@
             panelDineIn.Controls.Add(lblDineInTitle);
             panelDineIn.Controls.Add(picDineIn);
             panelDineIn.Cursor = Cursors.Hand;
-            panelDineIn.Location = new Point(50, 100);
+            panelDineIn.Location = new Point(99, 107);
             panelDineIn.Name = "panelDineIn";
-            panelDineIn.Size = new Size(230, 180);
+            panelDineIn.Size = new Size(273, 339);
             panelDineIn.TabIndex = 1;
-            // 
-            // picDineIn
-            // 
-            picDineIn.BackColor = Color.Transparent;
-            picDineIn.Location = new Point(90, 20);
-            picDineIn.Name = "picDineIn";
-            picDineIn.Size = new Size(50, 50);
-            picDineIn.SizeMode = PictureBoxSizeMode.Zoom;
-            picDineIn.TabIndex = 0;
-            picDineIn.TabStop = false;
-            // 
-            // lblDineInTitle
-            // 
-            lblDineInTitle.AutoSize = true;
-            lblDineInTitle.Font = new Font("微软雅黑", 14F, FontStyle.Bold, GraphicsUnit.Point, 134);
-            lblDineInTitle.ForeColor = Color.FromArgb(255, 87, 34);
-            lblDineInTitle.Location = new Point(52, 73);
-            lblDineInTitle.Name = "lblDineInTitle";
-            lblDineInTitle.Size = new Size(129, 37);
-            lblDineInTitle.TabIndex = 1;
-            lblDineInTitle.Text = "堂食点餐";
-            lblDineInTitle.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lblDineInDesc
-            // 
+
+            txtTableNumber.Font = new Font("微软雅黑", 10F);
+            txtTableNumber.Location = new Point(109, 249);
+            txtTableNumber.MaxLength = 100;
+            txtTableNumber.Name = "txtTableNumber";
+            txtTableNumber.Size = new Size(120, 34);
+            txtTableNumber.TabIndex = 4;
+
+            lblTableNumberLabel.AutoSize = true;
+            lblTableNumberLabel.Font = new Font("微软雅黑", 10F);
+            lblTableNumberLabel.Location = new Point(21, 256);
+            lblTableNumberLabel.Name = "lblTableNumberLabel";
+            lblTableNumberLabel.Size = new Size(72, 27);
+            lblTableNumberLabel.TabIndex = 3;
+            lblTableNumberLabel.Text = "桌号：";
+
             lblDineInDesc.AutoSize = true;
-            lblDineInDesc.Font = new Font("微软雅黑", 10F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            lblDineInDesc.Font = new Font("微软雅黑", 10F);
             lblDineInDesc.ForeColor = Color.Gray;
-            lblDineInDesc.Location = new Point(52, 110);
+            lblDineInDesc.Location = new Point(68, 196);
             lblDineInDesc.Name = "lblDineInDesc";
             lblDineInDesc.Size = new Size(112, 27);
             lblDineInDesc.TabIndex = 2;
             lblDineInDesc.Text = "在餐厅就餐";
             lblDineInDesc.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lblTableNumberLabel
-            // 
-            lblTableNumberLabel.AutoSize = true;
-            lblTableNumberLabel.Font = new Font("微软雅黑", 10F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            lblTableNumberLabel.Location = new Point(20, 145);
-            lblTableNumberLabel.Name = "lblTableNumberLabel";
-            lblTableNumberLabel.Size = new Size(72, 27);
-            lblTableNumberLabel.TabIndex = 3;
-            lblTableNumberLabel.Text = "桌号：";
-            // 
-            // txtTableNumber
-            // 
-            txtTableNumber.Font = new Font("微软雅黑", 10F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            txtTableNumber.Location = new Point(90, 140);
-            txtTableNumber.MaxLength = 100;
-            txtTableNumber.Name = "txtTableNumber";
-            txtTableNumber.Size = new Size(120, 34);
-            txtTableNumber.TabIndex = 4;
-            // 
-            // panelDelivery
-            // 
+
+            lblDineInTitle.AutoSize = true;
+            lblDineInTitle.Font = new Font("微软雅黑", 14F, FontStyle.Bold);
+            lblDineInTitle.ForeColor = Color.FromArgb(255, 87, 34);
+            lblDineInTitle.Location = new Point(68, 159);
+            lblDineInTitle.Name = "lblDineInTitle";
+            lblDineInTitle.Size = new Size(129, 37);
+            lblDineInTitle.TabIndex = 1;
+            lblDineInTitle.Text = "堂食点餐";
+            lblDineInTitle.TextAlign = ContentAlignment.MiddleCenter;
+
+            picDineIn.BackColor = Color.White;
+            picDineIn.Image = Properties.Resources.堂食;
+            picDineIn.Location = new Point(73, 30);
+            picDineIn.Name = "picDineIn";
+            picDineIn.Size = new Size(110, 110);
+            picDineIn.SizeMode = PictureBoxSizeMode.Zoom;
+            picDineIn.TabIndex = 0;
+            picDineIn.TabStop = false;
+
             panelDelivery.BackColor = Color.White;
             panelDelivery.BorderStyle = BorderStyle.FixedSingle;
+            panelDelivery.Controls.Add(lblDeliveryDesc);
             panelDelivery.Controls.Add(lblDeliveryTitle);
             panelDelivery.Controls.Add(picDelivery);
             panelDelivery.Cursor = Cursors.Hand;
-            panelDelivery.Location = new Point(320, 100);
+            panelDelivery.Location = new Point(442, 107);
             panelDelivery.Name = "panelDelivery";
-            panelDelivery.Size = new Size(230, 180);
+            panelDelivery.Size = new Size(279, 339);
             panelDelivery.TabIndex = 2;
-            // 
-            // picDelivery
-            // 
-            picDelivery.Location = new Point(90, 20);
-            picDelivery.Name = "picDelivery";
-            picDelivery.Size = new Size(50, 50);
-            picDelivery.SizeMode = PictureBoxSizeMode.Zoom;
-            picDelivery.TabIndex = 0;
-            picDelivery.TabStop = false;
-            // 
-            // lblDeliveryTitle
-            // 
+
+            lblDeliveryDesc = new Label();
+            lblDeliveryDesc.AutoSize = true;
+            lblDeliveryDesc.Font = new Font("微软雅黑", 10F);
+            lblDeliveryDesc.ForeColor = Color.Gray;
+            lblDeliveryDesc.Location = new Point(74, 196);
+            lblDeliveryDesc.Name = "lblDeliveryDesc";
+            lblDeliveryDesc.Size = new Size(112, 27);
+            lblDeliveryDesc.TabIndex = 3;
+            lblDeliveryDesc.Text = "配送到家";
+            lblDeliveryDesc.TextAlign = ContentAlignment.MiddleCenter;
+
             lblDeliveryTitle.AutoSize = true;
-            lblDeliveryTitle.Font = new Font("微软雅黑", 14F, FontStyle.Bold, GraphicsUnit.Point, 134);
+            lblDeliveryTitle.Font = new Font("微软雅黑", 14F, FontStyle.Bold);
             lblDeliveryTitle.ForeColor = Color.FromArgb(33, 150, 243);
-            lblDeliveryTitle.Location = new Point(54, 73);
+            lblDeliveryTitle.Location = new Point(74, 159);
             lblDeliveryTitle.Name = "lblDeliveryTitle";
             lblDeliveryTitle.Size = new Size(129, 37);
             lblDeliveryTitle.TabIndex = 1;
             lblDeliveryTitle.Text = "外卖点餐";
             lblDeliveryTitle.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lblAddress
-            // 
+
+            picDelivery.Image = Properties.Resources.外卖;
+            picDelivery.Location = new Point(83, 30);
+            picDelivery.Name = "picDelivery";
+            picDelivery.Size = new Size(110, 110);
+            picDelivery.SizeMode = PictureBoxSizeMode.Zoom;
+            picDelivery.TabIndex = 0;
+            picDelivery.TabStop = false;
+
             lblAddress.AutoSize = true;
             lblAddress.Enabled = false;
-            lblAddress.Font = new Font("微软雅黑", 10F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            lblAddress.Location = new Point(50, 300);
+            lblAddress.Font = new Font("微软雅黑", 10F);
+            lblAddress.Location = new Point(168, 480);
             lblAddress.Name = "lblAddress";
             lblAddress.Size = new Size(112, 27);
             lblAddress.TabIndex = 3;
             lblAddress.Text = "配送地址：";
-            // 
-            // txtAddress
-            // 
+
             txtAddress.Enabled = false;
-            txtAddress.Font = new Font("微软雅黑", 10F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            txtAddress.Location = new Point(150, 300);
+            txtAddress.Font = new Font("微软雅黑", 10F);
+            txtAddress.Location = new Point(286, 473);
             txtAddress.MaxLength = 200;
             txtAddress.Name = "txtAddress";
             txtAddress.Size = new Size(400, 34);
             txtAddress.TabIndex = 4;
-            // 
-            // btnConfirm
-            // 
+
             btnConfirm.Cursor = Cursors.Hand;
-            btnConfirm.Customization = "7e3t//Ly8v/r6+v/5ubm/+vr6//f39//p6en/zw8PP8UFBT/gICA/w==";
-            btnConfirm.Font = new Font("微软雅黑", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnConfirm.Image = null;
-            btnConfirm.Location = new Point(220, 340);
+            btnConfirm.Font = new Font("微软雅黑", 12F, FontStyle.Bold);
+            btnConfirm.Location = new Point(320, 537);
             btnConfirm.Name = "btnConfirm";
-            btnConfirm.NoRounding = false;
             btnConfirm.Size = new Size(160, 45);
             btnConfirm.TabIndex = 5;
             btnConfirm.Text = "开始点餐";
-            btnConfirm.Transparent = false;
-            // 
-            // OrderTypeForm
-            // 
+            btnConfirm.FillColor = Color.FromArgb(255, 109, 0);
+            btnConfirm.ForeColor = Color.White;
+            btnConfirm.RectColor = Color.FromArgb(255, 109, 0);
+            btnConfirm.Radius = 6;
+
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ButtonFace;
-            ClientSize = new Size(578, 394);
+            ClientSize = new Size(820, 607);
             Controls.Add(btnConfirm);
             Controls.Add(txtAddress);
             Controls.Add(lblAddress);
@@ -223,8 +197,6 @@
             PerformLayout();
         }
 
-        #endregion
-
         private Label lblTitle;
         private Panel panelDineIn;
         private Label lblDineInTitle;
@@ -235,8 +207,9 @@
         private Panel panelDelivery;
         private Label lblDeliveryTitle;
         private PictureBox picDelivery;
+        private Label lblDeliveryDesc;
         private Label lblAddress;
         private TextBox txtAddress;
-        private ReaLTaiizor.Controls.AirButton btnConfirm;
+        private Sunny.UI.UIButton btnConfirm;
     }
 }
