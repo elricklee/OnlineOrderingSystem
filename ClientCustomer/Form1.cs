@@ -16,41 +16,13 @@ namespace ClientCustomer
         private List<CartItem> _cart = new();
         private string _selectedCategory = "全部";
 
-        private const int PRIMARY_R = 255, PRIMARY_G = 109, PRIMARY_B = 0;
-        private readonly Color PrimaryColor = Color.FromArgb(PRIMARY_R, PRIMARY_G, PRIMARY_B);
-        private readonly Color PrimaryLightColor = Color.FromArgb(255, 243, 224);
-        private readonly Color PrimaryDarkColor = Color.FromArgb(230, 81, 0);
-        private readonly Color TextColor = Color.FromArgb(51, 51, 51);
-        private readonly Color TextSecondaryColor = Color.FromArgb(117, 117, 117);
-        private readonly Color CardBgColor = Color.White;
-        private readonly Color SuccessColor = Color.FromArgb(76, 175, 80);
-        private readonly Color DangerColor = Color.FromArgb(244, 67, 54);
-
-        private UITableLayoutPanel mainLayout = null!;
-        private UIPanel headerPanel = null!;
-        private UILabel lblTitle = null!;
-        private UILabel lblOrderInfo = null!;
-        private UITextBox txtSearch = null!;
-        private UIButton btnSearch = null!;
-        private UIButton btnCheckOrder = null!;
-
-        private UIPanel categoryPanel = null!;
-        private UILabel lblCategoryTitle = null!;
-        private FlowLayoutPanel categoryFlow = null!;
-
-        private Panel dishAreaPanel = null!;
-        private FlowLayoutPanel dishFlowPanel = null!;
-        private UILabel lblNoDish = null!;
-
-        private UIPanel cartBarPanel = null!;
-        private UILabel lblCartSummary = null!;
-        private UIButton btnViewCart = null!;
-        private UIButton btnCheckout = null!;
-
-        private UIPanel aiPanel = null!;
-        private UILabel lblAITitle = null!;
-        private UILabel lblAIText = null!;
-        private UIButton btnGetRecommend = null!;
+        private static readonly Color PrimaryColor = Color.FromArgb(255, 109, 0);
+        private static readonly Color TextColor = Color.FromArgb(51, 51, 51);
+        private static readonly Color TextSecondaryColor = Color.FromArgb(117, 117, 117);
+        private static readonly Color CardBgColor = Color.White;
+        private static readonly Color SuccessColor = Color.FromArgb(76, 175, 80);
+        private static readonly Color DangerColor = Color.FromArgb(244, 67, 54);
+        private static readonly Color PrimaryDarkColor = Color.FromArgb(230, 81, 0);
 
         public Form1(string orderType, string? tableNumber, string? deliveryAddress)
         {
@@ -60,200 +32,25 @@ namespace ClientCustomer
             _tableNumber = tableNumber;
             _deliveryAddress = deliveryAddress;
 
-            InitializeCustomControls();
+            CreateCategoryButtons();
+
             this.Load += Form1_Load;
         }
 
         private void Form1_Load(object? sender, EventArgs e)
         {
+            if (DesignMode) return;
+
             UpdateOrderInfoDisplay();
             _ = LoadDishesAsync();
         }
 
-        private void InitializeCustomControls()
-        {
-            this.BackColor = Color.FromArgb(250, 250, 250);
-            this.Padding = new Padding(0, 36, 0, 0);
-            this.ShowTitle = true;
-            this.TitleColor = PrimaryColor;
-
-            mainLayout = new UITableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 4,
-                BackColor = Color.FromArgb(250, 250, 250),
-                TagString = null
-            };
-            mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
-            mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 65F));
-            mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-
-            CreateHeaderPanel();
-            CreateContentArea();
-            CreateCartBar();
-            CreateAIPanel();
-
-            mainLayout.Controls.Add(headerPanel, 0, 0);
-            mainLayout.Controls.Add(dishAreaPanel, 0, 1);
-            mainLayout.Controls.Add(cartBarPanel, 0, 2);
-            mainLayout.Controls.Add(aiPanel, 0, 3);
-
-            this.Controls.Add(mainLayout);
-        }
-
-        private void CreateHeaderPanel()
-        {
-            headerPanel = new UIPanel
-            {
-                Dock = DockStyle.Fill,
-                FillColor = PrimaryColor,
-                Margin = new Padding(0),
-                TagString = null
-            };
-
-            lblTitle = new UILabel
-            {
-                Text = "珞珈线上点餐系统",
-                Font = new Font("微软雅黑", 16F, FontStyle.Bold),
-                ForeColor = Color.White,
-                Location = new Point(20, 15),
-                Size = new Size(250, 40),
-                TagString = null
-            };
-
-            lblOrderInfo = new UILabel
-            {
-                Text = "",
-                Font = new Font("微软雅黑", 11F),
-                ForeColor = Color.White,
-                Location = new Point(280, 18),
-                Size = new Size(300, 30),
-                TagString = null
-            };
-
-            txtSearch = new UITextBox
-            {
-                Location = new Point(700, 12),
-                Size = new Size(280, 36),
-                Font = new Font("微软雅黑", 10F),
-                FillColor = Color.White,
-                TagString = null,
-                Watermark = "搜索菜品..."
-            };
-
-            btnSearch = new UIButton
-            {
-                Text = "搜索",
-                Location = new Point(990, 12),
-                Size = new Size(80, 36),
-                Font = new Font("微软雅黑", 10F),
-                FillColor = Color.White,
-                ForeColor = PrimaryColor,
-                RectColor = Color.White,
-                TagString = null
-            };
-            btnSearch.Click += BtnSearch_Click;
-
-            btnCheckOrder = new UIButton
-            {
-                Text = "查询订单",
-                Location = new Point(1100, 12),
-                Size = new Size(110, 36),
-                Font = new Font("微软雅黑", 10F),
-                FillColor = Color.FromArgb(255, 255, 255),
-                ForeColor = PrimaryColor,
-                RectColor = Color.White,
-                TagString = null
-            };
-            btnCheckOrder.Click += BtnCheckOrder_Click;
-
-            headerPanel.Controls.AddRange(new Control[] { lblTitle, lblOrderInfo, txtSearch, btnSearch, btnCheckOrder });
-        }
-
-        private void CreateContentArea()
-        {
-            dishAreaPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(250, 250, 250)
-            };
-
-            categoryPanel = new UIPanel
-            {
-                Location = new Point(0, 0),
-                Size = new Size(180, dishAreaPanel.Height),
-                FillColor = Color.White,
-                Margin = new Padding(0),
-                TagString = null
-            };
-            categoryPanel.Dock = DockStyle.Left;
-
-            lblCategoryTitle = new UILabel
-            {
-                Text = "菜品分类",
-                Font = new Font("微软雅黑", 13F, FontStyle.Bold),
-                ForeColor = TextColor,
-                Location = new Point(15, 12),
-                Size = new Size(150, 35),
-                TagString = null
-            };
-
-            categoryFlow = new FlowLayoutPanel
-            {
-                Location = new Point(5, 55),
-                Size = new Size(170, categoryPanel.Height - 60),
-                FlowDirection = FlowDirection.TopDown,
-                WrapContents = false,
-                AutoScroll = true,
-                BackColor = Color.White,
-                Padding = new Padding(5)
-            };
-            categoryFlow.Dock = DockStyle.Fill;
-
-            CreateCategoryButtons();
-
-            categoryPanel.Controls.Add(lblCategoryTitle);
-            categoryPanel.Controls.Add(categoryFlow);
-
-            dishFlowPanel = new FlowLayoutPanel
-            {
-                Location = new Point(185, 0),
-                Size = new Size(dishAreaPanel.Width - 185, dishAreaPanel.Height),
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = true,
-                AutoScroll = true,
-                BackColor = Color.FromArgb(250, 250, 250),
-                Padding = new Padding(10, 10, 10, 10)
-            };
-            dishFlowPanel.Dock = DockStyle.Fill;
-
-            lblNoDish = new UILabel
-            {
-                Text = "暂无菜品数据，请稍后刷新...",
-                Font = new Font("微软雅黑", 14F),
-                ForeColor = TextSecondaryColor,
-                Size = new Size(400, 40),
-                Location = new Point(300, 200),
-                Visible = false,
-                TagString = null
-            };
-
-            dishAreaPanel.Controls.Add(categoryPanel);
-            dishAreaPanel.Controls.Add(dishFlowPanel);
-            dishAreaPanel.Controls.Add(lblNoDish);
-        }
-
         private void CreateCategoryButtons()
         {
-            categoryFlow.Controls.Clear();
-
             string[] categories = { "全部", "热菜", "凉菜", "主食", "饮品", "汤类" };
             foreach (var cat in categories)
             {
-                var btn = new UIButton
+                var catBtn = new UIButton
                 {
                     Text = cat,
                     Size = new Size(155, 40),
@@ -266,107 +63,9 @@ namespace ClientCustomer
                     Cursor = Cursors.Hand,
                     TagString = null
                 };
-                btn.Click += CategoryButton_Click;
-                categoryFlow.Controls.Add(btn);
+                catBtn.Click += CategoryButton_Click;
+                categoryFlow.Controls.Add(catBtn);
             }
-        }
-
-        private void CreateCartBar()
-        {
-            cartBarPanel = new UIPanel
-            {
-                Dock = DockStyle.Fill,
-                FillColor = PrimaryLightColor,
-                Margin = new Padding(0),
-                TagString = null
-            };
-
-            lblCartSummary = new UILabel
-            {
-                Text = "购物车：空",
-                Font = new Font("微软雅黑", 11F),
-                ForeColor = TextColor,
-                Location = new Point(20, 18),
-                Size = new Size(700, 30),
-                TagString = null
-            };
-
-            btnViewCart = new UIButton
-            {
-                Text = "查看购物车",
-                Location = new Point(850, 12),
-                Size = new Size(130, 40),
-                Font = new Font("微软雅黑", 10F, FontStyle.Bold),
-                FillColor = Color.White,
-                ForeColor = PrimaryColor,
-                RectColor = PrimaryColor,
-                Radius = 6,
-                TagString = null
-            };
-            btnViewCart.Click += BtnViewCart_Click;
-
-            btnCheckout = new UIButton
-            {
-                Text = "去结算",
-                Location = new Point(1000, 12),
-                Size = new Size(130, 40),
-                Font = new Font("微软雅黑", 10F, FontStyle.Bold),
-                FillColor = PrimaryColor,
-                ForeColor = Color.White,
-                RectColor = PrimaryColor,
-                Radius = 6,
-                TagString = null
-            };
-            btnCheckout.Click += BtnCheckout_Click;
-
-            cartBarPanel.Controls.AddRange(new Control[] { lblCartSummary, btnViewCart, btnCheckout });
-        }
-
-        private void CreateAIPanel()
-        {
-            aiPanel = new UIPanel
-            {
-                Dock = DockStyle.Fill,
-                FillColor = Color.FromArgb(232, 245, 233),
-                Margin = new Padding(0),
-                TagString = null
-            };
-
-            lblAITitle = new UILabel
-            {
-                Text = "AI推荐：",
-                Font = new Font("微软雅黑", 11F, FontStyle.Bold),
-                ForeColor = SuccessColor,
-                Location = new Point(15, 14),
-                Size = new Size(90, 28),
-                TagString = null
-            };
-
-            lblAIText = new UILabel
-            {
-                Text = "选择菜品后，点击获取AI推荐",
-                Font = new Font("微软雅黑", 10F),
-                ForeColor = TextSecondaryColor,
-                Location = new Point(110, 14),
-                Size = new Size(750, 28),
-                TagString = null
-            };
-
-            btnGetRecommend = new UIButton
-            {
-                Text = "获取推荐",
-                Location = new Point(1100, 8),
-                Size = new Size(110, 36),
-                Font = new Font("微软雅黑", 10F),
-                FillColor = SuccessColor,
-                ForeColor = Color.White,
-                RectColor = SuccessColor,
-                Radius = 6,
-                TagString = null
-            };
-            btnGetRecommend.Click += BtnGetRecommend_Click;
-
-            aiPanel.Controls.AddRange(new Control[] { lblAITitle, lblAIText, btnGetRecommend });
         }
 
         private void UpdateOrderInfoDisplay()
@@ -677,14 +376,8 @@ namespace ClientCustomer
             }
 
             var cartForm = new CartForm(_cart, _orderType, _tableNumber, _deliveryAddress);
-            if (cartForm.ShowDialog(this) == DialogResult.OK)
-            {
-                UpdateCartBar();
-            }
-            else
-            {
-                UpdateCartBar();
-            }
+            cartForm.ShowDialog(this);
+            UpdateCartBar();
         }
 
         private void BtnCheckout_Click(object? sender, EventArgs e)
@@ -696,14 +389,8 @@ namespace ClientCustomer
             }
 
             var cartForm = new CartForm(_cart, _orderType, _tableNumber, _deliveryAddress);
-            if (cartForm.ShowDialog(this) == DialogResult.OK)
-            {
-                UpdateCartBar();
-            }
-            else
-            {
-                UpdateCartBar();
-            }
+            cartForm.ShowDialog(this);
+            UpdateCartBar();
         }
 
         private async void BtnGetRecommend_Click(object? sender, EventArgs e)
