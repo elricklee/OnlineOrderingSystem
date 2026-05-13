@@ -32,8 +32,6 @@ namespace ClientCustomer
             _tableNumber = tableNumber;
             _deliveryAddress = deliveryAddress;
 
-            CreateCategoryButtons();
-
             this.Load += Form1_Load;
         }
 
@@ -43,29 +41,6 @@ namespace ClientCustomer
 
             UpdateOrderInfoDisplay();
             _ = LoadDishesAsync();
-        }
-
-        private void CreateCategoryButtons()
-        {
-            string[] categories = { "全部", "热菜", "凉菜", "主食", "饮品", "汤类" };
-            foreach (var cat in categories)
-            {
-                var catBtn = new UIButton
-                {
-                    Text = cat,
-                    Size = new Size(155, 40),
-                    Font = new Font("微软雅黑", 11F),
-                    FillColor = cat == "全部" ? PrimaryColor : Color.White,
-                    ForeColor = cat == "全部" ? Color.White : TextColor,
-                    RectColor = PrimaryColor,
-                    Radius = 6,
-                    Margin = new Padding(2, 3, 2, 3),
-                    Cursor = Cursors.Hand,
-                    TagString = null
-                };
-                catBtn.Click += CategoryButton_Click;
-                categoryFlow.Controls.Add(catBtn);
-            }
         }
 
         private void UpdateOrderInfoDisplay()

@@ -36,6 +36,12 @@ partial class Form1
         lblAITitle = new Sunny.UI.UILabel();
         lblAIText = new Sunny.UI.UILabel();
         btnGetRecommend = new Sunny.UI.UIButton();
+        btnCategoryAll = new Sunny.UI.UIButton();
+        btnCategoryHot = new Sunny.UI.UIButton();
+        btnCategoryCold = new Sunny.UI.UIButton();
+        btnCategoryStaple = new Sunny.UI.UIButton();
+        btnCategoryDrink = new Sunny.UI.UIButton();
+        btnCategorySoup = new Sunny.UI.UIButton();
         mainLayout.SuspendLayout();
         headerPanel.SuspendLayout();
         dishAreaPanel.SuspendLayout();
@@ -202,6 +208,114 @@ partial class Form1
         categoryFlow.Size = new Size(185, 641);
         categoryFlow.TabIndex = 1;
         categoryFlow.WrapContents = false;
+        categoryFlow.Controls.Add(btnCategoryAll);
+        categoryFlow.Controls.Add(btnCategoryHot);
+        categoryFlow.Controls.Add(btnCategoryCold);
+        categoryFlow.Controls.Add(btnCategoryStaple);
+        categoryFlow.Controls.Add(btnCategoryDrink);
+        categoryFlow.Controls.Add(btnCategorySoup);
+        // 
+        // btnCategoryAll
+        // 
+        btnCategoryAll.Cursor = Cursors.Hand;
+        btnCategoryAll.FillColor = Color.FromArgb(255, 109, 0);
+        btnCategoryAll.Font = new Font("微软雅黑", 11F);
+        btnCategoryAll.ForeColor = Color.White;
+        btnCategoryAll.Margin = new Padding(2, 3, 2, 3);
+        btnCategoryAll.MinimumSize = new Size(1, 1);
+        btnCategoryAll.Name = "btnCategoryAll";
+        btnCategoryAll.Radius = 6;
+        btnCategoryAll.RectColor = Color.FromArgb(255, 109, 0);
+        btnCategoryAll.Size = new Size(155, 40);
+        btnCategoryAll.TabIndex = 2;
+        btnCategoryAll.Text = "全部";
+        btnCategoryAll.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnCategoryAll.Click += CategoryButton_Click;
+        // 
+        // btnCategoryHot
+        // 
+        btnCategoryHot.Cursor = Cursors.Hand;
+        btnCategoryHot.FillColor = Color.White;
+        btnCategoryHot.Font = new Font("微软雅黑", 11F);
+        btnCategoryHot.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryHot.Margin = new Padding(2, 3, 2, 3);
+        btnCategoryHot.MinimumSize = new Size(1, 1);
+        btnCategoryHot.Name = "btnCategoryHot";
+        btnCategoryHot.Radius = 6;
+        btnCategoryHot.RectColor = Color.FromArgb(255, 109, 0);
+        btnCategoryHot.Size = new Size(155, 40);
+        btnCategoryHot.TabIndex = 3;
+        btnCategoryHot.Text = "热菜";
+        btnCategoryHot.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnCategoryHot.Click += CategoryButton_Click;
+        // 
+        // btnCategoryCold
+        // 
+        btnCategoryCold.Cursor = Cursors.Hand;
+        btnCategoryCold.FillColor = Color.White;
+        btnCategoryCold.Font = new Font("微软雅黑", 11F);
+        btnCategoryCold.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryCold.Margin = new Padding(2, 3, 2, 3);
+        btnCategoryCold.MinimumSize = new Size(1, 1);
+        btnCategoryCold.Name = "btnCategoryCold";
+        btnCategoryCold.Radius = 6;
+        btnCategoryCold.RectColor = Color.FromArgb(255, 109, 0);
+        btnCategoryCold.Size = new Size(155, 40);
+        btnCategoryCold.TabIndex = 4;
+        btnCategoryCold.Text = "凉菜";
+        btnCategoryCold.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnCategoryCold.Click += CategoryButton_Click;
+        // 
+        // btnCategoryStaple
+        // 
+        btnCategoryStaple.Cursor = Cursors.Hand;
+        btnCategoryStaple.FillColor = Color.White;
+        btnCategoryStaple.Font = new Font("微软雅黑", 11F);
+        btnCategoryStaple.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryStaple.Margin = new Padding(2, 3, 2, 3);
+        btnCategoryStaple.MinimumSize = new Size(1, 1);
+        btnCategoryStaple.Name = "btnCategoryStaple";
+        btnCategoryStaple.Radius = 6;
+        btnCategoryStaple.RectColor = Color.FromArgb(255, 109, 0);
+        btnCategoryStaple.Size = new Size(155, 40);
+        btnCategoryStaple.TabIndex = 5;
+        btnCategoryStaple.Text = "主食";
+        btnCategoryStaple.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnCategoryStaple.Click += CategoryButton_Click;
+        // 
+        // btnCategoryDrink
+        // 
+        btnCategoryDrink.Cursor = Cursors.Hand;
+        btnCategoryDrink.FillColor = Color.White;
+        btnCategoryDrink.Font = new Font("微软雅黑", 11F);
+        btnCategoryDrink.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryDrink.Margin = new Padding(2, 3, 2, 3);
+        btnCategoryDrink.MinimumSize = new Size(1, 1);
+        btnCategoryDrink.Name = "btnCategoryDrink";
+        btnCategoryDrink.Radius = 6;
+        btnCategoryDrink.RectColor = Color.FromArgb(255, 109, 0);
+        btnCategoryDrink.Size = new Size(155, 40);
+        btnCategoryDrink.TabIndex = 6;
+        btnCategoryDrink.Text = "饮品";
+        btnCategoryDrink.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnCategoryDrink.Click += CategoryButton_Click;
+        // 
+        // btnCategorySoup
+        // 
+        btnCategorySoup.Cursor = Cursors.Hand;
+        btnCategorySoup.FillColor = Color.White;
+        btnCategorySoup.Font = new Font("微软雅黑", 11F);
+        btnCategorySoup.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategorySoup.Margin = new Padding(2, 3, 2, 3);
+        btnCategorySoup.MinimumSize = new Size(1, 1);
+        btnCategorySoup.Name = "btnCategorySoup";
+        btnCategorySoup.Radius = 6;
+        btnCategorySoup.RectColor = Color.FromArgb(255, 109, 0);
+        btnCategorySoup.Size = new Size(155, 40);
+        btnCategorySoup.TabIndex = 7;
+        btnCategorySoup.Text = "汤类";
+        btnCategorySoup.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnCategorySoup.Click += CategoryButton_Click;
         // 
         // dishFlowPanel
         // 
@@ -381,4 +495,10 @@ partial class Form1
     private Sunny.UI.UILabel lblAITitle;
     private Sunny.UI.UILabel lblAIText;
     private Sunny.UI.UIButton btnGetRecommend;
+    private Sunny.UI.UIButton btnCategoryAll;
+    private Sunny.UI.UIButton btnCategoryHot;
+    private Sunny.UI.UIButton btnCategoryCold;
+    private Sunny.UI.UIButton btnCategoryStaple;
+    private Sunny.UI.UIButton btnCategoryDrink;
+    private Sunny.UI.UIButton btnCategorySoup;
 }
