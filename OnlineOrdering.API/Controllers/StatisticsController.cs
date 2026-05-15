@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 using OnlineOrdering.API.DTOs;
 using OnlineOrdering.API.Services;
 using System.Threading.Tasks;
@@ -16,19 +16,24 @@ namespace OnlineOrdering.API.Controllers
 			_statisticsService = statisticsService;
 		}
 
-		//»ñÈ¡ÈÈÏú²ËÆ·TOP5
+		//è·å–çƒ­é”€èœå“TOP N
 		[HttpGet("top-dishes")]
-		public async Task<IActionResult> GetTopDishes()
+		public async Task<IActionResult> GetTopDishes([FromQuery] int topCount = 5, [FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
 		{
-			var result = await _statisticsService.GetTopDishesAsync(5);
+			if (topCount <= 0)
+			{
+				topCount = 5;
+			}
+
+			var result = await _statisticsService.GetTopDishesAsync(topCount, startDate, endDate);
 			return Ok(result);
 		}
 
-		//»ñÈ¡ÓªÊÕÍ³¼Æ£¨×Ü¶©µ¥¡¢×ÜÊÕÈë¡¢Æ½¾ù¿Íµ¥¼Û£©
+		//è·å–è¥æ”¶ç»Ÿè®¡ï¼ˆæ€»è®¢å•ã€æ€»æ”¶å…¥ã€å¹³å‡å®¢å•ä»·ï¼‰
 		[HttpGet("revenue")]
-		public async Task<IActionResult> GetRevenue()
+		public async Task<IActionResult> GetRevenue([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
 		{
-			var result = await _statisticsService.GetRevenueStatsAsync();
+			var result = await _statisticsService.GetRevenueStatsAsync(startDate, endDate);
 			return Ok(result);
 		}
 	}

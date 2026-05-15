@@ -12,7 +12,7 @@ using OnlineOrdering.API.Data;
 namespace OnlineOrdering.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260510111304_InitDB")]
+    [Migration("20260510125606_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -38,11 +38,9 @@ namespace OnlineOrdering.API.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("ImagePath")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsAvailable")

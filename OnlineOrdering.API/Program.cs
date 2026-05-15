@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+锘縰sing Microsoft.EntityFrameworkCore;
 using OnlineOrdering.API.Data;
 using OnlineOrdering.API.Services;
 
@@ -17,7 +17,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IStatisticsService, StatisticsService>();//添加统计服务
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();//娣诲姞缁熻鏈嶅姟
+builder.Services.AddHttpClient<IAiService, AiService>();
 
 builder.Services.AddCors(opt =>
 {

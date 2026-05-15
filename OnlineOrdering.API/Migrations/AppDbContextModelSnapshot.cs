@@ -35,11 +35,9 @@ namespace OnlineOrdering.API.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("ImagePath")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsAvailable")
