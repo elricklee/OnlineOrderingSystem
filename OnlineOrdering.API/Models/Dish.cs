@@ -13,5 +13,8 @@ namespace OnlineOrdering.API.Models
         public bool IsAvailable { get; set; } = true;
 
         public string? Description { get; set; }
+
+        //Âß¼­É¾³ý×Ö¶Î
+        public bool IsDeleted { get; set; } = false;
     }
 }

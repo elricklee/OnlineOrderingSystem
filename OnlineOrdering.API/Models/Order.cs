@@ -20,6 +20,9 @@ namespace OnlineOrdering.API.Models
         public string Status { get; set; } = "Pending";//¶©µ¥×´Ì¬
         public DateTime CreatedAt { get; set; } = DateTime.Now;//´´½¨Ê±¼ä
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+        //Âß¼­É¾³ý×Ö¶Î
+        public bool IsDeleted { get; set; } = false;
     }
 
     public class OrderItem

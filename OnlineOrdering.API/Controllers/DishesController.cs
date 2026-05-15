@@ -35,10 +35,27 @@ namespace OnlineOrdering.API.Controllers
             return ok ? NoContent() : NotFound();
         }
 
+        //Âß¼­É¾³ý
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var ok = await _dishService.DeleteAsync(id);
+            return ok ? NoContent() : NotFound();
+        }
+
+        //ÎïÀíÉ¾³ý
+        [HttpDelete("{id}/hard")]
+        public async Task<IActionResult> HardDelete(int id)
+        {
+            var ok = await _dishService.HardDeleteAsync(id);
+            return ok ? NoContent() : NotFound();
+        }
+
+        //»Ö¸´Âß¼­É¾³ýµÄ²ËÆ·
+        [HttpPut("{id}/restore")]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var ok = await _dishService.RestoreDeletedAsync(id);
             return ok ? NoContent() : NotFound();
         }
     }
