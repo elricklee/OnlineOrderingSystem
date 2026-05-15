@@ -15,10 +15,10 @@ partial class OrderStatusForm
 
     private void InitializeComponent()
     {
-        DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-        DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
-        DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-        DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+        DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+        DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+        DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+        DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
         mainLayout = new Sunny.UI.UITableLayoutPanel();
         queryPanel = new Sunny.UI.UIPanel();
         lblHint = new Sunny.UI.UILabel();
@@ -120,6 +120,7 @@ partial class OrderStatusForm
         btnQuery.Size = new Size(110, 36);
         btnQuery.TabIndex = 2;
         btnQuery.Text = "查询";
+        btnQuery.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         btnQuery.Click += BtnQuery_Click;
         // 
         // grpOrderInfo
@@ -198,7 +199,7 @@ partial class OrderStatusForm
         // 
         // lblStatus
         // 
-        lblStatus.Font = new Font("微软雅黑", 12F, FontStyle.Bold);
+        lblStatus.Font = new Font("微软雅黑", 10F, FontStyle.Bold, GraphicsUnit.Point, 134);
         lblStatus.ForeColor = Color.FromArgb(117, 117, 117);
         lblStatus.Location = new Point(350, 35);
         lblStatus.Name = "lblStatus";
@@ -209,8 +210,8 @@ partial class OrderStatusForm
         // lblTotalAmount
         // 
         lblTotalAmount.Font = new Font("微软雅黑", 12F, FontStyle.Bold);
-        lblTotalAmount.ForeColor = Color.FromArgb(255, 109, 0);
-        lblTotalAmount.Location = new Point(350, 65);
+        lblTotalAmount.ForeColor = Color.Red;
+        lblTotalAmount.Location = new Point(350, 125);
         lblTotalAmount.Name = "lblTotalAmount";
         lblTotalAmount.Size = new Size(300, 30);
         lblTotalAmount.TabIndex = 6;
@@ -220,7 +221,7 @@ partial class OrderStatusForm
         // 
         lblDeliveryFee.Font = new Font("微软雅黑", 10F);
         lblDeliveryFee.ForeColor = Color.FromArgb(51, 51, 51);
-        lblDeliveryFee.Location = new Point(350, 95);
+        lblDeliveryFee.Location = new Point(350, 65);
         lblDeliveryFee.Name = "lblDeliveryFee";
         lblDeliveryFee.Size = new Size(300, 25);
         lblDeliveryFee.TabIndex = 7;
@@ -230,7 +231,7 @@ partial class OrderStatusForm
         // 
         lblCreatedAt.Font = new Font("微软雅黑", 10F);
         lblCreatedAt.ForeColor = Color.FromArgb(51, 51, 51);
-        lblCreatedAt.Location = new Point(350, 125);
+        lblCreatedAt.Location = new Point(350, 95);
         lblCreatedAt.Name = "lblCreatedAt";
         lblCreatedAt.Size = new Size(300, 25);
         lblCreatedAt.TabIndex = 8;
@@ -270,19 +271,19 @@ partial class OrderStatusForm
         // dgvOrderItems
         // 
         dgvOrderItems.AllowUserToAddRows = false;
-        dataGridViewCellStyle5.BackColor = Color.FromArgb(255, 248, 240);
-        dgvOrderItems.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle5;
+        dataGridViewCellStyle1.BackColor = Color.FromArgb(255, 248, 240);
+        dgvOrderItems.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
         dgvOrderItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         dgvOrderItems.BackgroundColor = Color.White;
         dgvOrderItems.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-        dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
-        dataGridViewCellStyle6.BackColor = Color.FromArgb(255, 109, 0);
-        dataGridViewCellStyle6.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        dataGridViewCellStyle6.ForeColor = Color.White;
-        dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
-        dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
-        dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
-        dgvOrderItems.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
+        dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+        dataGridViewCellStyle2.BackColor = Color.FromArgb(255, 109, 0);
+        dataGridViewCellStyle2.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        dataGridViewCellStyle2.ForeColor = Color.White;
+        dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+        dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+        dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+        dgvOrderItems.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
         dgvOrderItems.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
         dgvOrderItems.Dock = DockStyle.Fill;
         dgvOrderItems.EnableHeadersVisualStyles = false;
@@ -292,19 +293,19 @@ partial class OrderStatusForm
         dgvOrderItems.Name = "dgvOrderItems";
         dgvOrderItems.ReadOnly = true;
         dgvOrderItems.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-        dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
-        dataGridViewCellStyle7.BackColor = Color.FromArgb(235, 243, 255);
-        dataGridViewCellStyle7.Font = new Font("微软雅黑", 10F);
-        dataGridViewCellStyle7.ForeColor = Color.FromArgb(48, 48, 48);
-        dataGridViewCellStyle7.SelectionBackColor = Color.FromArgb(80, 160, 255);
-        dataGridViewCellStyle7.SelectionForeColor = Color.White;
-        dataGridViewCellStyle7.WrapMode = DataGridViewTriState.True;
-        dgvOrderItems.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
+        dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+        dataGridViewCellStyle3.BackColor = Color.FromArgb(235, 243, 255);
+        dataGridViewCellStyle3.Font = new Font("微软雅黑", 10F);
+        dataGridViewCellStyle3.ForeColor = Color.FromArgb(48, 48, 48);
+        dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(80, 160, 255);
+        dataGridViewCellStyle3.SelectionForeColor = Color.White;
+        dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+        dgvOrderItems.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
         dgvOrderItems.RowHeadersVisible = false;
         dgvOrderItems.RowHeadersWidth = 62;
-        dataGridViewCellStyle8.BackColor = Color.White;
-        dataGridViewCellStyle8.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        dgvOrderItems.RowsDefaultCellStyle = dataGridViewCellStyle8;
+        dataGridViewCellStyle4.BackColor = Color.White;
+        dataGridViewCellStyle4.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        dgvOrderItems.RowsDefaultCellStyle = dataGridViewCellStyle4;
         dgvOrderItems.SelectedIndex = -1;
         dgvOrderItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         dgvOrderItems.Size = new Size(680, 177);

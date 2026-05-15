@@ -26,6 +26,12 @@ partial class Form1
         categoryPanel = new Sunny.UI.UIPanel();
         lblCategoryTitle = new Sunny.UI.UILabel();
         categoryFlow = new FlowLayoutPanel();
+        btnCategoryAll = new Sunny.UI.UIButton();
+        btnCategoryHot = new Sunny.UI.UIButton();
+        btnCategoryCold = new Sunny.UI.UIButton();
+        btnCategoryStaple = new Sunny.UI.UIButton();
+        btnCategoryDrink = new Sunny.UI.UIButton();
+        btnCategorySoup = new Sunny.UI.UIButton();
         dishFlowPanel = new FlowLayoutPanel();
         lblNoDish = new Sunny.UI.UILabel();
         cartBarPanel = new Sunny.UI.UIPanel();
@@ -36,16 +42,11 @@ partial class Form1
         lblAITitle = new Sunny.UI.UILabel();
         lblAIText = new Sunny.UI.UILabel();
         btnGetRecommend = new Sunny.UI.UIButton();
-        btnCategoryAll = new Sunny.UI.UIButton();
-        btnCategoryHot = new Sunny.UI.UIButton();
-        btnCategoryCold = new Sunny.UI.UIButton();
-        btnCategoryStaple = new Sunny.UI.UIButton();
-        btnCategoryDrink = new Sunny.UI.UIButton();
-        btnCategorySoup = new Sunny.UI.UIButton();
         mainLayout.SuspendLayout();
         headerPanel.SuspendLayout();
         dishAreaPanel.SuspendLayout();
         categoryPanel.SuspendLayout();
+        categoryFlow.SuspendLayout();
         cartBarPanel.SuspendLayout();
         aiPanel.SuspendLayout();
         SuspendLayout();
@@ -92,9 +93,10 @@ partial class Form1
         // 
         // lblTitle
         // 
+        lblTitle.BackColor = Color.FromArgb(255, 109, 0);
         lblTitle.Font = new Font("微软雅黑", 16F, FontStyle.Bold);
         lblTitle.ForeColor = Color.Black;
-        lblTitle.Location = new Point(20, 15);
+        lblTitle.Location = new Point(20, 8);
         lblTitle.Name = "lblTitle";
         lblTitle.Size = new Size(276, 40);
         lblTitle.TabIndex = 0;
@@ -102,13 +104,15 @@ partial class Form1
         // 
         // lblOrderInfo
         // 
-        lblOrderInfo.BackColor = Color.White;
+        lblOrderInfo.BackColor = Color.FromArgb(255, 109, 0);
         lblOrderInfo.Font = new Font("微软雅黑", 11F);
         lblOrderInfo.ForeColor = Color.White;
         lblOrderInfo.Location = new Point(318, 18);
         lblOrderInfo.Name = "lblOrderInfo";
         lblOrderInfo.Size = new Size(262, 30);
         lblOrderInfo.TabIndex = 1;
+        lblOrderInfo.Text = "指尖点好菜，珞珈好味来";
+        lblOrderInfo.Click += lblOrderInfo_Click;
         // 
         // txtSearch
         // 
@@ -200,6 +204,12 @@ partial class Form1
         // 
         categoryFlow.AutoScroll = true;
         categoryFlow.BackColor = Color.White;
+        categoryFlow.Controls.Add(btnCategoryAll);
+        categoryFlow.Controls.Add(btnCategoryHot);
+        categoryFlow.Controls.Add(btnCategoryCold);
+        categoryFlow.Controls.Add(btnCategoryStaple);
+        categoryFlow.Controls.Add(btnCategoryDrink);
+        categoryFlow.Controls.Add(btnCategorySoup);
         categoryFlow.Dock = DockStyle.Fill;
         categoryFlow.FlowDirection = FlowDirection.TopDown;
         categoryFlow.Location = new Point(0, 0);
@@ -208,19 +218,13 @@ partial class Form1
         categoryFlow.Size = new Size(185, 641);
         categoryFlow.TabIndex = 1;
         categoryFlow.WrapContents = false;
-        categoryFlow.Controls.Add(btnCategoryAll);
-        categoryFlow.Controls.Add(btnCategoryHot);
-        categoryFlow.Controls.Add(btnCategoryCold);
-        categoryFlow.Controls.Add(btnCategoryStaple);
-        categoryFlow.Controls.Add(btnCategoryDrink);
-        categoryFlow.Controls.Add(btnCategorySoup);
         // 
         // btnCategoryAll
         // 
         btnCategoryAll.Cursor = Cursors.Hand;
         btnCategoryAll.FillColor = Color.FromArgb(255, 109, 0);
         btnCategoryAll.Font = new Font("微软雅黑", 11F);
-        btnCategoryAll.ForeColor = Color.White;
+        btnCategoryAll.Location = new Point(7, 8);
         btnCategoryAll.Margin = new Padding(2, 3, 2, 3);
         btnCategoryAll.MinimumSize = new Size(1, 1);
         btnCategoryAll.Name = "btnCategoryAll";
@@ -238,6 +242,7 @@ partial class Form1
         btnCategoryHot.FillColor = Color.White;
         btnCategoryHot.Font = new Font("微软雅黑", 11F);
         btnCategoryHot.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryHot.Location = new Point(7, 54);
         btnCategoryHot.Margin = new Padding(2, 3, 2, 3);
         btnCategoryHot.MinimumSize = new Size(1, 1);
         btnCategoryHot.Name = "btnCategoryHot";
@@ -255,6 +260,7 @@ partial class Form1
         btnCategoryCold.FillColor = Color.White;
         btnCategoryCold.Font = new Font("微软雅黑", 11F);
         btnCategoryCold.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryCold.Location = new Point(7, 100);
         btnCategoryCold.Margin = new Padding(2, 3, 2, 3);
         btnCategoryCold.MinimumSize = new Size(1, 1);
         btnCategoryCold.Name = "btnCategoryCold";
@@ -272,6 +278,7 @@ partial class Form1
         btnCategoryStaple.FillColor = Color.White;
         btnCategoryStaple.Font = new Font("微软雅黑", 11F);
         btnCategoryStaple.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryStaple.Location = new Point(7, 146);
         btnCategoryStaple.Margin = new Padding(2, 3, 2, 3);
         btnCategoryStaple.MinimumSize = new Size(1, 1);
         btnCategoryStaple.Name = "btnCategoryStaple";
@@ -289,6 +296,7 @@ partial class Form1
         btnCategoryDrink.FillColor = Color.White;
         btnCategoryDrink.Font = new Font("微软雅黑", 11F);
         btnCategoryDrink.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategoryDrink.Location = new Point(7, 192);
         btnCategoryDrink.Margin = new Padding(2, 3, 2, 3);
         btnCategoryDrink.MinimumSize = new Size(1, 1);
         btnCategoryDrink.Name = "btnCategoryDrink";
@@ -306,6 +314,7 @@ partial class Form1
         btnCategorySoup.FillColor = Color.White;
         btnCategorySoup.Font = new Font("微软雅黑", 11F);
         btnCategorySoup.ForeColor = Color.FromArgb(51, 51, 51);
+        btnCategorySoup.Location = new Point(7, 238);
         btnCategorySoup.Margin = new Padding(2, 3, 2, 3);
         btnCategorySoup.MinimumSize = new Size(1, 1);
         btnCategorySoup.Name = "btnCategorySoup";
@@ -327,6 +336,7 @@ partial class Form1
         dishFlowPanel.Padding = new Padding(10);
         dishFlowPanel.Size = new Size(1372, 641);
         dishFlowPanel.TabIndex = 0;
+        dishFlowPanel.Paint += dishFlowPanel_Paint;
         // 
         // lblNoDish
         // 
@@ -469,6 +479,7 @@ partial class Form1
         headerPanel.ResumeLayout(false);
         dishAreaPanel.ResumeLayout(false);
         categoryPanel.ResumeLayout(false);
+        categoryFlow.ResumeLayout(false);
         cartBarPanel.ResumeLayout(false);
         aiPanel.ResumeLayout(false);
         ResumeLayout(false);

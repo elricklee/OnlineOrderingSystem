@@ -428,5 +428,15 @@ namespace ClientCustomer
             if (string.IsNullOrEmpty(text)) return "";
             return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
         }
+
+        private void lblOrderInfo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dishFlowPanel_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
