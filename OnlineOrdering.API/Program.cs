@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OnlineOrdering.API.Data;
 using OnlineOrdering.API.Services;
 
@@ -37,5 +37,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+app.UseStaticFiles();
 app.MapControllers();
 app.Run();

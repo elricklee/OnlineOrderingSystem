@@ -165,8 +165,8 @@ partial class Form1
         // dishAreaPanel
         // 
         dishAreaPanel.BackColor = Color.FromArgb(250, 250, 250);
-        dishAreaPanel.Controls.Add(categoryPanel);
         dishAreaPanel.Controls.Add(dishFlowPanel);
+        dishAreaPanel.Controls.Add(categoryPanel);
         dishAreaPanel.Controls.Add(lblNoDish);
         dishAreaPanel.Dock = DockStyle.Fill;
         dishAreaPanel.Location = new Point(3, 63);
@@ -331,11 +331,11 @@ partial class Form1
         dishFlowPanel.AutoScroll = true;
         dishFlowPanel.BackColor = Color.FromArgb(250, 250, 250);
         dishFlowPanel.Dock = DockStyle.Fill;
-        dishFlowPanel.Location = new Point(0, 0);
+        dishFlowPanel.Location = new Point(185, 0);
         dishFlowPanel.Name = "dishFlowPanel";
-        dishFlowPanel.Padding = new Padding(10);
-        dishFlowPanel.Size = new Size(1372, 641);
-        dishFlowPanel.TabIndex = 0;
+        dishFlowPanel.Padding = new Padding(15, 10, 10, 10);
+        dishFlowPanel.Size = new Size(1187, 641);
+        dishFlowPanel.TabIndex = 2;
         dishFlowPanel.Paint += dishFlowPanel_Paint;
         // 
         // lblNoDish
