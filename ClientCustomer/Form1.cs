@@ -336,6 +336,33 @@ namespace ClientCustomer
             FilterDishes();
         }
 
+        private async void BtnRefresh_Click(object? sender, EventArgs e)
+        {
+            btnRefresh.Enabled = false;
+            btnRefresh.Text = "刷新中...";
+
+            try
+            {
+                await LoadDishesAsync();
+                UIMessageTip.ShowOk("菜品列表已刷新");
+            }
+            catch (Exception ex)
+            {
+                UIMessageTip.ShowError($"刷新失败：{ex.Message}");
+            }
+            finally
+            {
+                btnRefresh.Enabled = true;
+                btnRefresh.Text = "刷新";
+            }
+        }
+
+        private void BtnBack_Click(object? sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Retry;
+            this.Close();
+        }
+
         private void BtnCheckOrder_Click(object? sender, EventArgs e)
         {
             var orderStatusForm = new OrderStatusForm();

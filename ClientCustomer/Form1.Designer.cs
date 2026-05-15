@@ -21,6 +21,8 @@ partial class Form1
         lblOrderInfo = new Sunny.UI.UILabel();
         txtSearch = new Sunny.UI.UITextBox();
         btnSearch = new Sunny.UI.UIButton();
+        btnRefresh = new Sunny.UI.UIButton();
+        btnBack = new Sunny.UI.UIButton();
         btnCheckOrder = new Sunny.UI.UIButton();
         dishAreaPanel = new Panel();
         categoryPanel = new Sunny.UI.UIPanel();
@@ -78,6 +80,8 @@ partial class Form1
         headerPanel.Controls.Add(lblOrderInfo);
         headerPanel.Controls.Add(txtSearch);
         headerPanel.Controls.Add(btnSearch);
+        headerPanel.Controls.Add(btnRefresh);
+        headerPanel.Controls.Add(btnBack);
         headerPanel.Controls.Add(btnCheckOrder);
         headerPanel.Dock = DockStyle.Fill;
         headerPanel.FillColor = Color.FromArgb(255, 109, 0);
@@ -145,13 +149,47 @@ partial class Form1
         btnSearch.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         btnSearch.Click += BtnSearch_Click;
         // 
+        // btnRefresh
+        // 
+        btnRefresh.Cursor = Cursors.Hand;
+        btnRefresh.FillColor = Color.White;
+        btnRefresh.Font = new Font("微软雅黑", 10F);
+        btnRefresh.ForeColor = Color.FromArgb(255, 109, 0);
+        btnRefresh.Location = new Point(1080, 12);
+        btnRefresh.MinimumSize = new Size(1, 1);
+        btnRefresh.Name = "btnRefresh";
+        btnRefresh.Radius = 6;
+        btnRefresh.RectColor = Color.White;
+        btnRefresh.Size = new Size(80, 36);
+        btnRefresh.TabIndex = 5;
+        btnRefresh.Text = "刷新";
+        btnRefresh.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnRefresh.Click += BtnRefresh_Click;
+        // 
+        // btnBack
+        // 
+        btnBack.Cursor = Cursors.Hand;
+        btnBack.FillColor = Color.White;
+        btnBack.Font = new Font("微软雅黑", 10F);
+        btnBack.ForeColor = Color.FromArgb(255, 109, 0);
+        btnBack.Location = new Point(1165, 12);
+        btnBack.MinimumSize = new Size(1, 1);
+        btnBack.Name = "btnBack";
+        btnBack.Radius = 6;
+        btnBack.RectColor = Color.White;
+        btnBack.Size = new Size(80, 36);
+        btnBack.TabIndex = 6;
+        btnBack.Text = "返回";
+        btnBack.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnBack.Click += BtnBack_Click;
+        // 
         // btnCheckOrder
         // 
         btnCheckOrder.Cursor = Cursors.Hand;
         btnCheckOrder.FillColor = Color.FromArgb(255, 255, 255);
         btnCheckOrder.Font = new Font("微软雅黑", 10F);
         btnCheckOrder.ForeColor = Color.FromArgb(255, 109, 0);
-        btnCheckOrder.Location = new Point(1100, 12);
+        btnCheckOrder.Location = new Point(1250, 12);
         btnCheckOrder.MinimumSize = new Size(1, 1);
         btnCheckOrder.Name = "btnCheckOrder";
         btnCheckOrder.Radius = 6;
@@ -491,6 +529,8 @@ partial class Form1
     private Sunny.UI.UILabel lblOrderInfo;
     private Sunny.UI.UITextBox txtSearch;
     private Sunny.UI.UIButton btnSearch;
+    private Sunny.UI.UIButton btnRefresh;
+    private Sunny.UI.UIButton btnBack;
     private Sunny.UI.UIButton btnCheckOrder;
     private Sunny.UI.UIPanel categoryPanel;
     private Sunny.UI.UILabel lblCategoryTitle;

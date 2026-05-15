@@ -10,15 +10,26 @@ namespace ClientCustomer
         {
             ApplicationConfiguration.Initialize();
 
-            using (var orderTypeForm = new OrderTypeForm())
+            bool restartOrderType = true;
+            while (restartOrderType)
             {
-                if (orderTypeForm.ShowDialog() == DialogResult.OK)
+                restartOrderType = false;
+                
+                using (var orderTypeForm = new OrderTypeForm())
                 {
-                    Application.Run(new Form1(
-                        orderTypeForm.OrderType,
-                        orderTypeForm.TableNumber,
-                        orderTypeForm.DeliveryAddress
-                    ));
+                    if (orderTypeForm.ShowDialog() == DialogResult.OK)
+                    {
+                        var mainForm = new Form1(
+                            orderTypeForm.OrderType,
+                            orderTypeForm.TableNumber,
+                            orderTypeForm.DeliveryAddress
+                        );
+                        
+                        if (mainForm.ShowDialog() == DialogResult.Retry)
+                        {
+                            restartOrderType = true;
+                        }
+                    }
                 }
             }
         }

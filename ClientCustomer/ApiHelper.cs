@@ -44,7 +44,7 @@ namespace ClientCustomer
         {
             var json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _client.PostAsync("api/ai/recommend", content);
+            var response = await _client.PostAsync("api/ai/recommend-dish", content);
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<RecommendationResponseDto>(responseJson)
