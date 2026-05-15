@@ -28,5 +28,18 @@ namespace OnlineOrdering.API.Controllers
             var result = await _aiService.GetOperationSuggestionsAsync(dto.StartDate, dto.EndDate, dto.TopCount);
             return Ok(result);
         }
+
+        //菜品推荐接口
+        [HttpPost("recommend-dish")]
+        public async Task<IActionResult> GetDishRecommendations([FromBody] AiRecommendRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _aiService.GetDishRecommendationsAsync(request);
+            return Ok(result);
+        }
     }
 }

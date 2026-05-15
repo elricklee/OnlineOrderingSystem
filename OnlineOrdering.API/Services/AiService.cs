@@ -30,6 +30,106 @@ namespace OnlineOrdering.API.Services
             _httpClient = httpClient;
         }
 
+        //AI菜品推荐
+        public async Task<AiRecommendResponseDto> GetDishRecommendationsAsync(AiRecommendRequestDto request)
+        {
+            var apiKey = _configuration["ZhipuAI:ApiKey"];
+            if (string.IsNullOrWhiteSpace(apiKey))
+                throw new Exception("请配置 ZhipuAI:ApiKey");
+
+            //拿到数据库里真实的菜品
+            var allDishes = await _db.Dishes.ToListAsync();
+            var dishListStr = string.Join("\n", allDishes.Select(d => $"- {d.Id}：{d.Name}，{d.Description}"));
+
+            string jsonTemplate = @"
+{
+  ""recommendations"": [
+    {
+      ""dishId"": 数字,
+      ""dishName"": ""菜名"",
+      ""reason"": ""推荐理由""
+    }
+  ]
+}";
+
+            var systemPrompt = $"""
+你是餐厅智能推荐助手，根据用户已选菜品 + 口味偏好推荐菜品。
+餐厅所有菜品：
+{dishListStr}
+
+规则：
+1. 只推荐餐厅里真实存在的菜品
+2. 必须**只返回JSON**，不要任何解释、不要Markdown、不要多余文字
+3. 推荐 2~4 道菜品
+4. 理由必须结合用户偏好和已选菜品搭配
+5. 格式必须严格如下：
+{jsonTemplate}
+""";
+
+            var userPrompt = $"已选菜品：{string.Join("、", request.CurrentItems.Select(x => x.DishName))}\n用户偏好：{request.Preferences}";
+
+            var requestBody = new
+            {
+                model = DefaultModel,
+                messages = new[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = userPrompt }
+                },
+                temperature = 0.7,
+                response_format = new { type = "json_object" }
+            };
+
+            var json = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
+            var resp = await _httpClient.PostAsync(DefaultEndpoint, content);
+            var respJson = await resp.Content.ReadAsStringAsync();
+
+            if (!resp.IsSuccessStatusCode)
+                throw new Exception($"AI 调用失败：{respJson}");
+
+            var aiResult = JsonDocument.Parse(respJson).RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString()!;
+
+            Console.WriteLine("AI原始返回内容：");
+            Console.WriteLine(aiResult);
+
+            //容错解析
+            try
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<AiRecommendResponseDto>(aiResult, options);
+                if (result?.Recommendations != null && result.Recommendations.Any())
+                {
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("解析JSON失败：" + ex.Message);
+            }
+
+            //解析失败时，返回一个默认的非空推荐
+            return new AiRecommendResponseDto
+            {
+                Recommendations = new List<AiRecommendationDto>
+                {
+                    new AiRecommendationDto
+                    {
+                        DishId = allDishes.FirstOrDefault()?.Id ?? 1,
+                        DishName = allDishes.FirstOrDefault()?.Name ?? "招牌菜",
+                        Reason = "为您推荐本店热门菜品，适配您的口味偏好"
+                    }
+                }
+            };
+        }
+
+        //经营建议
         public async Task<AiOperationSuggestResponseDto> GetOperationSuggestionsAsync(DateTime? startDate = null, DateTime? endDate = null, int topCount = 5)
         {
             var apiKey = _configuration["ZhipuAI:ApiKey"] ?? Environment.GetEnvironmentVariable("ZHIPU_API_KEY");
