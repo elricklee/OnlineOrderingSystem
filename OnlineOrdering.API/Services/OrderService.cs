@@ -59,6 +59,12 @@ namespace OnlineOrdering.API.Services
             return list.Select(MapToDto).ToList();
         }
 
+        public async Task<OrderDto?> GetOrderByIdAsync(int id)
+        {
+            var order = await _db.Orders.Include(x => x.OrderItems).FirstOrDefaultAsync(x => x.Id == id);
+            return order == null ? null : MapToDto(order);
+        }
+
         private OrderDto MapToDto(Order order)
         {
             return new OrderDto

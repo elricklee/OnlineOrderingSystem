@@ -14,6 +14,13 @@ namespace OnlineOrdering.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll() => Ok(await _orderService.GetAllOrdersAsync());
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var order = await _orderService.GetOrderByIdAsync(id);
+            return order == null ? NotFound() : Ok(order);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(OrderCreateDto dto)
         {

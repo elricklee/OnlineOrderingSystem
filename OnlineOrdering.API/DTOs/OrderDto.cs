@@ -13,7 +13,7 @@ namespace OnlineOrdering.API.DTOs
     public class OrderCreateDto
     {
         [Required] public string CustomerName { get; set; } = string.Empty;
-        [Required] public string Phone { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
         [Required] public string OrderType { get; set; } = "DineIn";
         public string? TableNumber { get; set; }
         public string? Address { get; set; }

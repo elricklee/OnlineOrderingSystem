@@ -7,5 +7,6 @@ namespace OnlineOrdering.API.Services
         Task<OrderDto> CreateOrderAsync(OrderCreateDto dto);
         Task<OrderDto?> UpdateOrderStatusAsync(int id, string status);
         Task<List<OrderDto>> GetAllOrdersAsync();
+        Task<OrderDto?> GetOrderByIdAsync(int id);
     }
 }

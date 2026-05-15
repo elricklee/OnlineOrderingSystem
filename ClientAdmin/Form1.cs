@@ -1,4 +1,4 @@
-﻿using ClientAdmin.Helpers;
+using ClientAdmin.Helpers;
 using ClientAdmin.Models;
 using Sunny.UI;
 using System;
@@ -17,6 +17,19 @@ namespace ClientAdmin
         private int? selectedOrderId = null;
         private int? selectedProductId = null;
         private System.Collections.Generic.List<TopDishStatDto> currentTopDishes = new();
+
+        private static readonly System.Collections.Generic.Dictionary<string, string> StatusMap = new()
+        {
+            { "待处理", "Pending" },
+            { "已确认", "Confirmed" },
+            { "制作中", "Preparing" },
+            { "已出餐", "Ready" },
+            { "配送中", "Delivering" },
+            { "已完成", "Completed" },
+            { "已取消", "Cancelled" }
+        };
+
+        private static readonly System.Collections.Generic.Dictionary<string, string> StatusMapReverse = StatusMap.ToDictionary(x => x.Value, x => x.Key);
         public Form1()
         {
             InitializeComponent();
@@ -472,13 +485,13 @@ namespace ClientAdmin
             dgvOrderItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             cmbOrderStatus.Items.Clear();
-            cmbOrderStatus.Items.Add("Pending");
-            cmbOrderStatus.Items.Add("Confirmed");
-            cmbOrderStatus.Items.Add("Preparing");
-            cmbOrderStatus.Items.Add("Ready");
-            cmbOrderStatus.Items.Add("Delivering");
-            cmbOrderStatus.Items.Add("Completed");
-            cmbOrderStatus.Items.Add("Cancelled");
+            cmbOrderStatus.Items.Add("待处理");
+            cmbOrderStatus.Items.Add("已确认");
+            cmbOrderStatus.Items.Add("制作中");
+            cmbOrderStatus.Items.Add("已出餐");
+            cmbOrderStatus.Items.Add("配送中");
+            cmbOrderStatus.Items.Add("已完成");
+            cmbOrderStatus.Items.Add("已取消");
 
             if (cmbOrderStatus.Items.Count > 0)
             {
@@ -486,6 +499,20 @@ namespace ClientAdmin
             }
 
             ClearOrderDetail();
+
+            dgvOrders.CellFormatting += DgvOrders_CellFormatting;
+        }
+
+        private void DgvOrders_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+            var col = dgvOrders.Columns[e.ColumnIndex];
+            if (col?.Name == "Status" && e.Value is string status)
+            {
+                e.Value = StatusMapReverse.GetValueOrDefault(status, status);
+                e.FormattingApplied = true;
+            }
         }
 
         private async Task LoadOrdersAsync()
@@ -597,13 +624,14 @@ namespace ClientAdmin
 
             selectedOrderId = order.Id;
 
-            if (cmbOrderStatus.Items.Contains(order.Status))
+            var chineseStatus = StatusMapReverse.GetValueOrDefault(order.Status, order.Status);
+            if (cmbOrderStatus.Items.Contains(chineseStatus))
             {
-                cmbOrderStatus.SelectedItem = order.Status;
+                cmbOrderStatus.SelectedItem = chineseStatus;
             }
             else
             {
-                cmbOrderStatus.Text = order.Status;
+                cmbOrderStatus.Text = chineseStatus;
             }
 
             ShowOrderDetail(order);
@@ -621,7 +649,7 @@ namespace ClientAdmin
             lblNote.Text = $"备注：{GetDisplayText(order.Note)}";
             lblDeliveryFee.Text = $"配送费：{order.DeliveryFee:0.00} 元";
             lblTotalAmount.Text = $"总金额：{order.TotalAmount:0.00} 元";
-            lblStatus.Text = $"状态：{order.Status}";
+            lblStatus.Text = $"状态：{StatusMapReverse.GetValueOrDefault(order.Status, order.Status)}";
             lblCreatedAt.Text = $"创建时间：{order.CreatedAt:yyyy-MM-dd HH:mm:ss}";
         }
 
@@ -641,18 +669,20 @@ namespace ClientAdmin
                 return;
             }
 
-            var newStatus = cmbOrderStatus.SelectedItem?.ToString();
+            var newStatusChinese = cmbOrderStatus.SelectedItem?.ToString();
 
-            if (string.IsNullOrWhiteSpace(newStatus))
+            if (string.IsNullOrWhiteSpace(newStatusChinese))
             {
-                newStatus = cmbOrderStatus.Text;
+                newStatusChinese = cmbOrderStatus.Text;
             }
 
-            if (string.IsNullOrWhiteSpace(newStatus))
+            if (string.IsNullOrWhiteSpace(newStatusChinese))
             {
                 MessageBox.Show("请选择订单状态");
                 return;
             }
+
+            var newStatus = StatusMap.GetValueOrDefault(newStatusChinese, newStatusChinese);
 
             try
             {
