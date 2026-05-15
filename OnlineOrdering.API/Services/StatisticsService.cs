@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+锘縰sing Microsoft.EntityFrameworkCore;
 using OnlineOrdering.API.Data;
 using OnlineOrdering.API.DTOs;
 using OnlineOrdering.API.Models;
@@ -16,10 +16,15 @@ namespace OnlineOrdering.API.Services
             _db = db;
         }
 
-        //获取热销菜品TOP N
-        public async Task<List<TopDishDto>> GetTopDishesAsync(int count = 5)
+        //鑾峰彇鐑攢鑿滃搧TOP N
+        public async Task<List<TopDishDto>> GetTopDishesAsync(int count = 5, DateTime? startDate = null, DateTime? endDate = null)
         {
+            var normalizedCount = Math.Clamp(count, 1, 50);
+            var filteredOrders = FilterOrders(_db.Orders.AsNoTracking(), startDate, endDate);
+
             return await _db.OrderItems
+                .AsNoTracking()
+                .Where(item => filteredOrders.Select(order => order.Id).Contains(item.OrderId))
                 .GroupBy(o => new { o.DishId, o.DishName, o.Price })
                 .Select(g => new TopDishDto
                 {
@@ -29,14 +34,15 @@ namespace OnlineOrdering.API.Services
                     TotalRevenue = g.Sum(x => x.Quantity * x.Price)
                 })
                 .OrderByDescending(t => t.TotalQuantity)
-                .Take(count)
+                .ThenByDescending(t => t.TotalRevenue)
+                .Take(normalizedCount)
                 .ToListAsync();
         }
 
-        //营收统计
-        public async Task<RevenueStatDto> GetRevenueStatsAsync()
+        //钀ユ敹缁熻
+        public async Task<RevenueStatDto> GetRevenueStatsAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            var orders = await _db.Orders.ToListAsync();
+            var orders = await FilterOrders(_db.Orders.AsNoTracking(), startDate, endDate).ToListAsync();
 
             return new RevenueStatDto
             {
@@ -46,6 +52,25 @@ namespace OnlineOrdering.API.Services
                     ? 0
                     : orders.Sum(o => o.TotalAmount) / orders.Count
             };
+        }
+
+        private IQueryable<Order> FilterOrders(IQueryable<Order> query, DateTime? startDate, DateTime? endDate)
+        {
+            query = query.Where(order => order.Status != "Cancelled");
+
+            if (startDate.HasValue)
+            {
+                var start = startDate.Value.Date;
+                query = query.Where(order => order.CreatedAt >= start);
+            }
+
+            if (endDate.HasValue)
+            {
+                var endExclusive = endDate.Value.Date.AddDays(1);
+                query = query.Where(order => order.CreatedAt < endExclusive);
+            }
+
+            return query;
         }
     }
 }

@@ -40,6 +40,7 @@ partial class Form1
         DataGridViewCellStyle dataGridViewCellStyle23 = new DataGridViewCellStyle();
         DataGridViewCellStyle dataGridViewCellStyle24 = new DataGridViewCellStyle();
         DataGridViewCellStyle dataGridViewCellStyle25 = new DataGridViewCellStyle();
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
         tabMain = new Sunny.UI.UITabControl();
         tabDishes = new TabPage();
         layoutDishPage = new Sunny.UI.UITableLayoutPanel();
@@ -57,7 +58,7 @@ partial class Form1
         chkIsAvailable = new Sunny.UI.UICheckBox();
         lblDescription = new Sunny.UI.UILabel();
         txtDescription = new Sunny.UI.UITextBox();
-        pictureBox1 = new PictureBox();
+        picDishImage = new PictureBox();
         btnAddDish = new Sunny.UI.UIButton();
         btnUpdateDish = new Sunny.UI.UIButton();
         btnDeleteDish = new Sunny.UI.UIButton();
@@ -133,7 +134,7 @@ partial class Form1
         layoutDishPage.SuspendLayout();
         grpDishEdit.SuspendLayout();
         layoutDishEdit.SuspendLayout();
-        ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)picDishImage).BeginInit();
         ((System.ComponentModel.ISupportInitialize)dgvDishes).BeginInit();
         tabOrders.SuspendLayout();
         layoutOrderPage.SuspendLayout();
@@ -252,7 +253,7 @@ partial class Form1
         layoutDishEdit.Controls.Add(chkIsAvailable, 5, 1);
         layoutDishEdit.Controls.Add(lblDescription, 0, 3);
         layoutDishEdit.Controls.Add(txtDescription, 1, 3);
-        layoutDishEdit.Controls.Add(pictureBox1, 4, 3);
+        layoutDishEdit.Controls.Add(picDishImage, 4, 3);
         layoutDishEdit.Controls.Add(btnAddDish, 0, 4);
         layoutDishEdit.Controls.Add(btnUpdateDish, 1, 4);
         layoutDishEdit.Controls.Add(btnDeleteDish, 2, 4);
@@ -391,6 +392,7 @@ partial class Form1
         btnChooseImage.TabIndex = 12;
         btnChooseImage.Text = "选择图片";
         btnChooseImage.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnChooseImage.Click += btnChooseImage_Click;
         // 
         // chkIsAvailable
         // 
@@ -436,18 +438,19 @@ partial class Form1
         txtDescription.TextAlignment = ContentAlignment.MiddleLeft;
         txtDescription.Watermark = "";
         // 
-        // pictureBox1
+        // picDishImage
         // 
-        pictureBox1.Anchor = AnchorStyles.None;
-        pictureBox1.BorderStyle = BorderStyle.FixedSingle;
-        layoutDishEdit.SetColumnSpan(pictureBox1, 2);
-        pictureBox1.Location = new Point(766, 190);
-        pictureBox1.Name = "pictureBox1";
-        layoutDishEdit.SetRowSpan(pictureBox1, 2);
-        pictureBox1.Size = new Size(257, 103);
-        pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-        pictureBox1.TabIndex = 18;
-        pictureBox1.TabStop = false;
+        picDishImage.Anchor = AnchorStyles.None;
+        picDishImage.BorderStyle = BorderStyle.FixedSingle;
+        layoutDishEdit.SetColumnSpan(picDishImage, 2);
+        picDishImage.Location = new Point(766, 190);
+        picDishImage.Name = "picDishImage";
+        layoutDishEdit.SetRowSpan(picDishImage, 2);
+        picDishImage.Size = new Size(257, 103);
+        picDishImage.SizeMode = PictureBoxSizeMode.Zoom;
+        picDishImage.TabIndex = 18;
+        picDishImage.TabStop = false;
+        picDishImage.Click += picDishImage_Click;
         // 
         // btnAddDish
         // 
@@ -795,7 +798,7 @@ partial class Form1
         // 
         lblCreatedAt.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblCreatedAt.ForeColor = Color.FromArgb(48, 48, 48);
-        lblCreatedAt.Location = new Point(242, 210);
+        lblCreatedAt.Location = new Point(242, 108);
         lblCreatedAt.Name = "lblCreatedAt";
         lblCreatedAt.Size = new Size(189, 106);
         lblCreatedAt.TabIndex = 10;
@@ -805,7 +808,7 @@ partial class Form1
         // 
         lblStatus.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblStatus.ForeColor = Color.FromArgb(48, 48, 48);
-        lblStatus.Location = new Point(242, 142);
+        lblStatus.Location = new Point(242, 72);
         lblStatus.Name = "lblStatus";
         lblStatus.Size = new Size(189, 34);
         lblStatus.TabIndex = 9;
@@ -825,7 +828,7 @@ partial class Form1
         // 
         lblDeliveryFee.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblDeliveryFee.ForeColor = Color.FromArgb(48, 48, 48);
-        lblDeliveryFee.Location = new Point(3, 282);
+        lblDeliveryFee.Location = new Point(3, 324);
         lblDeliveryFee.Name = "lblDeliveryFee";
         lblDeliveryFee.Size = new Size(233, 34);
         lblDeliveryFee.TabIndex = 7;
@@ -837,7 +840,7 @@ partial class Form1
         lblNote.ForeColor = Color.FromArgb(48, 48, 48);
         lblNote.Location = new Point(3, 244);
         lblNote.Name = "lblNote";
-        lblNote.Size = new Size(233, 34);
+        lblNote.Size = new Size(403, 80);
         lblNote.TabIndex = 6;
         lblNote.Text = "备注：";
         // 
@@ -1102,6 +1105,7 @@ partial class Form1
         btnResetStatistics.TabIndex = 8;
         btnResetStatistics.Text = "重置";
         btnResetStatistics.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnResetStatistics.Click += btnResetStatistics_Click;
         // 
         // uiLabel5
         // 
@@ -1144,6 +1148,7 @@ partial class Form1
         btnLoadStatistics.TabIndex = 10;
         btnLoadStatistics.Text = "刷新统计";
         btnLoadStatistics.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnLoadStatistics.Click += btnLoadStatistics_Click;
         // 
         // layoutStatisticsSummary
         // 
@@ -1498,7 +1503,7 @@ partial class Form1
         tabAi.Controls.Add(layoutAiPage);
         tabAi.Location = new Point(0, 40);
         tabAi.Name = "tabAi";
-        tabAi.Size = new Size(200, 60);
+        tabAi.Size = new Size(1224, 646);
         tabAi.TabIndex = 3;
         tabAi.Text = "AI建议";
         tabAi.UseVisualStyleBackColor = true;
@@ -1518,7 +1523,7 @@ partial class Form1
         layoutAiPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
         layoutAiPage.RowStyles.Add(new RowStyle(SizeType.Percent, 75F));
         layoutAiPage.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-        layoutAiPage.Size = new Size(200, 60);
+        layoutAiPage.Size = new Size(1224, 646);
         layoutAiPage.TabIndex = 0;
         layoutAiPage.TagString = null;
         // 
@@ -1535,7 +1540,7 @@ partial class Form1
         layoutAiTop.Name = "layoutAiTop";
         layoutAiTop.RowCount = 1;
         layoutAiTop.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        layoutAiTop.Size = new Size(174, 64);
+        layoutAiTop.Size = new Size(1198, 64);
         layoutAiTop.TabIndex = 0;
         layoutAiTop.TagString = null;
         // 
@@ -1550,6 +1555,7 @@ partial class Form1
         btnLoadAiSuggestion.TabIndex = 0;
         btnLoadAiSuggestion.Text = "获取经营建议";
         btnLoadAiSuggestion.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnLoadAiSuggestion.Click += btnLoadAiSuggestion_Click;
         // 
         // lblAiHint
         // 
@@ -1558,7 +1564,7 @@ partial class Form1
         lblAiHint.ForeColor = Color.FromArgb(48, 48, 48);
         lblAiHint.Location = new Point(173, 0);
         lblAiHint.Name = "lblAiHint";
-        lblAiHint.Size = new Size(1, 64);
+        lblAiHint.Size = new Size(1012, 64);
         lblAiHint.TabIndex = 1;
         lblAiHint.Text = "根据热销菜品、低销量菜品和订单统计数据生成经营建议";
         lblAiHint.TextAlign = ContentAlignment.MiddleCenter;
@@ -1573,7 +1579,7 @@ partial class Form1
         grpAiSuggestion.MinimumSize = new Size(1, 1);
         grpAiSuggestion.Name = "grpAiSuggestion";
         grpAiSuggestion.Padding = new Padding(0, 32, 0, 0);
-        grpAiSuggestion.Size = new Size(172, 1);
+        grpAiSuggestion.Size = new Size(1196, 407);
         grpAiSuggestion.TabIndex = 1;
         grpAiSuggestion.Text = "AI经营建议";
         grpAiSuggestion.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1591,7 +1597,7 @@ partial class Form1
         txtAiSuggestion.ReadOnly = true;
         txtAiSuggestion.ShowScrollBar = true;
         txtAiSuggestion.ShowText = false;
-        txtAiSuggestion.Size = new Size(172, 16);
+        txtAiSuggestion.Size = new Size(1196, 375);
         txtAiSuggestion.TabIndex = 0;
         txtAiSuggestion.Text = "暂无经营建议，请点击“获取经营建议”。";
         txtAiSuggestion.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1602,12 +1608,12 @@ partial class Form1
         grpAiError.Controls.Add(txtAiError);
         grpAiError.Dock = DockStyle.Fill;
         grpAiError.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpAiError.Location = new Point(14, 63);
+        grpAiError.Location = new Point(14, 502);
         grpAiError.Margin = new Padding(4, 5, 4, 5);
         grpAiError.MinimumSize = new Size(1, 1);
         grpAiError.Name = "grpAiError";
         grpAiError.Padding = new Padding(0, 32, 0, 0);
-        grpAiError.Size = new Size(172, 1);
+        grpAiError.Size = new Size(1196, 129);
         grpAiError.TabIndex = 2;
         grpAiError.Text = "错误提示";
         grpAiError.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1624,7 +1630,7 @@ partial class Form1
         txtAiError.Padding = new Padding(5);
         txtAiError.ShowScrollBar = true;
         txtAiError.ShowText = false;
-        txtAiError.Size = new Size(172, 16);
+        txtAiError.Size = new Size(1196, 97);
         txtAiError.TabIndex = 0;
         txtAiError.Text = "暂无错误。";
         txtAiError.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1636,6 +1642,7 @@ partial class Form1
         ClientSize = new Size(1228, 724);
         Controls.Add(tabMain);
         Font = new Font("Microsoft YaHei UI", 10F);
+        IconImage = (Image)resources.GetObject("$this.IconImage");
         MinimumSize = new Size(1089, 724);
         Name = "Form1";
         Padding = new Padding(2, 36, 2, 2);
@@ -1648,7 +1655,7 @@ partial class Form1
         layoutDishPage.ResumeLayout(false);
         grpDishEdit.ResumeLayout(false);
         layoutDishEdit.ResumeLayout(false);
-        ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+        ((System.ComponentModel.ISupportInitialize)picDishImage).EndInit();
         ((System.ComponentModel.ISupportInitialize)dgvDishes).EndInit();
         tabOrders.ResumeLayout(false);
         layoutOrderPage.ResumeLayout(false);
@@ -1769,6 +1776,6 @@ partial class Form1
     private Sunny.UI.UILabel lblSpicyCondition;
     private Sunny.UI.UILabel lblDescription;
     private Sunny.UI.UITextBox txtDescription;
-    private PictureBox pictureBox1;
+    private PictureBox picDishImage;
     private Sunny.UI.UILabel lblPicture;
 }

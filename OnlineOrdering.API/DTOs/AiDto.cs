@@ -1,4 +1,4 @@
-namespace OnlineOrdering.API.DTOs
+﻿namespace OnlineOrdering.API.DTOs
 {
     public class AiRecommendRequestDto
     {
@@ -26,7 +26,9 @@ namespace OnlineOrdering.API.DTOs
 
     public class AiOperationSuggestRequestDto
     {
-        public object? SalesData { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int TopCount { get; set; } = 5;
     }
 
     public class AiOperationSuggestResponseDto

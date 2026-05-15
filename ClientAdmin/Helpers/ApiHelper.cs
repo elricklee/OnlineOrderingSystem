@@ -29,6 +29,20 @@ namespace ClientAdmin.Helpers
             return JsonConvert.DeserializeObject<List<T>>(json) ?? new List<T>();
         }
 
+        public static async Task<T?> GetAsync<T>(string url)
+        {
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorText = await response.Content.ReadAsStringAsync();
+                throw new Exception($"请求失败：{(int)response.StatusCode} {response.ReasonPhrase}\n请求地址：{client.BaseAddress}{url}\n{errorText}");
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(json);
+        }
+
         public static async Task PostAsync<T>(string url, T data)
         {
             var json = JsonConvert.SerializeObject(data);
