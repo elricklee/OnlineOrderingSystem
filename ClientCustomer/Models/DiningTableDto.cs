@@ -18,5 +18,8 @@ namespace ClientCustomer.Models
 
         [JsonProperty("isEnabled")]
         public bool IsEnabled { get; set; }
+
+        [JsonProperty("remainingSeats")]
+        public int RemainingSeats { get; set; }
     }
 }

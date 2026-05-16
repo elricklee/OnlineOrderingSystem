@@ -18,28 +18,61 @@ namespace OnlineOrdering.API.Controllers
         [HttpGet("suggest-operation")]
         public async Task<IActionResult> GetOperationSuggestions([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null, [FromQuery] int topCount = 5)
         {
-            var result = await _aiService.GetOperationSuggestionsAsync(startDate, endDate, topCount);
-            return Ok(result);
+            try
+            {
+                var result = await _aiService.GetOperationSuggestionsAsync(startDate, endDate, topCount);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取运营建议失败：{ex.Message}" });
+            }
         }
 
         [HttpPost("suggest-operation")]
         public async Task<IActionResult> GetOperationSuggestions([FromBody] AiOperationSuggestRequestDto dto)
         {
-            var result = await _aiService.GetOperationSuggestionsAsync(dto.StartDate, dto.EndDate, dto.TopCount);
-            return Ok(result);
+            try
+            {
+                var result = await _aiService.GetOperationSuggestionsAsync(dto.StartDate, dto.EndDate, dto.TopCount);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取运营建议失败：{ex.Message}" });
+            }
         }
 
-        //��Ʒ�Ƽ��ӿ�
+        //菜品推荐接口
         [HttpPost("recommend-dish")]
         public async Task<IActionResult> GetDishRecommendations([FromBody] AiRecommendRequestDto request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var result = await _aiService.GetDishRecommendationsAsync(request);
-            return Ok(result);
+                var result = await _aiService.GetDishRecommendationsAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取菜品推荐失败：{ex.Message}" });
+            }
         }
     }
 }

@@ -1612,12 +1612,14 @@ namespace ClientAdmin
             var idColumn = dgvDiningTables.Columns["Id"];
             var tableNumberColumn = dgvDiningTables.Columns["TableNumber"];
             var seatCountColumn = dgvDiningTables.Columns["SeatCount"];
+            var remainingColumn = dgvDiningTables.Columns["RemainingSeats"];
             var occupiedColumn = dgvDiningTables.Columns["IsOccupied"];
             var enabledColumn = dgvDiningTables.Columns["IsEnabled"];
 
             if (idColumn != null) idColumn.HeaderText = "编号";
             if (tableNumberColumn != null) tableNumberColumn.HeaderText = "桌号";
-            if (seatCountColumn != null) seatCountColumn.HeaderText = "座位数";
+            if (seatCountColumn != null) seatCountColumn.HeaderText = "总座位";
+            if (remainingColumn != null) remainingColumn.HeaderText = "剩余座位";
             if (occupiedColumn != null) occupiedColumn.HeaderText = "占用中";
             if (enabledColumn != null) enabledColumn.HeaderText = "启用";
         }

@@ -5,6 +5,7 @@ namespace ClientCustomer.Models
         public string OrderType { get; set; } = "DineIn";
         public string? TableNumber { get; set; }
         public int? DiningTableId { get; set; }
+        public int? DinerCount { get; set; }
         public string? Phone { get; set; }
         public int? DeliveryZoneId { get; set; }
         public string? DeliveryRegion { get; set; }

@@ -8,6 +8,7 @@ namespace OnlineOrdering.API.Models
         public bool IsOccupied { get; set; }
         public bool IsEnabled { get; set; } = true;
         public string Status { get; set; } = "Available";
+        public int CurrentOccupiedSeats { get; set; }
         public List<Order> Orders { get; set; } = new();
     }
 }

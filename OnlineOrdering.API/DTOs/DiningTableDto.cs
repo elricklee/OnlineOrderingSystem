@@ -7,6 +7,7 @@ namespace OnlineOrdering.API.DTOs
         public int Id { get; set; }
         public string TableNumber { get; set; } = string.Empty;
         public int SeatCount { get; set; }
+        public int RemainingSeats { get; set; }
         public bool IsOccupied { get; set; }
         public bool IsEnabled { get; set; }
     }

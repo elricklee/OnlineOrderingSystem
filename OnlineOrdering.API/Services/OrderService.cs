@@ -135,6 +135,7 @@ namespace OnlineOrdering.API.Services
                     if (order.DiningTable != null)
                     {
                         order.DiningTable.Status = "Available";
+                        order.DiningTable.CurrentOccupiedSeats = Math.Max(0, order.DiningTable.CurrentOccupiedSeats - (order.DinerCount ?? 1));
                     }
                     break;
                 case "Cancelled":
@@ -143,6 +144,7 @@ namespace OnlineOrdering.API.Services
                     if (order.DiningTable != null && oldStatus != "Pending")
                     {
                         order.DiningTable.Status = "Available";
+                        order.DiningTable.CurrentOccupiedSeats = Math.Max(0, order.DiningTable.CurrentOccupiedSeats - (order.DinerCount ?? 1));
                     }
                     break;
             }
@@ -264,13 +266,24 @@ namespace OnlineOrdering.API.Services
                 throw new InvalidOperationException("所选餐桌不存在或已停用。");
             }
 
-            if (diningTable.Status != "Available")
+            if (diningTable.Status != "Available" && !string.IsNullOrEmpty(diningTable.Status))
             {
                 throw new InvalidOperationException($"餐桌 {diningTable.TableNumber} 当前不可用，请重新选择。");
             }
 
+            var dinerCount = dto.DinerCount ?? 1;
+            if (dinerCount <= 0) dinerCount = 1;
+
+            var remainingSeats = diningTable.SeatCount - diningTable.CurrentOccupiedSeats;
+            if (dinerCount > remainingSeats)
+            {
+                throw new InvalidOperationException($"餐桌 {diningTable.TableNumber} 剩余 {remainingSeats} 个座位，无法容纳 {dinerCount} 人就餐。");
+            }
+
             order.DiningTableId = diningTable.Id;
             order.TableNumber = diningTable.TableNumber;
+            order.DinerCount = dinerCount;
+            diningTable.CurrentOccupiedSeats += dinerCount;
             order.DeliveryFee = 0m;
             order.Address = null;
             order.DeliveryZoneId = null;

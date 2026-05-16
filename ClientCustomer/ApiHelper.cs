@@ -1,5 +1,6 @@
 using ClientCustomer.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Text;
 
 namespace ClientCustomer
@@ -41,9 +42,23 @@ namespace ClientCustomer
             var json = JsonConvert.SerializeObject(orderCreate);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("api/orders", content);
-            response.EnsureSuccessStatusCode();
-            var responseJson = await response.Content.ReadAsStringAsync();
 
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorJson = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    var errorObj = JObject.Parse(errorJson);
+                    var message = errorObj["message"]?.ToString() ?? $"服务器错误({(int)response.StatusCode})";
+                    throw new Exception(message);
+                }
+                catch (JsonException)
+                {
+                    throw new Exception($"服务器错误({(int)response.StatusCode})");
+                }
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<OrderDto>(responseJson)
                 ?? throw new Exception("订单创建返回数据异常");
         }
@@ -77,13 +92,22 @@ namespace ClientCustomer
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("api/users/login", content);
 
+            var responseJson = await response.Content.ReadAsStringAsync();
+
             if (!response.IsSuccessStatusCode)
             {
-                var errorText = await response.Content.ReadAsStringAsync();
-                return new LoginResponse { Success = false, Message = $"服务器错误({(int)response.StatusCode})" };
+                try
+                {
+                    var errorObj = JObject.Parse(responseJson);
+                    var message = errorObj["message"]?.ToString() ?? $"登录失败({(int)response.StatusCode})";
+                    return new LoginResponse { Success = false, Message = message };
+                }
+                catch
+                {
+                    return new LoginResponse { Success = false, Message = $"登录失败({(int)response.StatusCode})" };
+                }
             }
 
-            var responseJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<LoginResponse>(responseJson) ?? new LoginResponse { Success = false, Message = "登录失败" };
         }
 
@@ -93,13 +117,22 @@ namespace ClientCustomer
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("api/users/register", content);
 
+            var responseJson = await response.Content.ReadAsStringAsync();
+
             if (!response.IsSuccessStatusCode)
             {
-                var errorText = await response.Content.ReadAsStringAsync();
-                return new LoginResponse { Success = false, Message = $"服务器错误({(int)response.StatusCode})" };
+                try
+                {
+                    var errorObj = JObject.Parse(responseJson);
+                    var message = errorObj["message"]?.ToString() ?? $"注册失败({(int)response.StatusCode})";
+                    return new LoginResponse { Success = false, Message = message };
+                }
+                catch
+                {
+                    return new LoginResponse { Success = false, Message = $"注册失败({(int)response.StatusCode})" };
+                }
             }
 
-            var responseJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<LoginResponse>(responseJson) ?? new LoginResponse { Success = false, Message = "注册失败" };
         }
 

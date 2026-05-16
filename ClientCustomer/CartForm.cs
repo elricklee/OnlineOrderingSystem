@@ -335,6 +335,7 @@ namespace ClientCustomer
                     OrderType = _session.OrderType,
                     TableNumber = _session.TableNumber,
                     DiningTableId = _session.DiningTableId,
+                    DinerCount = _session.DinerCount,
                     Address = _session.DeliveryAddressDetail,
                     DeliveryZoneId = _session.DeliveryZoneId,
                     DeliveryRegion = _session.DeliveryRegion,

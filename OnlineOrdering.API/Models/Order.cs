@@ -14,6 +14,7 @@ namespace OnlineOrdering.API.Models
         public string? TableNumber { get; set; }
         public int? DiningTableId { get; set; }
         public DiningTable? DiningTable { get; set; }
+        public int? DinerCount { get; set; }
 
         public string? Note { get; set; }
         public decimal TotalAmount { get; set; }

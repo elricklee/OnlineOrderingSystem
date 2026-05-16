@@ -19,7 +19,7 @@ namespace OnlineOrdering.API.Services
             var query = _db.DiningTables.AsQueryable();
             if (availableOnly)
             {
-                query = query.Where(x => x.IsEnabled && !x.IsOccupied);
+                query = query.Where(x => x.IsEnabled && (x.Status == "Available" || string.IsNullOrEmpty(x.Status)));
             }
 
             return await query
@@ -92,6 +92,7 @@ namespace OnlineOrdering.API.Services
                 Id = entity.Id,
                 TableNumber = entity.TableNumber,
                 SeatCount = entity.SeatCount,
+                RemainingSeats = entity.SeatCount - entity.CurrentOccupiedSeats,
                 IsOccupied = entity.IsOccupied,
                 IsEnabled = entity.IsEnabled
             };
@@ -104,6 +105,7 @@ namespace OnlineOrdering.API.Services
                 Id = entity.Id,
                 TableNumber = entity.TableNumber,
                 SeatCount = entity.SeatCount,
+                RemainingSeats = entity.SeatCount - entity.CurrentOccupiedSeats,
                 IsOccupied = entity.IsOccupied,
                 IsEnabled = entity.IsEnabled
             };

@@ -22,6 +22,9 @@ namespace ClientCustomer.Models
         [JsonProperty("diningTableId")]
         public int? DiningTableId { get; set; }
 
+        [JsonProperty("dinerCount")]
+        public int? DinerCount { get; set; }
+
         [JsonProperty("address")]
         public string? Address { get; set; }
 

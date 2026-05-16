@@ -219,10 +219,9 @@ namespace ClientCustomer
             var card = new Panel
             {
                 Width = 220,
-                Height = 340,
+                Height = 310,
                 BackColor = SurfaceColor,
-                Margin = new Padding(8),
-                Padding = new Padding(10)
+                Margin = new Padding(8)
             };
 
             card.Paint += (_, e) =>
@@ -230,13 +229,11 @@ namespace ClientCustomer
                 e.Graphics.Clear(SurfaceColor);
                 using var borderPen = new Pen(Color.FromArgb(230, 230, 230), 1);
                 e.Graphics.DrawRectangle(borderPen, 0, 0, card.Width - 1, card.Height - 1);
-                using var innerPen = new Pen(Color.FromArgb(245, 245, 245), 1);
-                e.Graphics.DrawRectangle(innerPen, 1, 1, card.Width - 3, card.Height - 3);
             };
 
             var pictureBox = new PictureBox
             {
-                Size = new Size(200, 118),
+                Size = new Size(200, 100),
                 Location = new Point(10, 10),
                 SizeMode = PictureBoxSizeMode.Zoom,
                 BackColor = Color.FromArgb(248, 248, 248)
@@ -248,18 +245,18 @@ namespace ClientCustomer
                 Text = dish.Name,
                 Font = new Font("微软雅黑", 11F, FontStyle.Bold),
                 ForeColor = TextColor,
-                Location = new Point(12, 136),
-                Size = new Size(196, 26),
+                Location = new Point(10, 118),
+                Size = new Size(200, 26),
                 TagString = null
             };
 
             var lblPrice = new UILabel
             {
                 Text = $"¥{dish.Price:0.##}",
-                Font = new Font("微软雅黑", 15F, FontStyle.Bold),
+                Font = new Font("微软雅黑", 14F, FontStyle.Bold),
                 ForeColor = PrimaryColor,
-                Location = new Point(12, 166),
-                Size = new Size(100, 30),
+                Location = new Point(10, 146),
+                Size = new Size(90, 26),
                 TagString = null
             };
 
@@ -268,29 +265,19 @@ namespace ClientCustomer
                 Text = GetSpicyDisplay(dish.SpicyLevel),
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = dish.SpicyLevel > 0 ? DangerColor : SuccessColor,
-                Location = new Point(112, 171),
-                Size = new Size(96, 24),
+                Location = new Point(105, 150),
+                Size = new Size(105, 22),
                 TextAlign = ContentAlignment.MiddleRight,
                 TagString = null
             };
 
             var lblDesc = new UILabel
             {
-                Text = TruncateText(dish.Description ?? string.Empty, 22),
-                Font = new Font("微软雅黑", 9F),
-                ForeColor = TextSecondaryColor,
-                Location = new Point(12, 200),
-                Size = new Size(196, 38),
-                TagString = null
-            };
-
-            var lblCategory = new UILabel
-            {
-                Text = dish.Category,
+                Text = TruncateText(dish.Description ?? string.Empty, 20),
                 Font = new Font("微软雅黑", 8.5F),
-                ForeColor = Color.FromArgb(150, 150, 150),
-                Location = new Point(12, 238),
-                Size = new Size(100, 22),
+                ForeColor = TextSecondaryColor,
+                Location = new Point(10, 176),
+                Size = new Size(200, 22),
                 TagString = null
             };
 
@@ -299,27 +286,27 @@ namespace ClientCustomer
                 Text = "数量",
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = TextSecondaryColor,
-                Location = new Point(12, 270),
-                Size = new Size(38, 22),
+                Location = new Point(10, 210),
+                Size = new Size(40, 22),
                 TagString = null
             };
 
             var quantityInput = new NumericUpDown
             {
                 Font = new Font("微软雅黑", 10F),
-                Location = new Point(58, 265),
+                Location = new Point(55, 206),
                 Minimum = 1,
                 Maximum = 99,
                 Value = 1,
-                Size = new Size(70, 34),
+                Size = new Size(60, 30),
                 TextAlign = HorizontalAlignment.Center
             };
 
             var btnAdd = new UIButton
             {
                 Text = "加入购物车",
-                Size = new Size(196, 38),
-                Location = new Point(12, 292),
+                Size = new Size(200, 36),
+                Location = new Point(10, 248),
                 Font = new Font("微软雅黑", 10F, FontStyle.Bold),
                 FillColor = PrimaryColor,
                 RectColor = PrimaryColor,
@@ -333,7 +320,7 @@ namespace ClientCustomer
             card.Controls.AddRange(
                 new Control[]
                 {
-                    pictureBox, lblName, lblPrice, lblSpicy, lblDesc, lblCategory,
+                    pictureBox, lblName, lblPrice, lblSpicy, lblDesc,
                     lblQuantity, quantityInput, btnAdd
                 });
 

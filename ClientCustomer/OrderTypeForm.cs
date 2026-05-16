@@ -37,7 +37,6 @@ namespace ClientCustomer
             ClientSize = new Size(820, 700);
             MinimumSize = new Size(820, 700);
 
-            lblTableNumberLabel.Text = "选择桌号：";
             txtTableNumber.Visible = false;
 
             lblAddress.Text = "配送区域：";
@@ -77,6 +76,8 @@ namespace ClientCustomer
             cmbCity.SelectedIndexChanged += CityChanged;
             cmbDistrict.SelectedIndexChanged += DistrictChanged;
             cmbDiningTable.SelectedIndexChanged += DiningTableChanged;
+            nudDinerCount.ValueChanged += NudDinerCount_ValueChanged;
+            btnRefreshTables.Click += BtnRefreshTables_Click;
         }
 
         private async Task LoadInitialOptionsAsync()
@@ -114,13 +115,35 @@ namespace ClientCustomer
             }
         }
 
+        private async void BtnRefreshTables_Click(object? sender, EventArgs e)
+        {
+            btnRefreshTables.Enabled = false;
+            btnRefreshTables.Text = "刷新中...";
+
+            try
+            {
+                _availableTables = await ApiHelper.GetAvailableTablesAsync();
+                BindDiningTables();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("刷新餐桌列表失败：" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                btnRefreshTables.Enabled = true;
+                btnRefreshTables.Text = "🔄 刷新";
+            }
+        }
+
         private void BindDiningTables()
         {
             cmbDiningTable.Items.Clear();
-            foreach (var table in _availableTables.Where(table => table.IsEnabled && !table.IsOccupied))
+            foreach (var table in _availableTables.Where(table => table.IsEnabled))
             {
+                var remaining = table.RemainingSeats;
                 cmbDiningTable.Items.Add(new ComboOption<DiningTableDto>(
-                    $"{table.TableNumber} · {table.SeatCount}座",
+                    $"{table.TableNumber} · {table.SeatCount}座(余{remaining})",
                     table));
             }
 
@@ -137,14 +160,33 @@ namespace ClientCustomer
             UpdateDiningTableHint();
         }
 
+        private void NudDinerCount_ValueChanged(object? sender, EventArgs e)
+        {
+            UpdateDiningTableHint();
+        }
+
         private void UpdateDiningTableHint()
         {
             if (cmbDiningTable.SelectedItem is ComboOption<DiningTableDto> option)
             {
-                lblDiningTableHint.Text = $"当前餐桌可坐 {option.Value.SeatCount} 人";
+                var table = option.Value;
+                var remaining = table.RemainingSeats;
+                var dinerCount = (int)nudDinerCount.Value;
+
+                if (dinerCount > remaining)
+                {
+                    lblDiningTableHint.ForeColor = Color.Red;
+                    lblDiningTableHint.Text = $"⚠ 剩余 {remaining} 座，不够 {dinerCount} 人！";
+                }
+                else
+                {
+                    lblDiningTableHint.ForeColor = Color.FromArgb(46, 125, 50);
+                    lblDiningTableHint.Text = $"✓ 剩余 {remaining} 座，可容纳 {dinerCount} 人";
+                }
                 return;
             }
 
+            lblDiningTableHint.ForeColor = Color.Gray;
             lblDiningTableHint.Text = "当前没有空闲餐桌，请联系管理员";
         }
 
@@ -257,7 +299,7 @@ namespace ClientCustomer
         private void SetDeliveryControlsEnabled(bool enabled)
         {
             lblAddress.Enabled = enabled;
-            lblDeliveryRegionHint.Enabled = enabled;
+            //lblDeliveryRegionHint.Enabled = enabled;
             lblAddressDetail.Enabled = enabled;
             lblCustomerPhone.Enabled = enabled;
             cmbProvince.Enabled = enabled;
@@ -277,11 +319,19 @@ namespace ClientCustomer
                     return;
                 }
 
+                var dinerCount = (int)nudDinerCount.Value;
+                if (dinerCount > option.Value.RemainingSeats)
+                {
+                    MessageBox.Show($"该餐桌剩余 {option.Value.RemainingSeats} 座，无法容纳 {dinerCount} 人。\n请减少人数或选择其他餐桌。", "座位不足", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 Session = new OrderSession
                 {
                     OrderType = "DineIn",
                     DiningTableId = option.Value.Id,
                     TableNumber = option.Value.TableNumber,
+                    DinerCount = dinerCount,
                     DeliveryFee = 0m
                 };
             }
@@ -307,6 +357,16 @@ namespace ClientCustomer
         {
             var text = value?.Trim();
             return string.IsNullOrWhiteSpace(text) ? null : text;
+        }
+
+        private void lblDineInDesc_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblDeliveryTitle_Click(object sender, EventArgs e)
+        {
+
         }
 
         private sealed class ComboOption<T>

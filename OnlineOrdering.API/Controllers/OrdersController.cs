@@ -12,54 +12,128 @@ namespace OnlineOrdering.API.Controllers
         public OrdersController(IOrderService orderService) => _orderService = orderService;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _orderService.GetAllOrdersAsync());
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                return Ok(await _orderService.GetAllOrdersAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取订单列表失败：{ex.Message}" });
+            }
+        }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetByUserId(int userId) => Ok(await _orderService.GetOrdersByUserIdAsync(userId));
+        public async Task<IActionResult> GetByUserId(int userId)
+        {
+            try
+            {
+                return Ok(await _orderService.GetOrdersByUserIdAsync(userId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取用户订单失败：{ex.Message}" });
+            }
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var order = await _orderService.GetOrderByIdAsync(id);
-            return order == null ? NotFound() : Ok(order);
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(id);
+                return order == null ? NotFound(new { message = "订单不存在" }) : Ok(order);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取订单详情失败：{ex.Message}" });
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(OrderCreateDto dto)
         {
-            var order = await _orderService.CreateOrderAsync(dto);
-            return CreatedAtAction(nameof(GetAll), new { id = order.Id }, order);
+            try
+            {
+                var order = await _orderService.CreateOrderAsync(dto);
+                return CreatedAtAction(nameof(GetAll), new { id = order.Id }, order);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"创建订单失败：{ex.Message}" });
+            }
         }
 
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] OrderUpdateStatusDto dto)
         {
-            var order = await _orderService.UpdateOrderStatusAsync(id, dto.Status, dto.CancelReason);
-            return order == null ? NotFound() : Ok(order);
+            try
+            {
+                var order = await _orderService.UpdateOrderStatusAsync(id, dto.Status, dto.CancelReason);
+                return order == null ? NotFound(new { message = "订单不存在" }) : Ok(order);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"更新订单状态失败：{ex.Message}" });
+            }
         }
 
         //逻辑删除订单
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var ok = await _orderService.DeleteOrderAsync(id);
-            return ok ? NoContent() : NotFound();
+            try
+            {
+                var ok = await _orderService.DeleteOrderAsync(id);
+                return ok ? NoContent() : NotFound(new { message = "订单不存在" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"删除订单失败：{ex.Message}" });
+            }
         }
 
         //物理删除订单
         [HttpDelete("{id}/hard")]
         public async Task<IActionResult> HardDelete(int id)
         {
-            var ok = await _orderService.HardDeleteOrderAsync(id);
-            return ok ? NoContent() : NotFound();
+            try
+            {
+                var ok = await _orderService.HardDeleteOrderAsync(id);
+                return ok ? NoContent() : NotFound(new { message = "订单不存在" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"删除订单失败：{ex.Message}" });
+            }
         }
 
         //恢复逻辑删除
         [HttpPut("{id}/restore")]
         public async Task<IActionResult> RestoreOrder(int id)
         {
-            var ok = await _orderService.RestoreOrderAsync(id);
-            return ok ? NoContent() : NotFound();
+            try
+            {
+                var ok = await _orderService.RestoreOrderAsync(id);
+                return ok ? NoContent() : NotFound(new { message = "订单不存在" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"恢复订单失败：{ex.Message}" });
+            }
         }
     }
 }
