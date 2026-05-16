@@ -34,7 +34,7 @@ namespace OnlineOrdering.API.Controllers
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] OrderUpdateStatusDto dto)
         {
-            var order = await _orderService.UpdateOrderStatusAsync(id, dto.Status);
+            var order = await _orderService.UpdateOrderStatusAsync(id, dto.Status, dto.CancelReason);
             return order == null ? NotFound() : Ok(order);
         }
 

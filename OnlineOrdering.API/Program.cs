@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineOrdering.API.Data;
+using OnlineOrdering.API.Middleware;
 using OnlineOrdering.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ builder.Services.AddScoped<IDiningTableService, DiningTableService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddHttpClient<IAiService, AiService>();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddCors(opt =>
 {

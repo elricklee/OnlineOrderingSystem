@@ -23,6 +23,7 @@ namespace OnlineOrdering.API.DTOs
         public string? DeliveryRegion { get; set; }
         public decimal DeliveryFee { get; set; }
         public string? Note { get; set; }
+        public string? CancelReason { get; set; }
 
         [Required] public List<OrderItemDto> OrderItems { get; set; } = new();
     }
@@ -44,6 +45,16 @@ namespace OnlineOrdering.API.DTOs
         public string OrderType { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public string? CancelReason { get; set; }
+        public DateTime? ConfirmedAt { get; set; }
+        public DateTime? PreparingAt { get; set; }
+        public DateTime? ReadyAt { get; set; }
+        public DateTime? DeliveringAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public DateTime? CancelledAt { get; set; }
+        public int EstimatedMinutes { get; set; }
+        public string? DeliveryPersonName { get; set; }
+        public string? DeliveryPersonPhone { get; set; }
         public List<OrderItemResponseDto> OrderItems { get; set; } = new();
     }
 
@@ -59,5 +70,6 @@ namespace OnlineOrdering.API.DTOs
     public class OrderUpdateStatusDto
     {
         [Required] public string Status { get; set; } = string.Empty;
+        public string? CancelReason { get; set; }
     }
 }

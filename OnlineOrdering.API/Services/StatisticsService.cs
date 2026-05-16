@@ -56,7 +56,7 @@ namespace OnlineOrdering.API.Services
 
         private IQueryable<Order> FilterOrders(IQueryable<Order> query, DateTime? startDate, DateTime? endDate)
         {
-            query = query.Where(order => order.Status != "Cancelled");
+            query = query.Where(order => order.Status == "Completed");
 
             if (startDate.HasValue)
             {

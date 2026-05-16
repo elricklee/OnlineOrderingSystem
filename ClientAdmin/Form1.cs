@@ -684,6 +684,8 @@ namespace ClientAdmin
             await LoadOrdersAsync();
         }
 
+        private OrderDto? _selectedOrder = null;
+
         private void dgvOrders_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
@@ -699,19 +701,11 @@ namespace ClientAdmin
             }
 
             selectedOrderId = order.Id;
-
-            var chineseStatus = StatusMapReverse.GetValueOrDefault(order.Status, order.Status);
-            if (cmbOrderStatus.Items.Contains(chineseStatus))
-            {
-                cmbOrderStatus.SelectedItem = chineseStatus;
-            }
-            else
-            {
-                cmbOrderStatus.Text = chineseStatus;
-            }
+            _selectedOrder = order;
 
             ShowOrderDetail(order);
             BindOrderItems(order);
+            UpdateOrderActionButtons(order.Status, order.OrderType);
         }
 
         private void ShowOrderDetail(OrderDto order)
@@ -737,7 +731,84 @@ namespace ClientAdmin
             SetOrderItemGridHeaders();
         }
 
-        private async void btnUpdateOrderStatus_Click(object sender, EventArgs e)
+        // ========== 订单工作台模式 ==========
+
+        private void UpdateOrderActionButtons(string status, string? orderType)
+        {
+            // 隐藏所有操作按钮
+            HideAllOrderActionButtons();
+
+            // 根据状态显示对应的按钮
+            switch (status)
+            {
+                case "Pending":
+                    btnConfirmOrder.Visible = true;
+                    btnConfirmOrder.Enabled = true;
+                    btnRejectOrder.Visible = true;
+                    btnRejectOrder.Enabled = true;
+                    lblOrderActionHint.Text = "待处理订单：请接单或拒单";
+                    break;
+
+                case "Confirmed":
+                    btnStartPreparing.Visible = true;
+                    btnStartPreparing.Enabled = true;
+                    btnCancelOrder.Visible = true;
+                    btnCancelOrder.Enabled = true;
+                    lblOrderActionHint.Text = "已确认订单：请开始制作或取消订单";
+                    break;
+
+                case "Preparing":
+                    btnReady.Visible = true;
+                    btnReady.Enabled = true;
+                    btnCancelOrder.Visible = true;
+                    btnCancelOrder.Enabled = true;
+                    lblOrderActionHint.Text = "制作中订单：请完成出餐或取消订单";
+                    break;
+
+                case "Ready":
+                    if (orderType == "Delivery")
+                    {
+                        btnStartDelivery.Visible = true;
+                        btnStartDelivery.Enabled = true;
+                    }
+                    btnCompleteOrder.Visible = true;
+                    btnCompleteOrder.Enabled = true;
+                    lblOrderActionHint.Text = orderType == "Delivery" ? "已出餐：请开始配送或直接完成" : "已出餐：请完成订单";
+                    break;
+
+                case "Delivering":
+                    btnCompleteOrder.Visible = true;
+                    btnCompleteOrder.Enabled = true;
+                    btnCompleteOrder.Text = "确认送达";
+                    lblOrderActionHint.Text = "配送中：请点击确认送达";
+                    break;
+
+                case "Completed":
+                case "Cancelled":
+                    lblOrderActionHint.Text = "订单已结束，无需操作";
+                    break;
+
+                default:
+                    lblOrderActionHint.Text = "请选择订单";
+                    break;
+            }
+        }
+
+        private void HideAllOrderActionButtons()
+        {
+            btnConfirmOrder.Visible = false;
+            btnRejectOrder.Visible = false;
+            btnStartPreparing.Visible = false;
+            btnReady.Visible = false;
+            btnStartDelivery.Visible = false;
+            btnCompleteOrder.Visible = false;
+            btnCancelOrder.Visible = false;
+
+            // 重置按钮文字
+            btnCompleteOrder.Text = "完成订单";
+        }
+
+        private async Task UpdateOrderStatusAsync(string newStatus, string? reason = null)
         {
             if (selectedOrderId == null)
             {
@@ -745,38 +816,191 @@ namespace ClientAdmin
                 return;
             }
 
-            var newStatusChinese = cmbOrderStatus.SelectedItem?.ToString();
-
-            if (string.IsNullOrWhiteSpace(newStatusChinese))
-            {
-                newStatusChinese = cmbOrderStatus.Text;
-            }
-
-            if (string.IsNullOrWhiteSpace(newStatusChinese))
-            {
-                MessageBox.Show("请选择订单状态");
-                return;
-            }
-
-            var newStatus = StatusMap.GetValueOrDefault(newStatusChinese, newStatusChinese);
-
             try
             {
                 var dto = new
                 {
-                    Status = newStatus
+                    Status = newStatus,
+                    Reason = reason
                 };
 
                 await ApiHelper.PutAsync($"api/Orders/{selectedOrderId.Value}/status", dto);
 
-                MessageBox.Show("订单状态修改成功");
+                MessageBox.Show("订单状态更新成功");
 
                 await LoadOrdersAsync();
+
+                // 更新按钮状态
+                if (_selectedOrder != null)
+                {
+                    _selectedOrder.Status = newStatus;
+                    UpdateOrderActionButtons(newStatus, _selectedOrder.OrderType);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("修改订单状态失败：" + ex.Message);
+                MessageBox.Show("更新订单状态失败：" + ex.Message);
             }
+        }
+
+        // 接单：Pending -> Confirmed
+        private async void btnConfirmOrder_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("确认接单？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                await UpdateOrderStatusAsync("Confirmed");
+            }
+        }
+
+        // 拒单：Pending -> Cancelled，需要弹窗输入原因
+        private async void btnRejectOrder_Click(object sender, EventArgs e)
+        {
+            using var dialog = new Form();
+            dialog.Text = "拒单原因";
+            dialog.Size = new Size(400, 200);
+            dialog.StartPosition = FormStartPosition.CenterParent;
+            dialog.FormBorderStyle = FormBorderStyle.FixedDialog;
+            dialog.MaximizeBox = false;
+            dialog.MinimizeBox = false;
+
+            var label = new Label
+            {
+                Text = "请输入拒单原因：",
+                Location = new Point(20, 20),
+                Size = new Size(350, 25)
+            };
+
+            var textBox = new TextBox
+            {
+                Location = new Point(20, 50),
+                Size = new Size(350, 25),
+                MaxLength = 200
+            };
+
+            var btnOk = new Button
+            {
+                Text = "确定",
+                DialogResult = DialogResult.OK,
+                Location = new Point(200, 100),
+                Size = new Size(80, 30)
+            };
+
+            var btnCancel = new Button
+            {
+                Text = "取消",
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(290, 100),
+                Size = new Size(80, 30)
+            };
+
+            dialog.Controls.Add(label);
+            dialog.Controls.Add(textBox);
+            dialog.Controls.Add(btnOk);
+            dialog.Controls.Add(btnCancel);
+            dialog.AcceptButton = btnOk;
+            dialog.CancelButton = btnCancel;
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var reason = textBox.Text.Trim();
+                if (string.IsNullOrWhiteSpace(reason))
+                {
+                    MessageBox.Show("请输入拒单原因");
+                    return;
+                }
+                await UpdateOrderStatusAsync("Cancelled", reason);
+            }
+        }
+
+        // 开始制作：Confirmed -> Preparing
+        private async void btnStartPreparing_Click(object sender, EventArgs e)
+        {
+            await UpdateOrderStatusAsync("Preparing");
+        }
+
+        // 出餐完成：Preparing -> Ready
+        private async void btnReady_Click(object sender, EventArgs e)
+        {
+            await UpdateOrderStatusAsync("Ready");
+        }
+
+        // 开始配送：Ready -> Delivering，外卖专用
+        private async void btnStartDelivery_Click(object sender, EventArgs e)
+        {
+            await UpdateOrderStatusAsync("Delivering");
+        }
+
+        // 完成订单：Ready/Delivering -> Completed
+        private async void btnCompleteOrder_Click(object sender, EventArgs e)
+        {
+            await UpdateOrderStatusAsync("Completed");
+        }
+
+        // 取消订单，需要弹窗输入原因
+        private async void btnCancelOrder_Click(object sender, EventArgs e)
+        {
+            using var dialog = new Form();
+            dialog.Text = "取消订单原因";
+            dialog.Size = new Size(400, 200);
+            dialog.StartPosition = FormStartPosition.CenterParent;
+            dialog.FormBorderStyle = FormBorderStyle.FixedDialog;
+            dialog.MaximizeBox = false;
+            dialog.MinimizeBox = false;
+
+            var label = new Label
+            {
+                Text = "请输入取消订单的原因：",
+                Location = new Point(20, 20),
+                Size = new Size(350, 25)
+            };
+
+            var textBox = new TextBox
+            {
+                Location = new Point(20, 50),
+                Size = new Size(350, 25),
+                MaxLength = 200
+            };
+
+            var btnOk = new Button
+            {
+                Text = "确定",
+                DialogResult = DialogResult.OK,
+                Location = new Point(200, 100),
+                Size = new Size(80, 30)
+            };
+
+            var btnCancel = new Button
+            {
+                Text = "取消",
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(290, 100),
+                Size = new Size(80, 30)
+            };
+
+            dialog.Controls.Add(label);
+            dialog.Controls.Add(textBox);
+            dialog.Controls.Add(btnOk);
+            dialog.Controls.Add(btnCancel);
+            dialog.AcceptButton = btnOk;
+            dialog.CancelButton = btnCancel;
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var reason = textBox.Text.Trim();
+                if (string.IsNullOrWhiteSpace(reason))
+                {
+                    MessageBox.Show("请输入取消原因");
+                    return;
+                }
+                await UpdateOrderStatusAsync("Cancelled", reason);
+            }
+        }
+
+        // 旧的更新状态按钮方法（保留但不再使用）
+        private async void btnUpdateOrderStatus_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("请使用新的工作台按钮来操作订单");
         }
 
         private void ClearOrderDetail()
@@ -792,6 +1016,11 @@ namespace ClientAdmin
             lblTotalAmount.Text = "总金额：";
             lblStatus.Text = "状态：";
             lblCreatedAt.Text = "创建时间：";
+
+            // 清空订单时隐藏操作按钮
+            _selectedOrder = null;
+            HideAllOrderActionButtons();
+            lblOrderActionHint.Text = "请选择订单";
         }
 
         private string GetDisplayText(string? value)

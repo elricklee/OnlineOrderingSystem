@@ -49,6 +49,9 @@ namespace ClientCustomer.Models
         [JsonProperty("createdAt")]
         public DateTime CreatedAt { get; set; }
 
+        [JsonProperty("estimatedMinutes")]
+        public int EstimatedMinutes { get; set; }
+
         [JsonProperty("orderItems")]
         public List<OrderItemDetailDto> OrderItems { get; set; } = new();
     }

@@ -22,6 +22,7 @@ partial class OrderHistoryForm
         lblStatus = new Sunny.UI.UILabel();
         lblTotalAmount = new Sunny.UI.UILabel();
         lblCreatedAt = new Sunny.UI.UILabel();
+        lblEstimatedTime = new Sunny.UI.UILabel();
         lblAddress = new Sunny.UI.UILabel();
         dgvOrderItems = new Sunny.UI.UIDataGridView();
         btnClose = new Sunny.UI.UIButton();
@@ -55,6 +56,7 @@ partial class OrderHistoryForm
         grpDetail.Controls.Add(lblStatus);
         grpDetail.Controls.Add(lblTotalAmount);
         grpDetail.Controls.Add(lblCreatedAt);
+        grpDetail.Controls.Add(lblEstimatedTime);
         grpDetail.Controls.Add(lblAddress);
         grpDetail.Controls.Add(dgvOrderItems);
         grpDetail.Font = new Font("微软雅黑", 10F);
@@ -115,14 +117,24 @@ partial class OrderHistoryForm
         lblCreatedAt.TabIndex = 4;
         lblCreatedAt.Text = "下单时间：";
         //
+        // lblEstimatedTime
+        //
+        lblEstimatedTime.Font = new Font("微软雅黑", 10F);
+        lblEstimatedTime.ForeColor = Color.FromArgb(46, 125, 50);
+        lblEstimatedTime.Location = new Point(15, 125);
+        lblEstimatedTime.Name = "lblEstimatedTime";
+        lblEstimatedTime.Size = new Size(415, 26);
+        lblEstimatedTime.TabIndex = 5;
+        lblEstimatedTime.Text = "预计完成时间：";
+        //
         // lblAddress
         //
         lblAddress.Font = new Font("微软雅黑", 10F);
         lblAddress.ForeColor = Color.FromArgb(51, 51, 51);
-        lblAddress.Location = new Point(15, 125);
+        lblAddress.Location = new Point(15, 155);
         lblAddress.Name = "lblAddress";
         lblAddress.Size = new Size(415, 26);
-        lblAddress.TabIndex = 5;
+        lblAddress.TabIndex = 6;
         lblAddress.Text = "配送地址：";
         //
         // dgvOrderItems
@@ -133,7 +145,7 @@ partial class OrderHistoryForm
         dgvOrderItems.BackgroundColor = Color.White;
         dgvOrderItems.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
         dgvOrderItems.Font = new Font("微软雅黑", 10F);
-        dgvOrderItems.Location = new Point(15, 160);
+        dgvOrderItems.Location = new Point(15, 190);
         dgvOrderItems.MultiSelect = false;
         dgvOrderItems.Name = "dgvOrderItems";
         dgvOrderItems.ReadOnly = true;
@@ -185,6 +197,7 @@ partial class OrderHistoryForm
     private Sunny.UI.UILabel lblStatus;
     private Sunny.UI.UILabel lblTotalAmount;
     private Sunny.UI.UILabel lblCreatedAt;
+    private Sunny.UI.UILabel lblEstimatedTime;
     private Sunny.UI.UILabel lblAddress;
     private Sunny.UI.UIDataGridView dgvOrderItems;
     private Sunny.UI.UIButton btnClose;

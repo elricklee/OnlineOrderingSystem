@@ -105,6 +105,18 @@ public partial class OrderHistoryForm : Form
             ? $"配送地址：{order.Address ?? "无"}"
             : $"桌号：{order.TableNumber ?? "无"}";
 
+        // 计算并显示预计完成时间
+        var activeStatuses = new[] { "Pending", "Confirmed", "Preparing" };
+        if (activeStatuses.Contains(order.Status) && order.EstimatedMinutes > 0)
+        {
+            var estimatedTime = order.CreatedAt.AddMinutes(order.EstimatedMinutes);
+            lblEstimatedTime.Text = $"预计完成时间：{estimatedTime:yyyy-MM-dd HH:mm:ss}";
+        }
+        else
+        {
+            lblEstimatedTime.Text = "预计完成时间：--";
+        }
+
         dgvOrderItems.DataSource = order.OrderItems;
         SetOrderItemGridHeaders();
     }
@@ -146,6 +158,7 @@ public partial class OrderHistoryForm : Form
         lblStatus.Text = "状态：";
         lblTotalAmount.Text = "总金额：";
         lblCreatedAt.Text = "下单时间：";
+        lblEstimatedTime.Text = "预计完成时间：";
         lblAddress.Text = "配送地址：";
         dgvOrderItems.DataSource = null;
     }
@@ -155,6 +168,7 @@ public partial class OrderHistoryForm : Form
         return status switch
         {
             "Pending" => "待处理",
+            "Confirmed" => "已接单",
             "Preparing" => "制作中",
             "Ready" => "已出餐",
             "Delivering" => "配送中",

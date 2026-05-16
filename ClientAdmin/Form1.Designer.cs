@@ -84,6 +84,15 @@ partial class Form1
         cmbOrderStatus = new Sunny.UI.UIComboBox();
         btnUpdateOrderStatus = new Sunny.UI.UIButton();
         layoutOrderMain = new Sunny.UI.UITableLayoutPanel();
+        panelOrderActions = new Sunny.UI.UIFlowLayoutPanel();
+        lblOrderActionHint = new Sunny.UI.UILabel();
+        btnConfirmOrder = new Sunny.UI.UIButton();
+        btnRejectOrder = new Sunny.UI.UIButton();
+        btnStartPreparing = new Sunny.UI.UIButton();
+        btnReady = new Sunny.UI.UIButton();
+        btnStartDelivery = new Sunny.UI.UIButton();
+        btnCompleteOrder = new Sunny.UI.UIButton();
+        btnCancelOrder = new Sunny.UI.UIButton();
         dgvOrders = new Sunny.UI.UIDataGridView();
         grpOrderDetail = new Sunny.UI.UIGroupBox();
         lblCreatedAt = new Sunny.UI.UILabel();
@@ -913,6 +922,7 @@ partial class Form1
         grpOrderDetail.Controls.Add(lblCustomerName);
         grpOrderDetail.Controls.Add(lblOrderType);
         grpOrderDetail.Controls.Add(lblOrderId);
+        grpOrderDetail.Controls.Add(panelOrderActions);
         grpOrderDetail.Dock = DockStyle.Fill;
         grpOrderDetail.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         grpOrderDetail.Location = new Point(773, 5);
@@ -920,7 +930,7 @@ partial class Form1
         grpOrderDetail.MinimumSize = new Size(1, 1);
         grpOrderDetail.Name = "grpOrderDetail";
         grpOrderDetail.Padding = new Padding(0, 32, 0, 0);
-        grpOrderDetail.Size = new Size(441, 358);
+        grpOrderDetail.Size = new Size(441, 600);
         grpOrderDetail.TabIndex = 1;
         grpOrderDetail.Text = "订单详情";
         grpOrderDetail.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1034,6 +1044,152 @@ partial class Form1
         lblOrderId.Size = new Size(420, 28);
         lblOrderId.TabIndex = 0;
         lblOrderId.Text = "订单编号：";
+        // 
+        // panelOrderActions
+        // 
+        panelOrderActions.Controls.Add(lblOrderActionHint);
+        panelOrderActions.Controls.Add(btnConfirmOrder);
+        panelOrderActions.Controls.Add(btnRejectOrder);
+        panelOrderActions.Controls.Add(btnStartPreparing);
+        panelOrderActions.Controls.Add(btnReady);
+        panelOrderActions.Controls.Add(btnStartDelivery);
+        panelOrderActions.Controls.Add(btnCompleteOrder);
+        panelOrderActions.Controls.Add(btnCancelOrder);
+        panelOrderActions.FlowDirection = FlowDirection.TopDown;
+        panelOrderActions.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        panelOrderActions.Location = new Point(10, 380);
+        panelOrderActions.Margin = new Padding(4, 5, 4, 5);
+        panelOrderActions.MinimumSize = new Size(1, 1);
+        panelOrderActions.Name = "panelOrderActions";
+        panelOrderActions.Padding = new Padding(2);
+        panelOrderActions.Size = new Size(420, 200);
+        panelOrderActions.TabIndex = 11;
+        panelOrderActions.Text = null;
+        panelOrderActions.TextAlignment = ContentAlignment.MiddleCenter;
+        // 
+        // lblOrderActionHint
+        // 
+        lblOrderActionHint.Font = new Font("微软雅黑", 10F, FontStyle.Bold, GraphicsUnit.Point, 134);
+        lblOrderActionHint.ForeColor = Color.FromArgb(51, 122, 183);
+        lblOrderActionHint.Location = new Point(5, 5);
+        lblOrderActionHint.Margin = new Padding(5);
+        lblOrderActionHint.Name = "lblOrderActionHint";
+        lblOrderActionHint.Size = new Size(400, 28);
+        lblOrderActionHint.TabIndex = 0;
+        lblOrderActionHint.Text = "请选择订单";
+        lblOrderActionHint.TextAlign = ContentAlignment.MiddleCenter;
+        // 
+        // btnConfirmOrder
+        // 
+        btnConfirmOrder.FillColor = Color.FromArgb(92, 184, 92);
+        btnConfirmOrder.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnConfirmOrder.Location = new Point(5, 43);
+        btnConfirmOrder.Margin = new Padding(5);
+        btnConfirmOrder.MinimumSize = new Size(1, 1);
+        btnConfirmOrder.Name = "btnConfirmOrder";
+        btnConfirmOrder.Radius = 6;
+        btnConfirmOrder.RectColor = Color.FromArgb(92, 184, 92);
+        btnConfirmOrder.Size = new Size(90, 35);
+        btnConfirmOrder.TabIndex = 1;
+        btnConfirmOrder.Text = "接单";
+        btnConfirmOrder.Visible = false;
+        btnConfirmOrder.Click += btnConfirmOrder_Click;
+        // 
+        // btnRejectOrder
+        // 
+        btnRejectOrder.FillColor = Color.FromArgb(217, 83, 79);
+        btnRejectOrder.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnRejectOrder.Location = new Point(105, 43);
+        btnRejectOrder.Margin = new Padding(5);
+        btnRejectOrder.MinimumSize = new Size(1, 1);
+        btnRejectOrder.Name = "btnRejectOrder";
+        btnRejectOrder.Radius = 6;
+        btnRejectOrder.RectColor = Color.FromArgb(217, 83, 79);
+        btnRejectOrder.Size = new Size(90, 35);
+        btnRejectOrder.TabIndex = 2;
+        btnRejectOrder.Text = "拒单";
+        btnRejectOrder.Visible = false;
+        btnRejectOrder.Click += btnRejectOrder_Click;
+        // 
+        // btnStartPreparing
+        // 
+        btnStartPreparing.FillColor = Color.FromArgb(240, 173, 78);
+        btnStartPreparing.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnStartPreparing.Location = new Point(5, 88);
+        btnStartPreparing.Margin = new Padding(5);
+        btnStartPreparing.MinimumSize = new Size(1, 1);
+        btnStartPreparing.Name = "btnStartPreparing";
+        btnStartPreparing.Radius = 6;
+        btnStartPreparing.RectColor = Color.FromArgb(240, 173, 78);
+        btnStartPreparing.Size = new Size(90, 35);
+        btnStartPreparing.TabIndex = 3;
+        btnStartPreparing.Text = "开始制作";
+        btnStartPreparing.Visible = false;
+        btnStartPreparing.Click += btnStartPreparing_Click;
+        // 
+        // btnReady
+        // 
+        btnReady.FillColor = Color.FromArgb(91, 192, 222);
+        btnReady.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnReady.Location = new Point(105, 88);
+        btnReady.Margin = new Padding(5);
+        btnReady.MinimumSize = new Size(1, 1);
+        btnReady.Name = "btnReady";
+        btnReady.Radius = 6;
+        btnReady.RectColor = Color.FromArgb(91, 192, 222);
+        btnReady.Size = new Size(90, 35);
+        btnReady.TabIndex = 4;
+        btnReady.Text = "出餐完成";
+        btnReady.Visible = false;
+        btnReady.Click += btnReady_Click;
+        // 
+        // btnStartDelivery
+        // 
+        btnStartDelivery.FillColor = Color.FromArgb(153, 102, 204);
+        btnStartDelivery.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnStartDelivery.Location = new Point(205, 88);
+        btnStartDelivery.Margin = new Padding(5);
+        btnStartDelivery.MinimumSize = new Size(1, 1);
+        btnStartDelivery.Name = "btnStartDelivery";
+        btnStartDelivery.Radius = 6;
+        btnStartDelivery.RectColor = Color.FromArgb(153, 102, 204);
+        btnStartDelivery.Size = new Size(90, 35);
+        btnStartDelivery.TabIndex = 5;
+        btnStartDelivery.Text = "开始配送";
+        btnStartDelivery.Visible = false;
+        btnStartDelivery.Click += btnStartDelivery_Click;
+        // 
+        // btnCompleteOrder
+        // 
+        btnCompleteOrder.FillColor = Color.FromArgb(51, 122, 183);
+        btnCompleteOrder.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnCompleteOrder.Location = new Point(5, 133);
+        btnCompleteOrder.Margin = new Padding(5);
+        btnCompleteOrder.MinimumSize = new Size(1, 1);
+        btnCompleteOrder.Name = "btnCompleteOrder";
+        btnCompleteOrder.Radius = 6;
+        btnCompleteOrder.RectColor = Color.FromArgb(51, 122, 183);
+        btnCompleteOrder.Size = new Size(90, 35);
+        btnCompleteOrder.TabIndex = 6;
+        btnCompleteOrder.Text = "完成订单";
+        btnCompleteOrder.Visible = false;
+        btnCompleteOrder.Click += btnCompleteOrder_Click;
+        // 
+        // btnCancelOrder
+        // 
+        btnCancelOrder.FillColor = Color.FromArgb(150, 150, 150);
+        btnCancelOrder.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnCancelOrder.Location = new Point(105, 133);
+        btnCancelOrder.Margin = new Padding(5);
+        btnCancelOrder.MinimumSize = new Size(1, 1);
+        btnCancelOrder.Name = "btnCancelOrder";
+        btnCancelOrder.Radius = 6;
+        btnCancelOrder.RectColor = Color.FromArgb(150, 150, 150);
+        btnCancelOrder.Size = new Size(90, 35);
+        btnCancelOrder.TabIndex = 7;
+        btnCancelOrder.Text = "取消订单";
+        btnCancelOrder.Visible = false;
+        btnCancelOrder.Click += btnCancelOrder_Click;
         // 
         // grpOrderItems
         // 
@@ -2849,6 +3005,15 @@ partial class Form1
     private Sunny.UI.UILabel changeOrder;
     private Sunny.UI.UIButton btnLoadOrders;
     private Sunny.UI.UITableLayoutPanel layoutOrderMain;
+    private Sunny.UI.UIFlowLayoutPanel panelOrderActions;
+    private Sunny.UI.UILabel lblOrderActionHint;
+    private Sunny.UI.UIButton btnConfirmOrder;
+    private Sunny.UI.UIButton btnRejectOrder;
+    private Sunny.UI.UIButton btnStartPreparing;
+    private Sunny.UI.UIButton btnReady;
+    private Sunny.UI.UIButton btnStartDelivery;
+    private Sunny.UI.UIButton btnCompleteOrder;
+    private Sunny.UI.UIButton btnCancelOrder;
     private Sunny.UI.UIDataGridView dgvOrders;
     private Sunny.UI.UIGroupBox grpOrderDetail;
     private Sunny.UI.UILabel uiLabel15;

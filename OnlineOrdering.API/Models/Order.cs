@@ -27,6 +27,17 @@ namespace OnlineOrdering.API.Models
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         public bool IsDeleted { get; set; } = false;
+
+        public string? CancelReason { get; set; }
+        public DateTime? ConfirmedAt { get; set; }
+        public DateTime? PreparingAt { get; set; }
+        public DateTime? ReadyAt { get; set; }
+        public DateTime? DeliveringAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public DateTime? CancelledAt { get; set; }
+        public int EstimatedMinutes { get; set; }
+        public string? DeliveryPersonName { get; set; }
+        public string? DeliveryPersonPhone { get; set; }
     }
 
     public class OrderItem
