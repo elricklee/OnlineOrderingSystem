@@ -41,7 +41,6 @@ namespace ClientAdmin
 
             Text = "珞珈线上点餐系统-管理员端";
             StartPosition = FormStartPosition.CenterScreen;
-            Size = new Size(1350, 850);
             MinimumSize = new Size(1000, 650);
 
             InitDishGrid();

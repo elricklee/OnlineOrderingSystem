@@ -37,8 +37,6 @@ namespace ClientCustomer
             ClientSize = new Size(820, 700);
             MinimumSize = new Size(820, 700);
 
-            txtTableNumber.Visible = false;
-
             lblAddress.Text = "配送区域：";
             txtAddress.Location = new Point(286, 516);
             txtAddress.Size = new Size(400, 34);

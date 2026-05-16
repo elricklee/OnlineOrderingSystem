@@ -17,7 +17,6 @@ partial class OrderTypeForm
     {
         lblTitle = new Label();
         panelDineIn = new Panel();
-        txtTableNumber = new TextBox();
         cmbDiningTable = new ComboBox();
         lblDinerCount = new Label();
         nudDinerCount = new NumericUpDown();
@@ -63,7 +62,6 @@ partial class OrderTypeForm
         // 
         panelDineIn.BackColor = Color.White;
         panelDineIn.BorderStyle = BorderStyle.FixedSingle;
-        panelDineIn.Controls.Add(txtTableNumber);
         panelDineIn.Controls.Add(cmbDiningTable);
         panelDineIn.Controls.Add(lblDinerCount);
         panelDineIn.Controls.Add(nudDinerCount);
@@ -78,15 +76,6 @@ partial class OrderTypeForm
         panelDineIn.Name = "panelDineIn";
         panelDineIn.Size = new Size(273, 365);
         panelDineIn.TabIndex = 1;
-        // 
-        // txtTableNumber
-        // 
-        txtTableNumber.Font = new Font("微软雅黑", 10F);
-        txtTableNumber.Location = new Point(96, 234);
-        txtTableNumber.MaxLength = 100;
-        txtTableNumber.Name = "txtTableNumber";
-        txtTableNumber.Size = new Size(146, 34);
-        txtTableNumber.TabIndex = 4;
         // 
         // cmbDiningTable
         // 
@@ -374,7 +363,6 @@ partial class OrderTypeForm
     private System.Windows.Forms.PictureBox picDineIn;
     private System.Windows.Forms.Label lblDineInTitle;
     private System.Windows.Forms.Label lblDineInDesc;
-    private System.Windows.Forms.TextBox txtTableNumber;
     private System.Windows.Forms.ComboBox cmbDiningTable;
     private System.Windows.Forms.Label lblDiningTableHint;
     private System.Windows.Forms.Button btnRefreshTables;
