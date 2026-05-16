@@ -4,6 +4,9 @@ namespace ClientCustomer.Models
 {
     public class OrderCreateDto
     {
+        [JsonProperty("userId")]
+        public int? UserId { get; set; }
+
         [JsonProperty("customerName")]
         public string CustomerName { get; set; } = "";
 
@@ -16,8 +19,17 @@ namespace ClientCustomer.Models
         [JsonProperty("tableNumber")]
         public string? TableNumber { get; set; }
 
+        [JsonProperty("diningTableId")]
+        public int? DiningTableId { get; set; }
+
         [JsonProperty("address")]
         public string? Address { get; set; }
+
+        [JsonProperty("deliveryZoneId")]
+        public int? DeliveryZoneId { get; set; }
+
+        [JsonProperty("deliveryRegion")]
+        public string? DeliveryRegion { get; set; }
 
         [JsonProperty("note")]
         public string? Note { get; set; }

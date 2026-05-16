@@ -8,51 +8,132 @@ namespace ClientCustomer
 {
     public partial class Form1 : UIForm
     {
-        private readonly string _orderType;
-        private readonly string? _tableNumber;
-        private readonly string? _deliveryAddress;
+        private readonly OrderSession _session;
+        private readonly List<DishDto> _allDishes = new();
+        private readonly List<CartItem> _cart = new();
 
-        private List<DishDto> _allDishes = new();
-        private List<CartItem> _cart = new();
         private string _selectedCategory = "全部";
+        private bool _eventsBound;
 
         private static readonly Color PrimaryColor = Color.FromArgb(255, 109, 0);
+        private static readonly Color PrimaryDarkColor = Color.FromArgb(230, 81, 0);
+        private static readonly Color SurfaceColor = Color.White;
         private static readonly Color TextColor = Color.FromArgb(51, 51, 51);
         private static readonly Color TextSecondaryColor = Color.FromArgb(117, 117, 117);
-        private static readonly Color CardBgColor = Color.White;
         private static readonly Color SuccessColor = Color.FromArgb(76, 175, 80);
         private static readonly Color DangerColor = Color.FromArgb(244, 67, 54);
-        private static readonly Color PrimaryDarkColor = Color.FromArgb(230, 81, 0);
 
-        public Form1(string orderType, string? tableNumber, string? deliveryAddress)
+        public Form1(OrderSession session)
         {
             InitializeComponent();
+            _session = session ?? new OrderSession();
+            Load += Form1_Load;
+        }
 
-            _orderType = orderType;
-            _tableNumber = tableNumber;
-            _deliveryAddress = deliveryAddress;
-
-            this.Load += Form1_Load;
+        public Form1(string orderType, string? tableNumber, string? deliveryAddress)
+            : this(new OrderSession
+            {
+                OrderType = orderType,
+                TableNumber = tableNumber,
+                DeliveryAddressDetail = deliveryAddress
+            })
+        {
         }
 
         private void Form1_Load(object? sender, EventArgs e)
         {
-            if (DesignMode) return;
+            if (DesignMode)
+            {
+                return;
+            }
 
+            BindEventsOnce();
+            ApplyVisualTweaks();
             UpdateOrderInfoDisplay();
+            UpdateCartBar();
             _ = LoadDishesAsync();
+        }
+
+        private void BindEventsOnce()
+        {
+            if (_eventsBound)
+            {
+                return;
+            }
+
+            _eventsBound = true;
+            btnSearch.Click += BtnSearch_Click;
+            btnRefresh.Click += BtnRefresh_Click;
+            btnBack.Click += BtnBack_Click;
+            btnCheckOrder.Click += BtnCheckOrder_Click;
+            btnViewCart.Click += BtnViewCart_Click;
+            btnCheckout.Click += BtnCheckout_Click;
+            btnGetRecommend.Click += BtnGetRecommend_Click;
+            txtSearch.KeyDown += TxtSearch_KeyDown;
+        }
+
+        private void ApplyVisualTweaks()
+        {
+            Text = "珞珈线上点餐系统";
+            lblTitle.Text = "珞珈线上点餐系统";
+
+            if (Program.CurrentUser != null)
+            {
+                lblTitle.Text = $"珞珈线上点餐系统 - 欢迎，{Program.CurrentUser.RealName ?? Program.CurrentUser.Username}";
+                btnCheckOrder.Text = "我的订单";
+            }
+            else
+            {
+                btnCheckOrder.Text = "查订单";
+            }
+
+            btnSearch.Text = "搜索";
+            btnRefresh.Text = "刷新";
+            btnBack.Text = "重选模式";
+            btnViewCart.Text = "购物车";
+            btnCheckout.Text = "去结算";
+            btnGetRecommend.Text = "获取推荐";
+            lblAITitle.Text = "AI 推荐";
+            lblAIText.Text = "先挑几道菜，AI 会帮你推荐更搭配的组合。";
+            lblAIText.ForeColor = TextSecondaryColor;
+
+            txtSearch.Watermark = "输入菜名搜索";
+
+            StyleActionButton(btnSearch, Color.White, PrimaryDarkColor);
+            StyleActionButton(btnRefresh, Color.White, PrimaryDarkColor);
+            StyleActionButton(btnBack, Color.White, PrimaryDarkColor);
+            StyleActionButton(btnCheckOrder, Color.White, PrimaryDarkColor);
+            StyleActionButton(btnViewCart, PrimaryColor, Color.White);
+            StyleActionButton(btnCheckout, Color.FromArgb(44, 62, 80), Color.White);
+            StyleActionButton(btnGetRecommend, Color.FromArgb(46, 125, 50), Color.White);
+        }
+
+        private static void StyleActionButton(UIButton button, Color fillColor, Color foreColor)
+        {
+            button.FillColor = fillColor;
+            button.RectColor = fillColor;
+            button.ForeColor = foreColor;
+            button.Radius = Math.Max(button.Radius, 8);
+            button.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
         }
 
         private void UpdateOrderInfoDisplay()
         {
-            if (_orderType == "DineIn")
+            if (_session.OrderType == "DineIn")
             {
-                lblOrderInfo.Text = $"[堂食 · 桌号：{_tableNumber}]";
+                lblOrderInfo.Text = $"[堂食 · 桌号：{_session.TableNumber ?? "未选择"}]";
+                return;
             }
-            else
-            {
-                lblOrderInfo.Text = $"[外卖 · 配送费：¥5]";
-            }
+
+            var region = string.IsNullOrWhiteSpace(_session.DeliveryRegion)
+                ? "未选择配送区域"
+                : _session.DeliveryRegion;
+
+            var feeText = _session.DeliveryZoneId == null
+                ? "配送费待定"
+                : $"配送费：¥{_session.DeliveryFee:0.##}";
+
+            lblOrderInfo.Text = $"[外卖 · {region} · {feeText}]";
         }
 
         private async Task LoadDishesAsync()
@@ -62,10 +143,12 @@ namespace ClientCustomer
                 lblNoDish.Visible = true;
                 lblNoDish.Text = "正在加载菜品...";
 
-                _allDishes = await ApiHelper.GetDishesAsync();
+                var dishes = await ApiHelper.GetDishesAsync();
+                _allDishes.Clear();
+                _allDishes.AddRange(dishes);
 
-                lblNoDish.Visible = false;
-                DisplayDishes(_allDishes);
+                BuildCategoryButtons(_allDishes.Select(d => d.Category));
+                FilterDishes();
             }
             catch (Exception ex)
             {
@@ -74,16 +157,52 @@ namespace ClientCustomer
             }
         }
 
+        private void BuildCategoryButtons(IEnumerable<string> categories)
+        {
+            var categoryList = categories
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+
+            categoryFlow.Controls.Clear();
+            categoryFlow.WrapContents = true;
+
+            CreateCategoryButton("全部", true);
+            foreach (var category in categoryList)
+            {
+                CreateCategoryButton(category, false);
+            }
+        }
+
+        private void CreateCategoryButton(string text, bool selected)
+        {
+            var button = new UIButton
+            {
+                Text = text,
+                Width = Math.Max(90, text.Length * 20 + 28),
+                Height = 34,
+                Font = new Font("微软雅黑", 9.5F, FontStyle.Bold),
+                Radius = 16,
+                Cursor = Cursors.Hand,
+                FillColor = selected ? PrimaryColor : Color.White,
+                RectColor = selected ? PrimaryColor : Color.FromArgb(220, 220, 220),
+                ForeColor = selected ? Color.White : TextColor,
+                TagString = null
+            };
+            button.Click += CategoryButton_Click;
+            categoryFlow.Controls.Add(button);
+        }
+
         private void DisplayDishes(List<DishDto> dishes)
         {
             dishFlowPanel.Controls.Clear();
-
             var availableDishes = dishes.Where(d => d.IsAvailable).ToList();
 
             if (availableDishes.Count == 0)
             {
                 lblNoDish.Visible = true;
-                lblNoDish.Text = "暂无菜品";
+                lblNoDish.Text = "暂无符合条件的菜品";
                 return;
             }
 
@@ -91,8 +210,7 @@ namespace ClientCustomer
 
             foreach (var dish in availableDishes)
             {
-                var card = CreateDishCard(dish);
-                dishFlowPanel.Controls.Add(card);
+                dishFlowPanel.Controls.Add(CreateDishCard(dish));
             }
         }
 
@@ -100,49 +218,48 @@ namespace ClientCustomer
         {
             var card = new Panel
             {
-                Width = 200,
-                Height = 290,
-                BackColor = CardBgColor,
-                Margin = new Padding(6, 6, 6, 6),
-                Padding = new Padding(8),
-                Cursor = Cursors.Default
-            };
-            card.Paint += (s, e) =>
-            {
-                e.Graphics.Clear(CardBgColor);
-                using var pen = new Pen(Color.FromArgb(224, 224, 224), 1);
-                e.Graphics.DrawRectangle(pen, 0, 0, card.Width - 1, card.Height - 1);
-                using var shadowPen = new Pen(Color.FromArgb(240, 240, 240), 1);
-                e.Graphics.DrawRectangle(shadowPen, 1, 1, card.Width - 3, card.Height - 3);
+                Width = 220,
+                Height = 340,
+                BackColor = SurfaceColor,
+                Margin = new Padding(8),
+                Padding = new Padding(10)
             };
 
-            var picBox = new PictureBox
+            card.Paint += (_, e) =>
             {
-                Size = new Size(182, 110),
-                Location = new Point(9, 9),
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.FromArgb(245, 245, 245),
-                BorderStyle = BorderStyle.None
+                e.Graphics.Clear(SurfaceColor);
+                using var borderPen = new Pen(Color.FromArgb(230, 230, 230), 1);
+                e.Graphics.DrawRectangle(borderPen, 0, 0, card.Width - 1, card.Height - 1);
+                using var innerPen = new Pen(Color.FromArgb(245, 245, 245), 1);
+                e.Graphics.DrawRectangle(innerPen, 1, 1, card.Width - 3, card.Height - 3);
             };
-            LoadDishImage(picBox, dish);
+
+            var pictureBox = new PictureBox
+            {
+                Size = new Size(200, 118),
+                Location = new Point(10, 10),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                BackColor = Color.FromArgb(248, 248, 248)
+            };
+            LoadDishImage(pictureBox, dish);
 
             var lblName = new UILabel
             {
                 Text = dish.Name,
                 Font = new Font("微软雅黑", 11F, FontStyle.Bold),
                 ForeColor = TextColor,
-                Location = new Point(10, 125),
-                Size = new Size(180, 25),
+                Location = new Point(12, 136),
+                Size = new Size(196, 26),
                 TagString = null
             };
 
             var lblPrice = new UILabel
             {
-                Text = $"¥{dish.Price:F0}",
-                Font = new Font("微软雅黑", 14F, FontStyle.Bold),
+                Text = $"¥{dish.Price:0.##}",
+                Font = new Font("微软雅黑", 15F, FontStyle.Bold),
                 ForeColor = PrimaryColor,
-                Location = new Point(10, 152),
-                Size = new Size(100, 28),
+                Location = new Point(12, 166),
+                Size = new Size(100, 30),
                 TagString = null
             };
 
@@ -151,110 +268,146 @@ namespace ClientCustomer
                 Text = GetSpicyDisplay(dish.SpicyLevel),
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = dish.SpicyLevel > 0 ? DangerColor : SuccessColor,
-                Location = new Point(115, 157),
-                Size = new Size(75, 22),
+                Location = new Point(112, 171),
+                Size = new Size(96, 24),
+                TextAlign = ContentAlignment.MiddleRight,
                 TagString = null
             };
 
             var lblDesc = new UILabel
             {
-                Text = TruncateText(dish.Description ?? "", 18),
+                Text = TruncateText(dish.Description ?? string.Empty, 22),
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = TextSecondaryColor,
-                Location = new Point(10, 183),
-                Size = new Size(180, 30),
+                Location = new Point(12, 200),
+                Size = new Size(196, 38),
                 TagString = null
+            };
+
+            var lblCategory = new UILabel
+            {
+                Text = dish.Category,
+                Font = new Font("微软雅黑", 8.5F),
+                ForeColor = Color.FromArgb(150, 150, 150),
+                Location = new Point(12, 238),
+                Size = new Size(100, 22),
+                TagString = null
+            };
+
+            var lblQuantity = new UILabel
+            {
+                Text = "数量",
+                Font = new Font("微软雅黑", 9F),
+                ForeColor = TextSecondaryColor,
+                Location = new Point(12, 270),
+                Size = new Size(38, 22),
+                TagString = null
+            };
+
+            var quantityInput = new NumericUpDown
+            {
+                Font = new Font("微软雅黑", 10F),
+                Location = new Point(58, 265),
+                Minimum = 1,
+                Maximum = 99,
+                Value = 1,
+                Size = new Size(70, 34),
+                TextAlign = HorizontalAlignment.Center
             };
 
             var btnAdd = new UIButton
             {
                 Text = "加入购物车",
-                Size = new Size(182, 38),
-                Location = new Point(9, 225),
-                Font = new Font("微软雅黑", 10F),
+                Size = new Size(196, 38),
+                Location = new Point(12, 292),
+                Font = new Font("微软雅黑", 10F, FontStyle.Bold),
                 FillColor = PrimaryColor,
-                ForeColor = Color.White,
                 RectColor = PrimaryColor,
-                Radius = 6,
+                ForeColor = Color.White,
+                Radius = 8,
                 Cursor = Cursors.Hand,
                 TagString = null
             };
-            btnAdd.Click += (s, e) => AddToCart(dish);
+            btnAdd.Click += (_, _) => AddToCart(dish, (int)quantityInput.Value);
 
-            var lblCategory = new UILabel
-            {
-                Text = dish.Category,
-                Font = new Font("微软雅黑", 8F),
-                ForeColor = Color.FromArgb(158, 158, 158),
-                Location = new Point(10, 268),
-                Size = new Size(80, 18),
-                TagString = null
-            };
+            card.Controls.AddRange(
+                new Control[]
+                {
+                    pictureBox, lblName, lblPrice, lblSpicy, lblDesc, lblCategory,
+                    lblQuantity, quantityInput, btnAdd
+                });
 
-            card.Controls.AddRange(new Control[] { picBox, lblName, lblPrice, lblSpicy, lblDesc, btnAdd, lblCategory });
             return card;
         }
 
-        private async void LoadDishImage(PictureBox picBox, DishDto dish)
+        private async void LoadDishImage(PictureBox pictureBox, DishDto dish)
         {
-            if (!string.IsNullOrEmpty(dish.ImagePath))
+            if (!string.IsNullOrWhiteSpace(dish.ImagePath))
             {
                 try
                 {
-                    var imageUrl = dish.ImagePath.StartsWith("http")
+                    var imageUrl = dish.ImagePath.StartsWith("http", StringComparison.OrdinalIgnoreCase)
                         ? dish.ImagePath
-                        : $"http://localhost:5000{dish.ImagePath}";
+                        : $"http://127.0.0.1:5000{dish.ImagePath}";
 
                     using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
                     var imageBytes = await client.GetByteArrayAsync(imageUrl);
 
-                    this.Invoke((MethodInvoker)delegate
+                    if (IsDisposed || !IsHandleCreated)
                     {
-                        try
-                        {
-                            using var ms = new MemoryStream(imageBytes);
-                            picBox.Image = Image.FromStream(ms);
-                        }
-                        catch { }
+                        return;
+                    }
+
+                    BeginInvoke((MethodInvoker)delegate
+                    {
+                        using var ms = new MemoryStream(imageBytes);
+                        pictureBox.Image = Image.FromStream(ms);
                     });
                 }
-                catch { }
+                catch
+                {
+                }
             }
 
-            if (picBox.Image == null)
+            if (pictureBox.Image == null && !IsDisposed && IsHandleCreated)
             {
-                this.Invoke((MethodInvoker)delegate
+                BeginInvoke((MethodInvoker)delegate
                 {
-                    DrawPlaceholderImage(picBox, dish.Name);
+                    if (pictureBox.Image == null)
+                    {
+                        DrawPlaceholderImage(pictureBox, dish.Name);
+                    }
                 });
             }
         }
 
-        private void DrawPlaceholderImage(PictureBox picBox, string dishName)
+        private void DrawPlaceholderImage(PictureBox pictureBox, string dishName)
         {
-            var bmp = new Bitmap(picBox.Width, picBox.Height);
-            using (var g = Graphics.FromImage(bmp))
-            {
-                var brush = new SolidBrush(Color.FromArgb(255, 224, 178));
-                g.FillRectangle(brush, 0, 0, bmp.Width, bmp.Height);
+            var bitmap = new Bitmap(pictureBox.Width, pictureBox.Height);
+            using var graphics = Graphics.FromImage(bitmap);
+            using var backgroundBrush = new SolidBrush(Color.FromArgb(255, 235, 210));
+            using var textBrush = new SolidBrush(PrimaryDarkColor);
+            using var font = new Font("微软雅黑", 30F, FontStyle.Bold);
 
-                var initial = dishName.Length > 0 ? dishName[0].ToString() : "?";
-                var font = new Font("微软雅黑", 32F, FontStyle.Bold);
-                var textColor = new SolidBrush(PrimaryDarkColor);
-                var textSize = g.MeasureString(initial, font);
-                g.DrawString(initial, font, textColor,
-                    (bmp.Width - textSize.Width) / 2,
-                    (bmp.Height - textSize.Height) / 2);
-            }
-            picBox.Image = bmp;
+            graphics.FillRectangle(backgroundBrush, 0, 0, bitmap.Width, bitmap.Height);
+            var initial = string.IsNullOrWhiteSpace(dishName) ? "?" : dishName[0].ToString();
+            var size = graphics.MeasureString(initial, font);
+            graphics.DrawString(
+                initial,
+                font,
+                textBrush,
+                (bitmap.Width - size.Width) / 2,
+                (bitmap.Height - size.Height) / 2);
+
+            pictureBox.Image = bitmap;
         }
 
-        private void AddToCart(DishDto dish)
+        private void AddToCart(DishDto dish, int quantity)
         {
             var existingItem = _cart.FirstOrDefault(c => c.DishId == dish.Id);
             if (existingItem != null)
             {
-                existingItem.Quantity++;
+                existingItem.Quantity += quantity;
             }
             else
             {
@@ -263,13 +416,12 @@ namespace ClientCustomer
                     DishId = dish.Id,
                     DishName = dish.Name,
                     Price = dish.Price,
-                    Quantity = 1
+                    Quantity = quantity
                 });
             }
 
             UpdateCartBar();
-
-            UIMessageTip.ShowOk($"已添加「{dish.Name}」到购物车", 1000);
+            UIMessageTip.ShowOk($"已加入 {quantity} 份「{dish.Name}」", 1000);
         }
 
         private void UpdateCartBar()
@@ -281,35 +433,42 @@ namespace ClientCustomer
             }
 
             var totalItems = _cart.Sum(c => c.Quantity);
-            var totalAmount = _cart.Sum(c => c.Subtotal);
-            var deliveryFee = _orderType == "Delivery" ? 5.00m : 0.00m;
-            var finalTotal = totalAmount + deliveryFee;
+            var subtotal = _cart.Sum(c => c.Subtotal);
+            var isDelivery = _session.OrderType == "Delivery";
+            var finalTotal = subtotal + _session.DeliveryFee;
+            var summaryText = string.Join("  ", _cart.Select(c => $"{c.DishName}x{c.Quantity}"));
 
-            var summaryParts = _cart.Select(c => $"{c.DishName}x{c.Quantity}");
-            var summaryText = string.Join("  ", summaryParts);
-
-            if (_orderType == "Delivery")
+            if (isDelivery)
             {
-                lblCartSummary.Text = $"购物车({totalItems}件)：{summaryText}  商品合计：¥{totalAmount:F0}  配送费：¥{deliveryFee:F0}  总计：¥{finalTotal:F0}";
+                var feeText = _session.DeliveryZoneId == null
+                    ? "待选择区域"
+                    : $"¥{_session.DeliveryFee:0.##}";
+                lblCartSummary.Text =
+                    $"购物车({totalItems}件)：{summaryText}  商品合计：¥{subtotal:0.##}  配送费：{feeText}" +
+                    (_session.DeliveryZoneId == null ? string.Empty : $"  总计：¥{finalTotal:0.##}");
             }
             else
             {
-                lblCartSummary.Text = $"购物车({totalItems}件)：{summaryText}  合计：¥{totalAmount:F0}";
+                lblCartSummary.Text = $"购物车({totalItems}件)：{summaryText}  合计：¥{subtotal:0.##}";
             }
         }
 
         private void CategoryButton_Click(object? sender, EventArgs e)
         {
-            if (sender is not UIButton btn) return;
-
-            _selectedCategory = btn.Text;
-
-            foreach (Control ctrl in categoryFlow.Controls)
+            if (sender is not UIButton button)
             {
-                if (ctrl is UIButton catBtn)
+                return;
+            }
+
+            _selectedCategory = button.Text;
+            foreach (Control control in categoryFlow.Controls)
+            {
+                if (control is UIButton categoryButton)
                 {
-                    catBtn.FillColor = catBtn.Text == _selectedCategory ? PrimaryColor : Color.White;
-                    catBtn.ForeColor = catBtn.Text == _selectedCategory ? Color.White : TextColor;
+                    var selected = categoryButton.Text == _selectedCategory;
+                    categoryButton.FillColor = selected ? PrimaryColor : Color.White;
+                    categoryButton.RectColor = selected ? PrimaryColor : Color.FromArgb(220, 220, 220);
+                    categoryButton.ForeColor = selected ? Color.White : TextColor;
                 }
             }
 
@@ -318,17 +477,31 @@ namespace ClientCustomer
 
         private void FilterDishes()
         {
-            var filtered = _selectedCategory == "全部"
-                ? _allDishes
-                : _allDishes.Where(d => d.Category == _selectedCategory).ToList();
+            IEnumerable<DishDto> filtered = _allDishes;
 
-            if (!string.IsNullOrWhiteSpace(txtSearch.Text))
+            if (_selectedCategory != "全部")
             {
-                var keyword = txtSearch.Text.Trim();
-                filtered = filtered.Where(d => d.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
+                filtered = filtered.Where(d => d.Category == _selectedCategory);
             }
 
-            DisplayDishes(filtered);
+            var keyword = txtSearch.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filtered = filtered.Where(d =>
+                    d.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                    (d.Description?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false));
+            }
+
+            DisplayDishes(filtered.ToList());
+        }
+
+        private void TxtSearch_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                FilterDishes();
+            }
         }
 
         private void BtnSearch_Click(object? sender, EventArgs e)
@@ -359,30 +532,35 @@ namespace ClientCustomer
 
         private void BtnBack_Click(object? sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Retry;
-            this.Close();
+            DialogResult = DialogResult.Retry;
+            Close();
         }
 
         private void BtnCheckOrder_Click(object? sender, EventArgs e)
         {
-            var orderStatusForm = new OrderStatusForm();
-            orderStatusForm.ShowDialog(this);
+            if (Program.CurrentUser != null)
+            {
+                using var orderHistoryForm = new OrderHistoryForm(Program.CurrentUser.Id);
+                orderHistoryForm.ShowDialog(this);
+            }
+            else
+            {
+                using var orderStatusForm = new OrderStatusForm();
+                orderStatusForm.ShowDialog(this);
+            }
         }
 
         private void BtnViewCart_Click(object? sender, EventArgs e)
         {
-            if (_cart.Count == 0)
-            {
-                UIMessageTip.ShowWarning("购物车为空");
-                return;
-            }
-
-            var cartForm = new CartForm(_cart, _orderType, _tableNumber, _deliveryAddress);
-            cartForm.ShowDialog(this);
-            UpdateCartBar();
+            OpenCartDialog();
         }
 
         private void BtnCheckout_Click(object? sender, EventArgs e)
+        {
+            OpenCartDialog();
+        }
+
+        private void OpenCartDialog()
         {
             if (_cart.Count == 0)
             {
@@ -390,8 +568,9 @@ namespace ClientCustomer
                 return;
             }
 
-            var cartForm = new CartForm(_cart, _orderType, _tableNumber, _deliveryAddress);
+            using var cartForm = new CartForm(_cart, _session);
             cartForm.ShowDialog(this);
+            UpdateOrderInfoDisplay();
             UpdateCartBar();
         }
 
@@ -414,17 +593,17 @@ namespace ClientCustomer
 
                 var result = await ApiHelper.GetRecommendationAsync(request);
 
-                if (result.Recommendations.Count > 0)
+                if (result.Recommendations.Count == 0)
                 {
-                    var recTexts = result.Recommendations.Select(r => $"「{r.DishName}」- {r.Reason}");
-                    lblAIText.Text = string.Join(" | ", recTexts);
-                    lblAIText.ForeColor = SuccessColor;
-                }
-                else
-                {
-                    lblAIText.Text = "暂无推荐结果，请尝试选择更多菜品后再获取推荐";
+                    lblAIText.Text = "当前没有推荐结果，试试先加几道菜。";
                     lblAIText.ForeColor = TextSecondaryColor;
+                    return;
                 }
+
+                lblAIText.Text = string.Join(
+                    " | ",
+                    result.Recommendations.Select(item => $"「{item.DishName}」{item.Reason}"));
+                lblAIText.ForeColor = SuccessColor;
             }
             catch (Exception ex)
             {
@@ -443,27 +622,29 @@ namespace ClientCustomer
             return level switch
             {
                 0 => "不辣",
-                1 => "微辣🌶",
-                2 => "中辣🌶🌶",
-                3 => "特辣🌶🌶🌶",
+                1 => "微辣 🌶",
+                2 => "中辣 🌶🌶",
+                3 => "特辣 🌶🌶🌶",
                 _ => "未知"
             };
         }
 
         private static string TruncateText(string text, int maxLength)
         {
-            if (string.IsNullOrEmpty(text)) return "";
-            return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            return text.Length <= maxLength ? text : text[..maxLength] + "...";
         }
 
         private void lblOrderInfo_Click(object sender, EventArgs e)
         {
-
         }
 
         private void dishFlowPanel_Paint(object sender, PaintEventArgs e)
         {
-
         }
     }
 }

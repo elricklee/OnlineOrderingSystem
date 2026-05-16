@@ -2,26 +2,30 @@ namespace OnlineOrdering.API.Models
 {
     public class Order
     {
-        public int Id { get; set; }//订单id
+        public int Id { get; set; }
 
-        //外卖
-        public string CustomerName { get; set; } = string.Empty;//姓名
-        public string Phone { get; set; } = string.Empty;//电话
-        public string? Address { get; set; }//地址
+        public int? UserId { get; set; }
+        public User? User { get; set; }
 
-        //堂食
-        public string? TableNumber { get; set; }//桌号
+        public string CustomerName { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string? Address { get; set; }
 
-        //通用
-        public string? Note { get; set; }//备注
-        public decimal TotalAmount { get; set; }//总金额
-        public decimal DeliveryFee { get; set; } = 0.00m;//配送费
-        public string OrderType { get; set; } = "DineIn";//订单类型：DineIn（堂食）/Delivery（外卖）
-        public string Status { get; set; } = "Pending";//订单状态
-        public DateTime CreatedAt { get; set; } = DateTime.Now;//创建时间
+        public string? TableNumber { get; set; }
+        public int? DiningTableId { get; set; }
+        public DiningTable? DiningTable { get; set; }
+
+        public string? Note { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal DeliveryFee { get; set; } = 0.00m;
+        public int? DeliveryZoneId { get; set; }
+        public DeliveryZone? DeliveryZone { get; set; }
+        public string? DeliveryRegion { get; set; }
+        public string OrderType { get; set; } = "DineIn";
+        public string Status { get; set; } = "Pending";
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
-        //逻辑删除字段
         public bool IsDeleted { get; set; } = false;
     }
 

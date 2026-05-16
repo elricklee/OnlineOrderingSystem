@@ -17,7 +17,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IStatisticsService, StatisticsService>();//添加统计服务
+builder.Services.AddScoped<IDeliveryZoneService, DeliveryZoneService>();
+builder.Services.AddScoped<IDiningTableService, DiningTableService>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddHttpClient<IAiService, AiService>();
 
 builder.Services.AddCors(opt =>
@@ -29,6 +32,13 @@ builder.Services.AddCors(opt =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+    await DbSeeder.SeedAsync(db);
+}
 
 if (app.Environment.IsDevelopment())
 {

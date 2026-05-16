@@ -16,7 +16,12 @@ namespace ClientAdmin
         private int? selectedDishId = null;
         private int? selectedOrderId = null;
         private int? selectedProductId = null;
+        private int? selectedUserId = null;
         private System.Collections.Generic.List<TopDishStatDto> currentTopDishes = new();
+        private readonly string[] _defaultCategories = { "热菜", "凉菜", "主食", "饮品", "汤类", "小吃" };
+        private int? _selectedZoneId;
+        private int? _selectedDiningTableId;
+        private bool _managementTabsInitialized;
 
         private static readonly System.Collections.Generic.Dictionary<string, string> StatusMap = new()
         {
@@ -43,6 +48,7 @@ namespace ClientAdmin
             InitOrderManagement();
             InitStatisticsPage();
             InitAiPage();
+            InitializeManagementTabs();
         }
 
         private void InitDishGrid()
@@ -538,69 +544,139 @@ namespace ClientAdmin
 
         private void SetOrderGridHeaders()
         {
+            dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
             if (dgvOrders.Columns["Id"] != null)
-                dgvOrders.Columns["Id"].HeaderText = "订单编号";
+            {
+                dgvOrders.Columns["Id"].HeaderText = "订单号";
+                dgvOrders.Columns["Id"].FillWeight = 50;
+                dgvOrders.Columns["Id"].DisplayIndex = 0;
+            }
+
+            if (dgvOrders.Columns["OrderType"] != null)
+            {
+                dgvOrders.Columns["OrderType"].HeaderText = "类型";
+                dgvOrders.Columns["OrderType"].FillWeight = 50;
+                dgvOrders.Columns["OrderType"].DisplayIndex = 1;
+            }
+
+            if (dgvOrders.Columns["TableNumber"] != null)
+            {
+                dgvOrders.Columns["TableNumber"].HeaderText = "桌号";
+                dgvOrders.Columns["TableNumber"].FillWeight = 50;
+                dgvOrders.Columns["TableNumber"].DisplayIndex = 2;
+            }
 
             if (dgvOrders.Columns["CustomerName"] != null)
-                dgvOrders.Columns["CustomerName"].HeaderText = "顾客姓名";
+            {
+                dgvOrders.Columns["CustomerName"].HeaderText = "顾客";
+                dgvOrders.Columns["CustomerName"].FillWeight = 60;
+                dgvOrders.Columns["CustomerName"].DisplayIndex = 3;
+            }
 
             if (dgvOrders.Columns["Phone"] != null)
+            {
                 dgvOrders.Columns["Phone"].HeaderText = "电话";
+                dgvOrders.Columns["Phone"].FillWeight = 80;
+                dgvOrders.Columns["Phone"].DisplayIndex = 4;
+            }
 
             if (dgvOrders.Columns["Address"] != null)
+            {
                 dgvOrders.Columns["Address"].HeaderText = "配送地址";
+                dgvOrders.Columns["Address"].FillWeight = 120;
+                dgvOrders.Columns["Address"].DisplayIndex = 5;
+            }
 
             if (dgvOrders.Columns["TotalAmount"] != null)
+            {
                 dgvOrders.Columns["TotalAmount"].HeaderText = "总金额";
+                dgvOrders.Columns["TotalAmount"].FillWeight = 70;
+                dgvOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "C2";
+                dgvOrders.Columns["TotalAmount"].DisplayIndex = 6;
+            }
 
             if (dgvOrders.Columns["Status"] != null)
-                dgvOrders.Columns["Status"].HeaderText = "订单状态";
+            {
+                dgvOrders.Columns["Status"].HeaderText = "状态";
+                dgvOrders.Columns["Status"].FillWeight = 60;
+                dgvOrders.Columns["Status"].DisplayIndex = 7;
+            }
 
             if (dgvOrders.Columns["CreatedAt"] != null)
             {
-                dgvOrders.Columns["CreatedAt"].HeaderText = "创建时间";
-                dgvOrders.Columns["CreatedAt"].DefaultCellStyle.Format = "yyyy-MM-dd HH:mm:ss";
+                dgvOrders.Columns["CreatedAt"].HeaderText = "下单时间";
+                dgvOrders.Columns["CreatedAt"].FillWeight = 80;
+                dgvOrders.Columns["CreatedAt"].DefaultCellStyle.Format = "MM-dd HH:mm";
+                dgvOrders.Columns["CreatedAt"].DisplayIndex = 8;
             }
 
             if (dgvOrders.Columns["OrderItems"] != null)
                 dgvOrders.Columns["OrderItems"].Visible = false;
 
-            // 这些是文档里的预留字段。当前后端没返回时可以先隐藏。
-            if (dgvOrders.Columns["OrderType"] != null)
-                dgvOrders.Columns["OrderType"].HeaderText = "订单类型";
-
-            if (dgvOrders.Columns["TableNumber"] != null)
-                dgvOrders.Columns["TableNumber"].HeaderText = "桌号";
-
             if (dgvOrders.Columns["Note"] != null)
                 dgvOrders.Columns["Note"].Visible = false;
 
             if (dgvOrders.Columns["DeliveryFee"] != null)
-                dgvOrders.Columns["DeliveryFee"].HeaderText = "配送费";
+                dgvOrders.Columns["DeliveryFee"].Visible = false;
+
+            if (dgvOrders.Columns["DiningTableId"] != null)
+                dgvOrders.Columns["DiningTableId"].Visible = false;
+
+            if (dgvOrders.Columns["DeliveryZoneId"] != null)
+                dgvOrders.Columns["DeliveryZoneId"].Visible = false;
+
+            if (dgvOrders.Columns["DeliveryRegion"] != null)
+                dgvOrders.Columns["DeliveryRegion"].Visible = false;
         }
 
         private void SetOrderItemGridHeaders()
         {
+            dgvOrderItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
             if (dgvOrderItems.Columns["Id"] != null)
+            {
                 dgvOrderItems.Columns["Id"].HeaderText = "明细编号";
+                dgvOrderItems.Columns["Id"].FillWeight = 60;
+            }
 
             if (dgvOrderItems.Columns["OrderId"] != null)
+            {
                 dgvOrderItems.Columns["OrderId"].HeaderText = "订单编号";
+                dgvOrderItems.Columns["OrderId"].FillWeight = 60;
+            }
 
             if (dgvOrderItems.Columns["DishId"] != null)
+            {
                 dgvOrderItems.Columns["DishId"].HeaderText = "菜品编号";
+                dgvOrderItems.Columns["DishId"].FillWeight = 60;
+            }
 
             if (dgvOrderItems.Columns["DishName"] != null)
+            {
                 dgvOrderItems.Columns["DishName"].HeaderText = "菜品名称";
+                dgvOrderItems.Columns["DishName"].FillWeight = 100;
+            }
 
             if (dgvOrderItems.Columns["Price"] != null)
+            {
                 dgvOrderItems.Columns["Price"].HeaderText = "单价";
+                dgvOrderItems.Columns["Price"].FillWeight = 70;
+                dgvOrderItems.Columns["Price"].DefaultCellStyle.Format = "C2";
+            }
 
             if (dgvOrderItems.Columns["Quantity"] != null)
+            {
                 dgvOrderItems.Columns["Quantity"].HeaderText = "数量";
+                dgvOrderItems.Columns["Quantity"].FillWeight = 50;
+            }
 
             if (dgvOrderItems.Columns["Subtotal"] != null)
+            {
                 dgvOrderItems.Columns["Subtotal"].HeaderText = "小计";
+                dgvOrderItems.Columns["Subtotal"].FillWeight = 70;
+                dgvOrderItems.Columns["Subtotal"].DefaultCellStyle.Format = "C2";
+            }
         }
 
         private async void btnLoadOrders_Click(object sender, EventArgs e)
@@ -1031,6 +1107,415 @@ namespace ClientAdmin
 
         }
 
+        private void InitializeManagementTabs()
+        {
+            if (_managementTabsInitialized)
+            {
+                return;
+            }
+
+            _managementTabsInitialized = true;
+            ApplyManagementTextAndTheme();
+            BindManagementEvents();
+            Load += AdminForm_Load;
+            dgvOrders.SelectionChanged += (_, _) => RefreshOrderAddressDisplay();
+        }
+
+        private void BindManagementEvents()
+        {
+            cmbDishCategory.TextChanged += (_, _) =>
+            {
+                if (txtCategory.Text != cmbDishCategory.Text)
+                {
+                    txtCategory.Text = cmbDishCategory.Text;
+                }
+            };
+
+            btnLoadDeliveryZones.Click += async (_, _) => await LoadDeliveryZonesAsync();
+            btnAddDeliveryZone.Click += async (_, _) => await AddDeliveryZoneAsync();
+            btnUpdateDeliveryZone.Click += async (_, _) => await UpdateDeliveryZoneAsync();
+            btnDeleteDeliveryZone.Click += async (_, _) => await DeleteDeliveryZoneAsync();
+            dgvDeliveryZones.CellClick += DeliveryZonesGrid_CellClick;
+
+            btnLoadDiningTables.Click += async (_, _) => await LoadDiningTablesAsync();
+            btnAddDiningTable.Click += async (_, _) => await AddDiningTableAsync();
+            btnUpdateDiningTable.Click += async (_, _) => await UpdateDiningTableAsync();
+            btnDeleteDiningTable.Click += async (_, _) => await DeleteDiningTableAsync();
+            dgvDiningTables.CellClick += DiningTablesGrid_CellClick;
+
+            btnLoadUsers.Click += async (_, _) => await LoadUsersAsync();
+            btnAddUser.Click += async (_, _) => await AddUserAsync();
+            btnUpdateUser.Click += async (_, _) => await UpdateUserAsync();
+            btnDeleteUser.Click += async (_, _) => await DeleteUserAsync();
+            btnResetPassword.Click += async (_, _) => await ResetUserPasswordAsync();
+            dgvUsers.CellClick += UsersGrid_CellClick;
+        }
+
+        private async void AdminForm_Load(object? sender, EventArgs e)
+        {
+            await RefreshDishCategoriesAsync();
+            RefreshOrderAddressDisplay();
+        }
+
+        private void ApplyManagementTextAndTheme()
+        {
+            Text = "珞珈线上点餐系统 - 管理员端";
+            tabDishes.Text = "菜品管理";
+            tabOrders.Text = "订单管理";
+            tabStatistics.Text = "统计分析";
+            tabAi.Text = "AI 建议";
+            grpDishEdit.Text = "菜品编辑";
+            grpOrderDetail.Text = "订单详情";
+            grpOrderItems.Text = "订单明细";
+            btnLoadDishes.Text = "加载菜品";
+            btnAddDish.Text = "新增菜品";
+            btnUpdateDish.Text = "更新菜品";
+            btnDeleteDish.Text = "删除菜品";
+            btnLoadOrders.Text = "加载订单";
+            btnUpdateOrderStatus.Text = "更新状态";
+            btnLoadStatistics.Text = "加载统计";
+            btnResetStatistics.Text = "重置";
+            btnLoadAiSuggestion.Text = "获取建议";
+            btnChooseImage.Text = "选择图片";
+
+            cmbSpicyLevel.Items.Clear();
+            cmbSpicyLevel.Items.Add("0 - 不辣");
+            cmbSpicyLevel.Items.Add("1 - 微辣");
+            cmbSpicyLevel.Items.Add("2 - 中辣");
+            cmbSpicyLevel.Items.Add("3 - 特辣");
+            cmbSpicyLevel.SelectedIndex = 0;
+
+            cmbOrderStatus.Items.Clear();
+            cmbOrderStatus.Items.AddRange(new object[]
+            {
+                "待处理", "已确认", "制作中", "已出餐", "配送中", "已完成", "已取消"
+            });
+            if (cmbOrderStatus.Items.Count > 0)
+            {
+                cmbOrderStatus.SelectedIndex = 0;
+            }
+        }
+
+        private async Task RefreshDishCategoriesAsync()
+        {
+            try
+            {
+                var dishes = await ApiHelper.GetListAsync<DishDto>("api/dishes");
+                var categories = _defaultCategories
+                    .Concat(dishes.Select(dish => dish.Category))
+                    .Where(category => !string.IsNullOrWhiteSpace(category))
+                    .Distinct()
+                    .OrderBy(category => category)
+                    .ToList();
+
+                var current = cmbDishCategory.Text;
+                cmbDishCategory.Items.Clear();
+                foreach (var category in categories)
+                {
+                    cmbDishCategory.Items.Add(category);
+                }
+
+                if (!string.IsNullOrWhiteSpace(current))
+                {
+                    cmbDishCategory.Text = current;
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private async Task LoadDeliveryZonesAsync()
+        {
+            var zones = await ApiHelper.GetListAsync<DeliveryZoneDto>("api/deliveryzones");
+            dgvDeliveryZones.DataSource = null;
+            dgvDeliveryZones.DataSource = zones;
+            SetDeliveryZoneGridHeaders();
+        }
+
+        private void SetDeliveryZoneGridHeaders()
+        {
+            var provinceColumn = dgvDeliveryZones.Columns["Province"];
+            var cityColumn = dgvDeliveryZones.Columns["City"];
+            var districtColumn = dgvDeliveryZones.Columns["District"];
+            var deliveryFeeColumn = dgvDeliveryZones.Columns["DeliveryFee"];
+            var isActiveColumn = dgvDeliveryZones.Columns["IsActive"];
+            var sortOrderColumn = dgvDeliveryZones.Columns["SortOrder"];
+            var displayNameColumn = dgvDeliveryZones.Columns["DisplayName"];
+            var idColumn = dgvDeliveryZones.Columns["Id"];
+
+            if (provinceColumn != null) provinceColumn.HeaderText = "省份";
+            if (cityColumn != null) cityColumn.HeaderText = "城市";
+            if (districtColumn != null) districtColumn.HeaderText = "区县";
+            if (deliveryFeeColumn != null) deliveryFeeColumn.HeaderText = "配送费";
+            if (isActiveColumn != null) isActiveColumn.HeaderText = "可配送";
+            if (sortOrderColumn != null) sortOrderColumn.HeaderText = "排序";
+            if (displayNameColumn != null) displayNameColumn.HeaderText = "显示名称";
+            if (idColumn != null) idColumn.HeaderText = "编号";
+        }
+
+        private async Task AddDeliveryZoneAsync()
+        {
+            try
+            {
+                await ApiHelper.PostAsync("api/deliveryzones", BuildDeliveryZoneDto());
+                ClearDeliveryZoneEditor();
+                await LoadDeliveryZonesAsync();
+                MessageBox.Show("配送区域已新增。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("新增配送区域失败：" + ex.Message);
+            }
+        }
+
+        private async Task UpdateDeliveryZoneAsync()
+        {
+            if (_selectedZoneId == null)
+            {
+                MessageBox.Show("请先选择一个配送区域。");
+                return;
+            }
+
+            try
+            {
+                await ApiHelper.PutAsync($"api/deliveryzones/{_selectedZoneId.Value}", BuildDeliveryZoneDto());
+                ClearDeliveryZoneEditor();
+                await LoadDeliveryZonesAsync();
+                MessageBox.Show("配送区域已更新。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("更新配送区域失败：" + ex.Message);
+            }
+        }
+
+        private async Task DeleteDeliveryZoneAsync()
+        {
+            if (_selectedZoneId == null)
+            {
+                MessageBox.Show("请先选择一个配送区域。");
+                return;
+            }
+
+            if (MessageBox.Show("确定删除这个配送区域吗？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                await ApiHelper.DeleteAsync($"api/deliveryzones/{_selectedZoneId.Value}");
+                ClearDeliveryZoneEditor();
+                await LoadDeliveryZonesAsync();
+                MessageBox.Show("配送区域已删除。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("删除配送区域失败：" + ex.Message);
+            }
+        }
+
+        private DeliveryZoneCreateUpdateDto BuildDeliveryZoneDto()
+        {
+            if (string.IsNullOrWhiteSpace(txtZoneProvince.Text) ||
+                string.IsNullOrWhiteSpace(txtZoneCity.Text) ||
+                string.IsNullOrWhiteSpace(txtZoneDistrict.Text))
+            {
+                throw new InvalidOperationException("省份、城市、区县都必须填写。");
+            }
+
+            if (!decimal.TryParse(txtZoneFee.Text, out var fee))
+            {
+                throw new InvalidOperationException("配送费必须是数字。");
+            }
+
+            _ = int.TryParse(txtZoneSortOrder.Text, out var sortOrder);
+
+            return new DeliveryZoneCreateUpdateDto
+            {
+                Province = txtZoneProvince.Text.Trim(),
+                City = txtZoneCity.Text.Trim(),
+                District = txtZoneDistrict.Text.Trim(),
+                DeliveryFee = fee,
+                SortOrder = sortOrder,
+                IsActive = chkZoneIsActive.Checked
+            };
+        }
+
+        private void DeliveryZonesGrid_CellClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvDeliveryZones.Rows[e.RowIndex].DataBoundItem is not DeliveryZoneDto zone)
+            {
+                return;
+            }
+
+            _selectedZoneId = zone.Id;
+            txtZoneProvince.Text = zone.Province;
+            txtZoneCity.Text = zone.City;
+            txtZoneDistrict.Text = zone.District;
+            txtZoneFee.Text = zone.DeliveryFee.ToString("0.##");
+            txtZoneSortOrder.Text = zone.SortOrder.ToString();
+            chkZoneIsActive.Checked = zone.IsActive;
+        }
+
+        private void ClearDeliveryZoneEditor()
+        {
+            _selectedZoneId = null;
+            txtZoneProvince.Text = string.Empty;
+            txtZoneCity.Text = string.Empty;
+            txtZoneDistrict.Text = string.Empty;
+            txtZoneFee.Text = string.Empty;
+            txtZoneSortOrder.Text = "0";
+            chkZoneIsActive.Checked = true;
+        }
+
+        private async Task LoadDiningTablesAsync()
+        {
+            var tables = await ApiHelper.GetListAsync<DiningTableDto>("api/diningtables");
+            dgvDiningTables.DataSource = null;
+            dgvDiningTables.DataSource = tables;
+            SetDiningTableGridHeaders();
+        }
+
+        private void SetDiningTableGridHeaders()
+        {
+            var idColumn = dgvDiningTables.Columns["Id"];
+            var tableNumberColumn = dgvDiningTables.Columns["TableNumber"];
+            var seatCountColumn = dgvDiningTables.Columns["SeatCount"];
+            var occupiedColumn = dgvDiningTables.Columns["IsOccupied"];
+            var enabledColumn = dgvDiningTables.Columns["IsEnabled"];
+
+            if (idColumn != null) idColumn.HeaderText = "编号";
+            if (tableNumberColumn != null) tableNumberColumn.HeaderText = "桌号";
+            if (seatCountColumn != null) seatCountColumn.HeaderText = "座位数";
+            if (occupiedColumn != null) occupiedColumn.HeaderText = "占用中";
+            if (enabledColumn != null) enabledColumn.HeaderText = "启用";
+        }
+
+        private async Task AddDiningTableAsync()
+        {
+            try
+            {
+                await ApiHelper.PostAsync("api/diningtables", BuildDiningTableDto());
+                ClearDiningTableEditor();
+                await LoadDiningTablesAsync();
+                MessageBox.Show("餐桌已新增。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("新增餐桌失败：" + ex.Message);
+            }
+        }
+
+        private async Task UpdateDiningTableAsync()
+        {
+            if (_selectedDiningTableId == null)
+            {
+                MessageBox.Show("请先选择一张餐桌。");
+                return;
+            }
+
+            try
+            {
+                await ApiHelper.PutAsync($"api/diningtables/{_selectedDiningTableId.Value}", BuildDiningTableDto());
+                ClearDiningTableEditor();
+                await LoadDiningTablesAsync();
+                MessageBox.Show("餐桌已更新。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("更新餐桌失败：" + ex.Message);
+            }
+        }
+
+        private async Task DeleteDiningTableAsync()
+        {
+            if (_selectedDiningTableId == null)
+            {
+                MessageBox.Show("请先选择一张餐桌。");
+                return;
+            }
+
+            if (MessageBox.Show("确定删除这张餐桌吗？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                await ApiHelper.DeleteAsync($"api/diningtables/{_selectedDiningTableId.Value}");
+                ClearDiningTableEditor();
+                await LoadDiningTablesAsync();
+                MessageBox.Show("餐桌已删除。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("删除餐桌失败：" + ex.Message);
+            }
+        }
+
+        private DiningTableCreateUpdateDto BuildDiningTableDto()
+        {
+            if (string.IsNullOrWhiteSpace(txtDiningTableNumber.Text))
+            {
+                throw new InvalidOperationException("桌号不能为空。");
+            }
+
+            if (!int.TryParse(txtDiningTableSeats.Text, out var seatCount) || seatCount <= 0)
+            {
+                throw new InvalidOperationException("座位数必须是大于 0 的整数。");
+            }
+
+            return new DiningTableCreateUpdateDto
+            {
+                TableNumber = txtDiningTableNumber.Text.Trim(),
+                SeatCount = seatCount,
+                IsOccupied = chkDiningTableOccupied.Checked,
+                IsEnabled = chkDiningTableEnabled.Checked
+            };
+        }
+
+        private void DiningTablesGrid_CellClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvDiningTables.Rows[e.RowIndex].DataBoundItem is not DiningTableDto table)
+            {
+                return;
+            }
+
+            _selectedDiningTableId = table.Id;
+            txtDiningTableNumber.Text = table.TableNumber;
+            txtDiningTableSeats.Text = table.SeatCount.ToString();
+            chkDiningTableOccupied.Checked = table.IsOccupied;
+            chkDiningTableEnabled.Checked = table.IsEnabled;
+        }
+
+        private void ClearDiningTableEditor()
+        {
+            _selectedDiningTableId = null;
+            txtDiningTableNumber.Text = string.Empty;
+            txtDiningTableSeats.Text = string.Empty;
+            chkDiningTableOccupied.Checked = false;
+            chkDiningTableEnabled.Checked = true;
+        }
+
+        private void RefreshOrderAddressDisplay()
+        {
+            if (dgvOrders.CurrentRow?.DataBoundItem is not OrderDto order)
+            {
+                return;
+            }
+
+            var fullAddress = string.Join(
+                " ",
+                new[] { order.DeliveryRegion, order.Address }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+            if (!string.IsNullOrWhiteSpace(fullAddress))
+            {
+                lblAddress.Text = $"配送地址：{fullAddress}";
+            }
+        }
+
         private sealed class StatisticsGridRow
         {
             public StatisticsGridRow(string metric, string value)
@@ -1042,6 +1527,213 @@ namespace ClientAdmin
             public string Metric { get; }
 
             public string Value { get; }
+        }
+
+        // ==================== 用户管理 ====================
+
+        private async Task LoadUsersAsync()
+        {
+            var users = await ApiHelper.GetListAsync<UserDto>("api/users");
+            dgvUsers.DataSource = null;
+            dgvUsers.DataSource = users;
+            SetUserGridHeaders();
+        }
+
+        private void SetUserGridHeaders()
+        {
+            var idColumn = dgvUsers.Columns["Id"];
+            var usernameColumn = dgvUsers.Columns["Username"];
+            var roleColumn = dgvUsers.Columns["Role"];
+            var realNameColumn = dgvUsers.Columns["RealName"];
+            var phoneColumn = dgvUsers.Columns["Phone"];
+            var addressColumn = dgvUsers.Columns["Address"];
+            var createdAtColumn = dgvUsers.Columns["CreatedAt"];
+            var isActiveColumn = dgvUsers.Columns["IsActive"];
+
+            if (idColumn != null) idColumn.HeaderText = "编号";
+            if (usernameColumn != null) usernameColumn.HeaderText = "用户名";
+            if (roleColumn != null) roleColumn.HeaderText = "角色";
+            if (realNameColumn != null) realNameColumn.HeaderText = "姓名";
+            if (phoneColumn != null) phoneColumn.HeaderText = "电话";
+            if (addressColumn != null) addressColumn.HeaderText = "地址";
+            if (createdAtColumn != null)
+            {
+                createdAtColumn.HeaderText = "创建时间";
+                createdAtColumn.DefaultCellStyle.Format = "yyyy-MM-dd HH:mm";
+            }
+            if (isActiveColumn != null) isActiveColumn.HeaderText = "启用";
+        }
+
+        private async Task AddUserAsync()
+        {
+            MessageBox.Show("新增用户功能暂未实现，请通过注册页面添加用户。");
+        }
+
+        private async Task UpdateUserAsync()
+        {
+            if (selectedUserId == null)
+            {
+                MessageBox.Show("请先选择一个用户。");
+                return;
+            }
+
+            try
+            {
+                var request = new UpdateUserRequest
+                {
+                    RealName = txtRealName.Text.Trim(),
+                    Phone = txtUserPhone.Text.Trim(),
+                    Address = txtUserAddress.Text.Trim(),
+                    IsActive = chkIsActive.Checked
+                };
+
+                await ApiHelper.UpdateUserAsync(selectedUserId.Value, request);
+                ClearUserEditor();
+                await LoadUsersAsync();
+                MessageBox.Show("用户信息已更新。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("更新用户失败：" + ex.Message);
+            }
+        }
+
+        private async Task DeleteUserAsync()
+        {
+            if (selectedUserId == null)
+            {
+                MessageBox.Show("请先选择一个用户。");
+                return;
+            }
+
+            if (MessageBox.Show("确定删除这个用户吗？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                await ApiHelper.DeleteUserAsync(selectedUserId.Value);
+                ClearUserEditor();
+                await LoadUsersAsync();
+                MessageBox.Show("用户已删除。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("删除用户失败：" + ex.Message);
+            }
+        }
+
+        private async Task ResetUserPasswordAsync()
+        {
+            if (selectedUserId == null)
+            {
+                MessageBox.Show("请先选择一个用户。");
+                return;
+            }
+
+            // 使用自定义对话框输入新密码
+            using var inputForm = new Form
+            {
+                Text = "重置密码",
+                Size = new Size(350, 150),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            var lblPrompt = new Label
+            {
+                Text = "请输入新密码：",
+                Location = new Point(20, 20),
+                Size = new Size(280, 20)
+            };
+
+            var txtPassword = new TextBox
+            {
+                Location = new Point(20, 50),
+                Size = new Size(280, 25),
+                PasswordChar = '*',
+                UseSystemPasswordChar = true
+            };
+
+            var btnOK = new Button
+            {
+                Text = "确定",
+                DialogResult = DialogResult.OK,
+                Location = new Point(140, 85),
+                Size = new Size(80, 30)
+            };
+
+            var btnCancel = new Button
+            {
+                Text = "取消",
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(230, 85),
+                Size = new Size(80, 30)
+            };
+
+            inputForm.Controls.Add(lblPrompt);
+            inputForm.Controls.Add(txtPassword);
+            inputForm.Controls.Add(btnOK);
+            inputForm.Controls.Add(btnCancel);
+            inputForm.AcceptButton = btnOK;
+            inputForm.CancelButton = btnCancel;
+
+            if (inputForm.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            var newPassword = txtPassword.Text;
+
+            if (string.IsNullOrWhiteSpace(newPassword))
+            {
+                MessageBox.Show("密码不能为空。");
+                return;
+            }
+
+            if (newPassword.Length < 6)
+            {
+                MessageBox.Show("密码长度至少为 6 位。");
+                return;
+            }
+
+            try
+            {
+                await ApiHelper.ResetPasswordAsync(selectedUserId.Value, newPassword);
+                MessageBox.Show("密码已重置。");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("重置密码失败：" + ex.Message);
+            }
+        }
+
+        private void UsersGrid_CellClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvUsers.Rows[e.RowIndex].DataBoundItem is not UserDto user)
+            {
+                return;
+            }
+
+            selectedUserId = user.Id;
+            txtUsername.Text = user.Username;
+            txtRealName.Text = user.RealName ?? string.Empty;
+            txtUserPhone.Text = user.Phone ?? string.Empty;
+            txtUserAddress.Text = user.Address ?? string.Empty;
+            chkIsActive.Checked = user.IsActive;
+        }
+
+        private void ClearUserEditor()
+        {
+            selectedUserId = null;
+            txtUsername.Text = string.Empty;
+            txtRealName.Text = string.Empty;
+            txtUserPhone.Text = string.Empty;
+            txtUserAddress.Text = string.Empty;
+            chkIsActive.Checked = true;
         }
     }
 }

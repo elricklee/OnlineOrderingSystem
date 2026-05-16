@@ -12,11 +12,15 @@ namespace OnlineOrdering.API.DTOs
 
     public class OrderCreateDto
     {
+        public int? UserId { get; set; }
         [Required] public string CustomerName { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         [Required] public string OrderType { get; set; } = "DineIn";
         public string? TableNumber { get; set; }
+        public int? DiningTableId { get; set; }
         public string? Address { get; set; }
+        public int? DeliveryZoneId { get; set; }
+        public string? DeliveryRegion { get; set; }
         public decimal DeliveryFee { get; set; }
         public string? Note { get; set; }
 
@@ -26,13 +30,17 @@ namespace OnlineOrdering.API.DTOs
     public class OrderDto
     {
         public int Id { get; set; }
+        public int? UserId { get; set; }
         public string CustomerName { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string? Address { get; set; }
         public string? TableNumber { get; set; }
+        public int? DiningTableId { get; set; }
         public string? Note { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal DeliveryFee { get; set; }
+        public int? DeliveryZoneId { get; set; }
+        public string? DeliveryRegion { get; set; }
         public string OrderType { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }

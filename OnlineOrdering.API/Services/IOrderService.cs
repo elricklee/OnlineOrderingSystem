@@ -7,9 +7,10 @@ namespace OnlineOrdering.API.Services
         Task<OrderDto> CreateOrderAsync(OrderCreateDto dto);
         Task<OrderDto?> UpdateOrderStatusAsync(int id, string status);
         Task<List<OrderDto>> GetAllOrdersAsync();
+        Task<List<OrderDto>> GetOrdersByUserIdAsync(int userId);
         Task<OrderDto?> GetOrderByIdAsync(int id);
-        Task<bool> DeleteOrderAsync(int id); //Âß¼­É¾³ý¶©µ¥
-        Task<bool> HardDeleteOrderAsync(int id); //ÎïÀíÉ¾³ý¶©µ¥
-        Task<bool> RestoreOrderAsync(int id);//»Ö¸´Âß¼­É¾³ý
+        Task<bool> DeleteOrderAsync(int id);
+        Task<bool> HardDeleteOrderAsync(int id);
+        Task<bool> RestoreOrderAsync(int id);
     }
 }

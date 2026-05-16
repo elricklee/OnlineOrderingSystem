@@ -8,41 +8,71 @@ namespace OnlineOrdering.API.Services
     public class OrderService : IOrderService
     {
         private readonly AppDbContext _db;
-        public OrderService(AppDbContext db) => _db = db;
+
+        public OrderService(AppDbContext db)
+        {
+            _db = db;
+        }
 
         public async Task<OrderDto> CreateOrderAsync(OrderCreateDto dto)
         {
+            if (dto.OrderItems.Count == 0)
+            {
+                throw new InvalidOperationException("è®¢å•è‡³å°‘éœ€è¦ä¸€ä¸ªèœå“ã€‚");
+            }
+
+            var normalizedOrderType = dto.OrderType?.Trim();
+            if (normalizedOrderType != "DineIn" && normalizedOrderType != "Delivery")
+            {
+                throw new InvalidOperationException("ä¸æ”¯æŒçš„è®¢å•ç±»å‹ã€‚");
+            }
+
             var order = new Order
             {
-                CustomerName = dto.CustomerName,
-                Phone = dto.Phone,
-                OrderType = dto.OrderType,
-                TableNumber = dto.TableNumber,
-                Address = dto.Address,
-                DeliveryFee = dto.DeliveryFee,
-                Note = dto.Note,
-                IsDeleted = false //ĞÂÔöÊ±Ä¬ÈÏÎ´É¾³ı
+                UserId = dto.UserId,
+                CustomerName = string.IsNullOrWhiteSpace(dto.CustomerName)
+                    ? normalizedOrderType == "DineIn" ? "å ‚é£Ÿé¡¾å®¢" : "å¤–å–é¡¾å®¢"
+                    : dto.CustomerName.Trim(),
+                Phone = dto.Phone?.Trim() ?? string.Empty,
+                OrderType = normalizedOrderType,
+                Note = dto.Note?.Trim(),
+                IsDeleted = false
             };
+
+            if (normalizedOrderType == "DineIn")
+            {
+                await ConfigureDineInOrderAsync(dto, order);
+            }
+            else
+            {
+                await ConfigureDeliveryOrderAsync(dto, order);
+            }
 
             decimal total = 0;
             foreach (var item in dto.OrderItems)
             {
-                //ÏÂµ¥Ê±Ğ£Ñé²ËÆ·ÊÇ·ñÎ´É¾³ıÇÒ¿ÉÓÃ
+                if (item.Quantity <= 0)
+                {
+                    throw new InvalidOperationException("èœå“æ•°é‡å¿…é¡»å¤§äº 0ã€‚");
+                }
+
                 var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == item.DishId && !d.IsDeleted && d.IsAvailable);
                 if (dish == null)
                 {
-                    throw new KeyNotFoundException($"²ËÆ·ID {item.DishId} ²»´æÔÚ¡¢ÒÑÉ¾³ı»ò²»¿ÉÓÃ");
+                    throw new KeyNotFoundException($"èœå“ID {item.DishId} ä¸å­˜åœ¨ã€å·²åˆ é™¤æˆ–ä¸å¯ç”¨");
                 }
-                var orderItem = new OrderItem
+
+                order.OrderItems.Add(new OrderItem
                 {
                     DishId = item.DishId,
-                    DishName = dish!.Name,
+                    DishName = dish.Name,
                     Price = dish.Price,
                     Quantity = item.Quantity
-                };
-                order.OrderItems.Add(orderItem);
+                });
+
                 total += dish.Price * item.Quantity;
             }
+
             order.TotalAmount = total + order.DeliveryFee;
             _db.Orders.Add(order);
             await _db.SaveChangesAsync();
@@ -52,74 +82,192 @@ namespace OnlineOrdering.API.Services
 
         public async Task<OrderDto?> UpdateOrderStatusAsync(int id, string status)
         {
-            var order = await _db.Orders.Include(x => x.OrderItems)
+            var order = await _db.Orders
+                .Include(x => x.OrderItems)
+                .Include(x => x.DiningTable)
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-            if (order == null) return null;
+
+            if (order == null)
+            {
+                return null;
+            }
+
             order.Status = status;
+
+            if (ShouldReleaseTable(status) && order.DiningTable != null)
+            {
+                order.DiningTable.IsOccupied = false;
+            }
+
             await _db.SaveChangesAsync();
             return MapToDto(order);
         }
 
         public async Task<List<OrderDto>> GetAllOrdersAsync()
         {
-            var list = await _db.Orders.Include(x => x.OrderItems)
+            var list = await _db.Orders
+                .Include(x => x.OrderItems)
+                .Include(x => x.DiningTable)
+                .Include(x => x.DeliveryZone)
                 .Where(o => !o.IsDeleted)
                 .ToListAsync();
+
+            return list.Select(MapToDto).ToList();
+        }
+
+        public async Task<List<OrderDto>> GetOrdersByUserIdAsync(int userId)
+        {
+            var list = await _db.Orders
+                .Include(x => x.OrderItems)
+                .Include(x => x.DiningTable)
+                .Include(x => x.DeliveryZone)
+                .Where(o => !o.IsDeleted && o.UserId == userId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+
             return list.Select(MapToDto).ToList();
         }
 
         public async Task<OrderDto?> GetOrderByIdAsync(int id)
         {
-            var order = await _db.Orders.Include(x => x.OrderItems)
+            var order = await _db.Orders
+                .Include(x => x.OrderItems)
+                .Include(x => x.DiningTable)
+                .Include(x => x.DeliveryZone)
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+
             return order == null ? null : MapToDto(order);
         }
 
-        //Âß¼­É¾³ı¶©µ¥
         public async Task<bool> DeleteOrderAsync(int id)
         {
-            var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted);
-            if (order == null) return false;
-            order.IsDeleted = true; //±ê¼ÇÎªÒÑÉ¾³ı
+            var order = await _db.Orders
+                .Include(o => o.DiningTable)
+                .FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted);
+
+            if (order == null)
+            {
+                return false;
+            }
+
+            order.IsDeleted = true;
+
+            if (order.DiningTable != null && !ShouldReleaseTable(order.Status))
+            {
+                order.DiningTable.IsOccupied = false;
+            }
+
             await _db.SaveChangesAsync();
             return true;
         }
 
-        //ÎïÀíÉ¾³ı¶©µ¥
         public async Task<bool> HardDeleteOrderAsync(int id)
         {
-            var order = await _db.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == id);
-            if (order == null) return false;
-            //ÏÈÉ¾³ı¶©µ¥Ïî£¬ÔÙÉ¾³ı¶©µ¥
+            var order = await _db.Orders
+                .Include(o => o.OrderItems)
+                .Include(o => o.DiningTable)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+            {
+                return false;
+            }
+
+            if (order.DiningTable != null)
+            {
+                order.DiningTable.IsOccupied = false;
+            }
+
             _db.OrderItems.RemoveRange(order.OrderItems);
             _db.Orders.Remove(order);
             await _db.SaveChangesAsync();
             return true;
         }
 
-        //»Ö¸´Âß¼­É¾³ı
         public async Task<bool> RestoreOrderAsync(int id)
         {
             var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id && o.IsDeleted);
-            if (order == null) return false;
+            if (order == null)
+            {
+                return false;
+            }
 
             order.IsDeleted = false;
             await _db.SaveChangesAsync();
             return true;
         }
 
-        private OrderDto MapToDto(Order order)
+        private async Task ConfigureDineInOrderAsync(OrderCreateDto dto, Order order)
+        {
+            if (dto.DiningTableId == null)
+            {
+                throw new InvalidOperationException("å ‚é£Ÿè®¢å•å¿…é¡»é€‰æ‹©é¤æ¡Œã€‚");
+            }
+
+            var diningTable = await _db.DiningTables.FirstOrDefaultAsync(t => t.Id == dto.DiningTableId.Value && t.IsEnabled);
+            if (diningTable == null)
+            {
+                throw new KeyNotFoundException("æ‰€é€‰é¤æ¡Œä¸å­˜åœ¨æˆ–å·²åœç”¨ã€‚");
+            }
+
+            if (diningTable.IsOccupied)
+            {
+                throw new InvalidOperationException($"é¤æ¡Œ {diningTable.TableNumber} å½“å‰å·²è¢«å ç”¨ï¼Œè¯·é‡æ–°é€‰æ‹©ã€‚");
+            }
+
+            diningTable.IsOccupied = true;
+            order.DiningTableId = diningTable.Id;
+            order.TableNumber = diningTable.TableNumber;
+            order.DeliveryFee = 0m;
+            order.Address = null;
+            order.DeliveryZoneId = null;
+            order.DeliveryRegion = null;
+            order.CustomerName = $"æ¡Œå·{diningTable.TableNumber}";
+        }
+
+        private async Task ConfigureDeliveryOrderAsync(OrderCreateDto dto, Order order)
+        {
+            if (dto.DeliveryZoneId == null)
+            {
+                throw new InvalidOperationException("å¤–å–è®¢å•å¿…é¡»é€‰æ‹©é…é€åŒºåŸŸã€‚");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Address))
+            {
+                throw new InvalidOperationException("å¤–å–è®¢å•å¿…é¡»å¡«å†™è¯¦ç»†é…é€åœ°å€ã€‚");
+            }
+
+            var zone = await _db.DeliveryZones.FirstOrDefaultAsync(z => z.Id == dto.DeliveryZoneId.Value && z.IsActive);
+            if (zone == null)
+            {
+                throw new KeyNotFoundException("æ‰€é€‰é…é€åŒºåŸŸä¸å­˜åœ¨æˆ–å½“å‰ä¸å¯é…é€ã€‚");
+            }
+
+            order.DeliveryZoneId = zone.Id;
+            order.DeliveryRegion = $"{zone.Province} {zone.City} {zone.District}";
+            order.Address = dto.Address.Trim();
+            order.DeliveryFee = zone.DeliveryFee;
+            order.DiningTableId = null;
+            order.TableNumber = null;
+            order.CustomerName = string.IsNullOrWhiteSpace(dto.CustomerName) ? "å¤–å–é¡¾å®¢" : dto.CustomerName.Trim();
+        }
+
+        private static OrderDto MapToDto(Order order)
         {
             return new OrderDto
             {
                 Id = order.Id,
+                UserId = order.UserId,
                 CustomerName = order.CustomerName,
                 Phone = order.Phone,
                 Address = order.Address,
                 TableNumber = order.TableNumber,
+                DiningTableId = order.DiningTableId,
                 Note = order.Note,
                 TotalAmount = order.TotalAmount,
                 DeliveryFee = order.DeliveryFee,
+                DeliveryZoneId = order.DeliveryZoneId,
+                DeliveryRegion = order.DeliveryRegion,
                 OrderType = order.OrderType,
                 Status = order.Status,
                 CreatedAt = order.CreatedAt,
@@ -132,6 +280,11 @@ namespace OnlineOrdering.API.Services
                     Quantity = i.Quantity
                 }).ToList()
             };
+        }
+
+        private static bool ShouldReleaseTable(string status)
+        {
+            return status == "Completed" || status == "Cancelled";
         }
     }
 }

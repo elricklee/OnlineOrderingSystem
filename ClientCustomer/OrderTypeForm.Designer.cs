@@ -18,6 +18,8 @@ partial class OrderTypeForm
         lblTitle = new Label();
         panelDineIn = new Panel();
         txtTableNumber = new TextBox();
+        cmbDiningTable = new ComboBox();
+        lblDiningTableHint = new Label();
         lblTableNumberLabel = new Label();
         lblDineInDesc = new Label();
         lblDineInTitle = new Label();
@@ -27,7 +29,14 @@ partial class OrderTypeForm
         lblDeliveryTitle = new Label();
         picDelivery = new PictureBox();
         lblAddress = new Label();
+        lblDeliveryRegionHint = new Label();
+        cmbProvince = new ComboBox();
+        cmbCity = new ComboBox();
+        cmbDistrict = new ComboBox();
+        lblAddressDetail = new Label();
         txtAddress = new TextBox();
+        lblCustomerPhone = new Label();
+        txtCustomerPhone = new TextBox();
         btnConfirm = new Sunny.UI.UIButton();
         panelDineIn.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)picDineIn).BeginInit();
@@ -52,6 +61,8 @@ partial class OrderTypeForm
         panelDineIn.BackColor = Color.White;
         panelDineIn.BorderStyle = BorderStyle.FixedSingle;
         panelDineIn.Controls.Add(txtTableNumber);
+        panelDineIn.Controls.Add(cmbDiningTable);
+        panelDineIn.Controls.Add(lblDiningTableHint);
         panelDineIn.Controls.Add(lblTableNumberLabel);
         panelDineIn.Controls.Add(lblDineInDesc);
         panelDineIn.Controls.Add(lblDineInTitle);
@@ -71,6 +82,46 @@ partial class OrderTypeForm
         txtTableNumber.Size = new Size(120, 34);
         txtTableNumber.TabIndex = 4;
         // 
+        // cmbDiningTable
+
+        // 
+
+        cmbDiningTable.DropDownStyle = ComboBoxStyle.DropDownList;
+
+        cmbDiningTable.Font = new Font("微软雅黑", 10F);
+
+        cmbDiningTable.FormattingEnabled = true;
+
+        cmbDiningTable.Location = new Point(109, 248);
+
+        cmbDiningTable.Name = "cmbDiningTable";
+
+        cmbDiningTable.Size = new Size(132, 35);
+
+        cmbDiningTable.TabIndex = 5;
+
+        // 
+
+        // lblDiningTableHint
+
+        // 
+
+        lblDiningTableHint.Font = new Font("微软雅黑", 9F);
+
+        lblDiningTableHint.ForeColor = Color.Gray;
+
+        lblDiningTableHint.Location = new Point(20, 292);
+
+        lblDiningTableHint.Name = "lblDiningTableHint";
+
+        lblDiningTableHint.Size = new Size(220, 28);
+
+        lblDiningTableHint.TabIndex = 6;
+
+        lblDiningTableHint.Text = "请选择可用餐桌";
+
+        // 
+
         // lblTableNumberLabel
         // 
         lblTableNumberLabel.AutoSize = true;
@@ -174,38 +225,199 @@ partial class OrderTypeForm
         lblAddress.TabIndex = 3;
         lblAddress.Text = "配送地址：";
         // 
+        // lblDeliveryRegionHint
+
+        // 
+
+        lblDeliveryRegionHint.AutoSize = true;
+
+        lblDeliveryRegionHint.Enabled = false;
+
+        lblDeliveryRegionHint.Font = new Font("微软雅黑", 9F);
+
+        lblDeliveryRegionHint.ForeColor = Color.Gray;
+
+        lblDeliveryRegionHint.Location = new Point(168, 446);
+
+        lblDeliveryRegionHint.Name = "lblDeliveryRegionHint";
+
+        lblDeliveryRegionHint.Size = new Size(264, 24);
+
+        lblDeliveryRegionHint.TabIndex = 6;
+
+        lblDeliveryRegionHint.Text = "先选配送区域，提交订单前再校验";
+
+        // 
+
+        // cmbProvince
+
+        // 
+
+        cmbProvince.DropDownStyle = ComboBoxStyle.DropDownList;
+
+        cmbProvince.Enabled = false;
+
+        cmbProvince.Font = new Font("微软雅黑", 10F);
+
+        cmbProvince.FormattingEnabled = true;
+
+        cmbProvince.Location = new Point(286, 473);
+
+        cmbProvince.Name = "cmbProvince";
+
+        cmbProvince.Size = new Size(120, 35);
+
+        cmbProvince.TabIndex = 7;
+
+        // 
+
+        // cmbCity
+
+        // 
+
+        cmbCity.DropDownStyle = ComboBoxStyle.DropDownList;
+
+        cmbCity.Enabled = false;
+
+        cmbCity.Font = new Font("微软雅黑", 10F);
+
+        cmbCity.FormattingEnabled = true;
+
+        cmbCity.Location = new Point(416, 473);
+
+        cmbCity.Name = "cmbCity";
+
+        cmbCity.Size = new Size(120, 35);
+
+        cmbCity.TabIndex = 8;
+
+        // 
+
+        // cmbDistrict
+
+        // 
+
+        cmbDistrict.DropDownStyle = ComboBoxStyle.DropDownList;
+
+        cmbDistrict.Enabled = false;
+
+        cmbDistrict.Font = new Font("微软雅黑", 10F);
+
+        cmbDistrict.FormattingEnabled = true;
+
+        cmbDistrict.Location = new Point(546, 473);
+
+        cmbDistrict.Name = "cmbDistrict";
+
+        cmbDistrict.Size = new Size(140, 35);
+
+        cmbDistrict.TabIndex = 9;
+
+        // 
+
+        // lblAddressDetail
+
+        // 
+
+        lblAddressDetail.AutoSize = true;
+
+        lblAddressDetail.Enabled = false;
+
+        lblAddressDetail.Font = new Font("微软雅黑", 10F);
+
+        lblAddressDetail.Location = new Point(168, 523);
+
+        lblAddressDetail.Name = "lblAddressDetail";
+
+        lblAddressDetail.Size = new Size(112, 27);
+
+        lblAddressDetail.TabIndex = 10;
+
+        lblAddressDetail.Text = "详细地址：";
+
+        // 
+
         // txtAddress
         // 
         txtAddress.Enabled = false;
         txtAddress.Font = new Font("微软雅黑", 10F);
-        txtAddress.Location = new Point(286, 473);
+        txtAddress.Location = new Point(286, 516);
         txtAddress.MaxLength = 200;
         txtAddress.Name = "txtAddress";
         txtAddress.Size = new Size(400, 34);
-        txtAddress.TabIndex = 4;
+        txtAddress.TabIndex = 11;
         // 
+        // lblCustomerPhone
+
+        // 
+
+        lblCustomerPhone.AutoSize = true;
+
+        lblCustomerPhone.Enabled = false;
+
+        lblCustomerPhone.Font = new Font("微软雅黑", 10F);
+
+        lblCustomerPhone.Location = new Point(196, 566);
+
+        lblCustomerPhone.Name = "lblCustomerPhone";
+
+        lblCustomerPhone.Size = new Size(84, 27);
+
+        lblCustomerPhone.TabIndex = 12;
+
+        lblCustomerPhone.Text = "手机号：";
+
+        // 
+
+        // txtCustomerPhone
+
+        // 
+
+        txtCustomerPhone.Enabled = false;
+
+        txtCustomerPhone.Font = new Font("微软雅黑", 10F);
+
+        txtCustomerPhone.Location = new Point(286, 559);
+
+        txtCustomerPhone.MaxLength = 20;
+
+        txtCustomerPhone.Name = "txtCustomerPhone";
+
+        txtCustomerPhone.Size = new Size(200, 34);
+
+        txtCustomerPhone.TabIndex = 13;
+
+        // 
+
         // btnConfirm
         // 
         btnConfirm.Cursor = Cursors.Hand;
         btnConfirm.FillColor = Color.FromArgb(255, 109, 0);
         btnConfirm.Font = new Font("微软雅黑", 12F, FontStyle.Bold);
-        btnConfirm.Location = new Point(320, 537);
+        btnConfirm.Location = new Point(320, 618);
         btnConfirm.MinimumSize = new Size(1, 1);
         btnConfirm.Name = "btnConfirm";
         btnConfirm.Radius = 6;
         btnConfirm.RectColor = Color.FromArgb(255, 109, 0);
-        btnConfirm.Size = new Size(160, 45);
-        btnConfirm.TabIndex = 5;
-        btnConfirm.Text = "开始点餐";
+        btnConfirm.Size = new Size(180, 48);
+        btnConfirm.TabIndex = 14;
+        btnConfirm.Text = "进入点餐";
         // 
         // OrderTypeForm
         // 
         AutoScaleDimensions = new SizeF(11F, 24F);
         AutoScaleMode = AutoScaleMode.Font;
         BackColor = SystemColors.ButtonFace;
-        ClientSize = new Size(820, 607);
+        ClientSize = new Size(820, 700);
         Controls.Add(btnConfirm);
+        Controls.Add(txtCustomerPhone);
+        Controls.Add(lblCustomerPhone);
         Controls.Add(txtAddress);
+        Controls.Add(lblAddressDetail);
+        Controls.Add(cmbDistrict);
+        Controls.Add(cmbCity);
+        Controls.Add(cmbProvince);
+        Controls.Add(lblDeliveryRegionHint);
         Controls.Add(lblAddress);
         Controls.Add(panelDelivery);
         Controls.Add(panelDineIn);
@@ -232,12 +444,21 @@ partial class OrderTypeForm
     private System.Windows.Forms.Label lblDineInTitle;
     private System.Windows.Forms.Label lblDineInDesc;
     private System.Windows.Forms.TextBox txtTableNumber;
+    private System.Windows.Forms.ComboBox cmbDiningTable;
+    private System.Windows.Forms.Label lblDiningTableHint;
     private System.Windows.Forms.Label lblTableNumberLabel;
     private System.Windows.Forms.Panel panelDelivery;
     private System.Windows.Forms.PictureBox picDelivery;
     private System.Windows.Forms.Label lblDeliveryTitle;
     private System.Windows.Forms.Label lblDeliveryDesc;
     private System.Windows.Forms.Label lblAddress;
+    private System.Windows.Forms.Label lblDeliveryRegionHint;
+    private System.Windows.Forms.ComboBox cmbProvince;
+    private System.Windows.Forms.ComboBox cmbCity;
+    private System.Windows.Forms.ComboBox cmbDistrict;
+    private System.Windows.Forms.Label lblAddressDetail;
     private System.Windows.Forms.TextBox txtAddress;
+    private System.Windows.Forms.Label lblCustomerPhone;
+    private System.Windows.Forms.TextBox txtCustomerPhone;
     private Sunny.UI.UIButton btnConfirm;
 }

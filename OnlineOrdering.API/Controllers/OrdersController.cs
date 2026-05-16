@@ -14,6 +14,9 @@ namespace OnlineOrdering.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll() => Ok(await _orderService.GetAllOrdersAsync());
 
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetByUserId(int userId) => Ok(await _orderService.GetOrdersByUserIdAsync(userId));
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -35,7 +38,7 @@ namespace OnlineOrdering.API.Controllers
             return order == null ? NotFound() : Ok(order);
         }
 
-        //Âß¼­É¾³ı¶©µ¥
+        //é€»è¾‘åˆ é™¤è®¢å•
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -43,7 +46,7 @@ namespace OnlineOrdering.API.Controllers
             return ok ? NoContent() : NotFound();
         }
 
-        //ÎïÀíÉ¾³ı¶©µ¥
+        //ç‰©ç†åˆ é™¤è®¢å•
         [HttpDelete("{id}/hard")]
         public async Task<IActionResult> HardDelete(int id)
         {
@@ -51,7 +54,7 @@ namespace OnlineOrdering.API.Controllers
             return ok ? NoContent() : NotFound();
         }
 
-        //»Ö¸´Âß¼­É¾³ı
+        //æ¢å¤é€»è¾‘åˆ é™¤
         [HttpPut("{id}/restore")]
         public async Task<IActionResult> RestoreOrder(int id)
         {

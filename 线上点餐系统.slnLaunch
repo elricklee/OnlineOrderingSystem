@@ -9,6 +9,10 @@
       {
         "Path": "ClientAdmin\\ClientAdmin.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "ClientCustomer\\ClientCustomer.csproj",
+        "Action": "Start"
       }
     ]
   }
