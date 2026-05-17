@@ -52,15 +52,18 @@ partial class Form1
         tabMain = new Sunny.UI.UITabControl();
         tabDishes = new TabPage();
         layoutDishPage = new Sunny.UI.UITableLayoutPanel();
+        panelDishTop = new Sunny.UI.UIFlowLayoutPanel();
+        btnLoadDishes = new Sunny.UI.UIButton();
+        btnToggleDeletedDishes = new Sunny.UI.UIButton();
         grpDishEdit = new Sunny.UI.UIGroupBox();
         layoutDishEdit = new Sunny.UI.UITableLayoutPanel();
         uiLabel3 = new Sunny.UI.UILabel();
         txtDishName = new Sunny.UI.UITextBox();
         uiLabel1 = new Sunny.UI.UILabel();
-        txtCategory = new Sunny.UI.UITextBox();
         uiLabel2 = new Sunny.UI.UILabel();
         txtPrice = new Sunny.UI.UITextBox();
         cmbDishCategory = new Sunny.UI.UIComboBox();
+        txtCategory = new Sunny.UI.UITextBox();
         lblImagePath = new Sunny.UI.UILabel();
         txtImagePath = new Sunny.UI.UITextBox();
         btnChooseImage = new Sunny.UI.UIButton();
@@ -74,7 +77,6 @@ partial class Form1
         lblPicture = new Sunny.UI.UILabel();
         lblSpicyCondition = new Sunny.UI.UILabel();
         cmbSpicyLevel = new Sunny.UI.UIComboBox();
-        btnLoadDishes = new Sunny.UI.UIButton();
         dgvDishes = new Sunny.UI.UIDataGridView();
         tabOrders = new TabPage();
         layoutOrderPage = new Sunny.UI.UITableLayoutPanel();
@@ -204,15 +206,17 @@ partial class Form1
         txtUserAddress = new Sunny.UI.UITextBox();
         chkIsActive = new Sunny.UI.UICheckBox();
         panelUserActions = new Sunny.UI.UIFlowLayoutPanel();
-        btnAddUser = new Sunny.UI.UIButton();
         btnUpdateUser = new Sunny.UI.UIButton();
+        btnAddUser = new Sunny.UI.UIButton();
         btnDeleteUser = new Sunny.UI.UIButton();
         btnResetPassword = new Sunny.UI.UIButton();
         tabMain.SuspendLayout();
         tabDishes.SuspendLayout();
         layoutDishPage.SuspendLayout();
+        panelDishTop.SuspendLayout();
         grpDishEdit.SuspendLayout();
         layoutDishEdit.SuspendLayout();
+        cmbDishCategory.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)picDishImage).BeginInit();
         ((System.ComponentModel.ISupportInitialize)dgvDishes).BeginInit();
         tabOrders.SuspendLayout();
@@ -285,7 +289,7 @@ partial class Form1
         tabMain.MainPage = "";
         tabMain.Name = "tabMain";
         tabMain.SelectedIndex = 0;
-        tabMain.Size = new Size(1224, 1045);
+        tabMain.Size = new Size(1592, 1045);
         tabMain.SizeMode = TabSizeMode.Fixed;
         tabMain.TabIndex = 0;
         tabMain.TabUnSelectedForeColor = Color.FromArgb(240, 240, 240);
@@ -297,7 +301,7 @@ partial class Form1
         tabDishes.Controls.Add(layoutDishPage);
         tabDishes.Location = new Point(0, 40);
         tabDishes.Name = "tabDishes";
-        tabDishes.Size = new Size(1224, 1005);
+        tabDishes.Size = new Size(1592, 1005);
         tabDishes.TabIndex = 0;
         tabDishes.Text = "菜品管理";
         tabDishes.UseVisualStyleBackColor = true;
@@ -306,41 +310,86 @@ partial class Form1
         // 
         layoutDishPage.ColumnCount = 1;
         layoutDishPage.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        layoutDishPage.Controls.Add(panelDishTop, 0, 0);
         layoutDishPage.Controls.Add(grpDishEdit, 0, 2);
-        layoutDishPage.Controls.Add(btnLoadDishes, 0, 0);
         layoutDishPage.Controls.Add(dgvDishes, 0, 1);
         layoutDishPage.Dock = DockStyle.Fill;
         layoutDishPage.Location = new Point(0, 0);
         layoutDishPage.Name = "layoutDishPage";
         layoutDishPage.RowCount = 3;
-        layoutDishPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+        layoutDishPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 75F));
         layoutDishPage.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         layoutDishPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 360F));
-        layoutDishPage.Size = new Size(1224, 1005);
+        layoutDishPage.Size = new Size(1592, 1005);
         layoutDishPage.TabIndex = 8;
         layoutDishPage.TagString = null;
+        // 
+        // panelDishTop
+        // 
+        panelDishTop.Controls.Add(btnLoadDishes);
+        panelDishTop.Controls.Add(btnToggleDeletedDishes);
+        panelDishTop.Dock = DockStyle.Fill;
+        panelDishTop.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        panelDishTop.Location = new Point(4, 5);
+        panelDishTop.Margin = new Padding(4, 5, 4, 5);
+        panelDishTop.MinimumSize = new Size(1, 1);
+        panelDishTop.Name = "panelDishTop";
+        panelDishTop.Padding = new Padding(12, 10, 12, 10);
+        panelDishTop.ShowText = false;
+        panelDishTop.Size = new Size(1584, 65);
+        panelDishTop.TabIndex = 10;
+        panelDishTop.Text = null;
+        panelDishTop.TextAlignment = ContentAlignment.MiddleCenter;
+        // 
+        // btnLoadDishes
+        // 
+        btnLoadDishes.FillColor = Color.FromArgb(51, 122, 183);
+        btnLoadDishes.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnLoadDishes.Location = new Point(15, 13);
+        btnLoadDishes.MinimumSize = new Size(1, 1);
+        btnLoadDishes.Name = "btnLoadDishes";
+        btnLoadDishes.Radius = 8;
+        btnLoadDishes.RectColor = Color.FromArgb(51, 122, 183);
+        btnLoadDishes.Size = new Size(115, 35);
+        btnLoadDishes.TabIndex = 0;
+        btnLoadDishes.Text = "加载菜品";
+        btnLoadDishes.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnLoadDishes.Click += btnLoadDishes_Click;
+        // 
+        // btnToggleDeletedDishes
+        // 
+        btnToggleDeletedDishes.FillColor = Color.FromArgb(255, 153, 51);
+        btnToggleDeletedDishes.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnToggleDeletedDishes.Location = new Point(201, 11);
+        btnToggleDeletedDishes.MinimumSize = new Size(1, 1);
+        btnToggleDeletedDishes.Name = "btnToggleDeletedDishes";
+        btnToggleDeletedDishes.Radius = 8;
+        btnToggleDeletedDishes.RectColor = Color.FromArgb(255, 153, 51);
+        btnToggleDeletedDishes.Size = new Size(128, 37);
+        btnToggleDeletedDishes.TabIndex = 1;
+        btnToggleDeletedDishes.Text = "查看已删除";
+        btnToggleDeletedDishes.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnToggleDeletedDishes.Click += btnToggleDeletedDishes_Click;
         // 
         // grpDishEdit
         // 
         grpDishEdit.Controls.Add(layoutDishEdit);
         grpDishEdit.Dock = DockStyle.Fill;
         grpDishEdit.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpDishEdit.Location = new Point(10, 448);
+        grpDishEdit.Location = new Point(10, 655);
         grpDishEdit.Margin = new Padding(10);
         grpDishEdit.MinimumSize = new Size(1, 1);
         grpDishEdit.Name = "grpDishEdit";
         grpDishEdit.Padding = new Padding(0, 32, 0, 0);
-        grpDishEdit.Size = new Size(1204, 547);
+        grpDishEdit.Size = new Size(1572, 340);
         grpDishEdit.TabIndex = 9;
         grpDishEdit.Text = "菜品编辑";
         grpDishEdit.TextAlignment = ContentAlignment.MiddleLeft;
         // 
         // layoutDishEdit
         // 
-        layoutDishEdit.Dock = DockStyle.Fill;
-        layoutDishEdit.Padding = new Padding(24, 18, 24, 18);
         layoutDishEdit.ColumnCount = 6;
-        layoutDishEdit.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120F));
+        layoutDishEdit.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 156F));
         layoutDishEdit.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34F));
         layoutDishEdit.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 90F));
         layoutDishEdit.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 26F));
@@ -349,7 +398,6 @@ partial class Form1
         layoutDishEdit.Controls.Add(uiLabel3, 4, 0);
         layoutDishEdit.Controls.Add(txtDishName, 1, 0);
         layoutDishEdit.Controls.Add(uiLabel1, 0, 0);
-        layoutDishEdit.Controls.Add(txtCategory, 3, 0);
         layoutDishEdit.Controls.Add(uiLabel2, 2, 0);
         layoutDishEdit.Controls.Add(txtPrice, 5, 0);
         layoutDishEdit.Controls.Add(cmbDishCategory, 3, 0);
@@ -366,8 +414,10 @@ partial class Form1
         layoutDishEdit.Controls.Add(lblPicture, 4, 2);
         layoutDishEdit.Controls.Add(lblSpicyCondition, 0, 2);
         layoutDishEdit.Controls.Add(cmbSpicyLevel, 1, 2);
+        layoutDishEdit.Dock = DockStyle.Fill;
         layoutDishEdit.Location = new Point(0, 32);
         layoutDishEdit.Name = "layoutDishEdit";
+        layoutDishEdit.Padding = new Padding(24, 18, 24, 18);
         layoutDishEdit.RowCount = 5;
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
@@ -375,7 +425,7 @@ partial class Form1
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 62F));
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-        layoutDishEdit.Size = new Size(1204, 515);
+        layoutDishEdit.Size = new Size(1572, 308);
         layoutDishEdit.TabIndex = 0;
         layoutDishEdit.TagString = null;
         // 
@@ -384,7 +434,7 @@ partial class Form1
         uiLabel3.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         uiLabel3.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         uiLabel3.ForeColor = Color.FromArgb(48, 48, 48);
-        uiLabel3.Location = new Point(958, 9);
+        uiLabel3.Location = new Point(973, 30);
         uiLabel3.Name = "uiLabel3";
         uiLabel3.Size = new Size(104, 34);
         uiLabel3.TabIndex = 9;
@@ -394,13 +444,13 @@ partial class Form1
         // 
         txtDishName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtDishName.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtDishName.Location = new Point(182, 5);
+        txtDishName.Location = new Point(184, 26);
         txtDishName.Margin = new Padding(4, 5, 4, 5);
         txtDishName.MinimumSize = new Size(1, 16);
         txtDishName.Name = "txtDishName";
         txtDishName.Padding = new Padding(5);
         txtDishName.ShowText = false;
-        txtDishName.Size = new Size(247, 42);
+        txtDishName.Size = new Size(389, 42);
         txtDishName.TabIndex = 7;
         txtDishName.TextAlignment = ContentAlignment.MiddleLeft;
         txtDishName.Watermark = "";
@@ -410,27 +460,11 @@ partial class Form1
         uiLabel1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         uiLabel1.Font = new Font("宋体", 12F);
         uiLabel1.ForeColor = Color.FromArgb(48, 48, 48);
-        uiLabel1.Location = new Point(15, 9);
+        uiLabel1.Location = new Point(27, 30);
         uiLabel1.Name = "uiLabel1";
-        uiLabel1.Size = new Size(132, 34);
+        uiLabel1.Size = new Size(150, 34);
         uiLabel1.TabIndex = 8;
         uiLabel1.Text = "菜品名称：";
-        // 
-        // txtCategory
-        // 
-        txtCategory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-        txtCategory.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtCategory.Location = new Point(718, 5);
-        txtCategory.Margin = new Padding(4, 5, 4, 5);
-        txtCategory.MinimumSize = new Size(1, 16);
-        txtCategory.Name = "txtCategory";
-        txtCategory.Padding = new Padding(5);
-        txtCategory.ShowText = false;
-        txtCategory.Size = new Size(180, 42);
-        txtCategory.TabIndex = 6;
-        txtCategory.TextAlignment = ContentAlignment.MiddleLeft;
-        txtCategory.Visible = false;
-        txtCategory.Watermark = "";
         // 
         // uiLabel2
         // 
@@ -438,9 +472,9 @@ partial class Form1
         uiLabel2.Enabled = false;
         uiLabel2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         uiLabel2.ForeColor = Color.FromArgb(48, 48, 48);
-        uiLabel2.Location = new Point(376, 9);
+        uiLabel2.Location = new Point(580, 30);
         uiLabel2.Name = "uiLabel2";
-        uiLabel2.Size = new Size(94, 34);
+        uiLabel2.Size = new Size(84, 34);
         uiLabel2.TabIndex = 9;
         uiLabel2.Text = "分类：";
         // 
@@ -448,13 +482,13 @@ partial class Form1
         // 
         txtPrice.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtPrice.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtPrice.Location = new Point(7, 76);
+        txtPrice.Location = new Point(1084, 26);
         txtPrice.Margin = new Padding(4, 5, 4, 5);
         txtPrice.MinimumSize = new Size(1, 16);
         txtPrice.Name = "txtPrice";
         txtPrice.Padding = new Padding(5);
         txtPrice.ShowText = false;
-        txtPrice.Size = new Size(291, 42);
+        txtPrice.Size = new Size(460, 42);
         txtPrice.TabIndex = 7;
         txtPrice.TextAlignment = ContentAlignment.MiddleLeft;
         txtPrice.Watermark = "";
@@ -462,28 +496,46 @@ partial class Form1
         // cmbDishCategory
         // 
         cmbDishCategory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        cmbDishCategory.Controls.Add(txtCategory);
         cmbDishCategory.DataSource = null;
         cmbDishCategory.FillColor = Color.White;
         cmbDishCategory.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         cmbDishCategory.ItemHoverColor = Color.FromArgb(155, 200, 255);
         cmbDishCategory.ItemSelectForeColor = Color.FromArgb(235, 243, 255);
-        cmbDishCategory.Location = new Point(523, 5);
+        cmbDishCategory.Location = new Point(671, 26);
         cmbDishCategory.Margin = new Padding(4, 5, 4, 5);
         cmbDishCategory.MinimumSize = new Size(1, 16);
         cmbDishCategory.Name = "cmbDishCategory";
         cmbDishCategory.Padding = new Padding(0, 0, 30, 2);
-        cmbDishCategory.Size = new Size(190, 42);
+        cmbDishCategory.Size = new Size(295, 42);
         cmbDishCategory.SymbolSize = 24;
         cmbDishCategory.TabIndex = 20;
         cmbDishCategory.TextAlignment = ContentAlignment.MiddleLeft;
         cmbDishCategory.Watermark = "";
+        // 
+        // txtCategory
+        // 
+        txtCategory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        txtCategory.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        txtCategory.Location = new Point(4, 0);
+        txtCategory.Margin = new Padding(4, 5, 4, 5);
+        txtCategory.MinimumSize = new Size(1, 16);
+        txtCategory.Name = "txtCategory";
+        txtCategory.Padding = new Padding(5);
+        txtCategory.Radius = 1;
+        txtCategory.ShowText = false;
+        txtCategory.Size = new Size(257, 42);
+        txtCategory.TabIndex = 6;
+        txtCategory.TextAlignment = ContentAlignment.MiddleLeft;
+        txtCategory.Visible = false;
+        txtCategory.Watermark = "";
         // 
         // lblImagePath
         // 
         lblImagePath.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         lblImagePath.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblImagePath.ForeColor = Color.FromArgb(48, 48, 48);
-        lblImagePath.Location = new Point(177, 80);
+        lblImagePath.Location = new Point(27, 88);
         lblImagePath.Name = "lblImagePath";
         lblImagePath.Size = new Size(150, 34);
         lblImagePath.TabIndex = 10;
@@ -495,13 +547,13 @@ partial class Form1
         txtImagePath.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         layoutDishEdit.SetColumnSpan(txtImagePath, 3);
         txtImagePath.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtImagePath.Location = new Point(361, 75);
+        txtImagePath.Location = new Point(184, 83);
         txtImagePath.Margin = new Padding(4, 5, 4, 5);
         txtImagePath.MinimumSize = new Size(1, 16);
         txtImagePath.Name = "txtImagePath";
         txtImagePath.Padding = new Padding(5);
         txtImagePath.ShowText = false;
-        txtImagePath.Size = new Size(565, 44);
+        txtImagePath.Size = new Size(782, 44);
         txtImagePath.TabIndex = 11;
         txtImagePath.Text = "空";
         txtImagePath.TextAlignment = ContentAlignment.MiddleLeft;
@@ -512,38 +564,43 @@ partial class Form1
         btnChooseImage.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         btnChooseImage.FillColor = Color.FromArgb(51, 122, 183);
         btnChooseImage.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnChooseImage.Location = new Point(924, 71);
+        btnChooseImage.Location = new Point(973, 79);
         btnChooseImage.MinimumSize = new Size(1, 1);
         btnChooseImage.Name = "btnChooseImage";
         btnChooseImage.Radius = 8;
         btnChooseImage.RectColor = Color.FromArgb(51, 122, 183);
-        btnChooseImage.Size = new Size(150, 52);
+        btnChooseImage.Size = new Size(104, 52);
         btnChooseImage.TabIndex = 12;
         btnChooseImage.Text = "选择图片";
         btnChooseImage.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         btnChooseImage.Click += btnChooseImage_Click;
         // 
-        // 
         // cmbSaleStatus
         // 
         cmbSaleStatus.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        cmbSaleStatus.DataSource = null;
+        cmbSaleStatus.FillColor = Color.White;
         cmbSaleStatus.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        cmbSaleStatus.Location = new Point(3, 146);
+        cmbSaleStatus.ItemHoverColor = Color.FromArgb(155, 200, 255);
+        cmbSaleStatus.ItemSelectForeColor = Color.FromArgb(235, 243, 255);
+        cmbSaleStatus.Location = new Point(1084, 87);
         cmbSaleStatus.Margin = new Padding(4, 5, 4, 5);
         cmbSaleStatus.MinimumSize = new Size(1, 1);
         cmbSaleStatus.Name = "cmbSaleStatus";
         cmbSaleStatus.Padding = new Padding(0, 0, 30, 2);
-        cmbSaleStatus.Size = new Size(157, 35);
+        cmbSaleStatus.Size = new Size(460, 35);
+        cmbSaleStatus.SymbolSize = 24;
         cmbSaleStatus.TabIndex = 13;
         cmbSaleStatus.Text = "销售状态";
         cmbSaleStatus.TextAlignment = ContentAlignment.MiddleLeft;
+        cmbSaleStatus.Watermark = "";
         // 
         // lblDescription
         // 
         lblDescription.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         lblDescription.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblDescription.ForeColor = Color.FromArgb(48, 48, 48);
-        lblDescription.Location = new Point(6, 197);
+        lblDescription.Location = new Point(27, 188);
         lblDescription.Name = "lblDescription";
         lblDescription.Size = new Size(150, 34);
         lblDescription.TabIndex = 16;
@@ -556,7 +613,7 @@ partial class Form1
         txtDescription.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         layoutDishEdit.SetColumnSpan(txtDescription, 3);
         txtDescription.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtDescription.Location = new Point(167, 189);
+        txtDescription.Location = new Point(184, 193);
         txtDescription.Margin = new Padding(4, 5, 4, 5);
         txtDescription.MinimumSize = new Size(1, 16);
         txtDescription.Multiline = true;
@@ -564,7 +621,7 @@ partial class Form1
         txtDescription.Padding = new Padding(5);
         txtDescription.ShowScrollBar = true;
         txtDescription.ShowText = false;
-        txtDescription.Size = new Size(565, 160);
+        txtDescription.Size = new Size(782, 30);
         txtDescription.TabIndex = 17;
         txtDescription.Text = "空";
         txtDescription.TextAlignment = ContentAlignment.MiddleLeft;
@@ -575,10 +632,10 @@ partial class Form1
         picDishImage.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         picDishImage.BorderStyle = BorderStyle.FixedSingle;
         layoutDishEdit.SetColumnSpan(picDishImage, 2);
-        picDishImage.Location = new Point(766, 190);
+        picDishImage.Location = new Point(973, 191);
         picDishImage.Name = "picDishImage";
         layoutDishEdit.SetRowSpan(picDishImage, 2);
-        picDishImage.Size = new Size(291, 222);
+        picDishImage.Size = new Size(572, 96);
         picDishImage.SizeMode = PictureBoxSizeMode.Zoom;
         picDishImage.TabIndex = 18;
         picDishImage.TabStop = false;
@@ -589,7 +646,7 @@ partial class Form1
         btnAddDish.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         btnAddDish.FillColor = Color.FromArgb(51, 122, 183);
         btnAddDish.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnAddDish.Location = new Point(6, 248);
+        btnAddDish.Location = new Point(27, 235);
         btnAddDish.MinimumSize = new Size(1, 1);
         btnAddDish.Name = "btnAddDish";
         btnAddDish.Radius = 8;
@@ -605,12 +662,12 @@ partial class Form1
         btnUpdateDish.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         btnUpdateDish.FillColor = Color.FromArgb(51, 122, 183);
         btnUpdateDish.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnUpdateDish.Location = new Point(177, 248);
+        btnUpdateDish.Location = new Point(183, 234);
         btnUpdateDish.MinimumSize = new Size(1, 1);
         btnUpdateDish.Name = "btnUpdateDish";
         btnUpdateDish.Radius = 8;
         btnUpdateDish.RectColor = Color.FromArgb(51, 122, 183);
-        btnUpdateDish.Size = new Size(150, 48);
+        btnUpdateDish.Size = new Size(391, 49);
         btnUpdateDish.TabIndex = 2;
         btnUpdateDish.Text = "更新菜品";
         btnUpdateDish.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -621,12 +678,12 @@ partial class Form1
         btnDeleteDish.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         btnDeleteDish.FillColor = Color.FromArgb(211, 47, 47);
         btnDeleteDish.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnDeleteDish.Location = new Point(351, 248);
+        btnDeleteDish.Location = new Point(580, 235);
         btnDeleteDish.MinimumSize = new Size(1, 1);
         btnDeleteDish.Name = "btnDeleteDish";
         btnDeleteDish.Radius = 8;
         btnDeleteDish.RectColor = Color.FromArgb(211, 47, 47);
-        btnDeleteDish.Size = new Size(144, 48);
+        btnDeleteDish.Size = new Size(84, 48);
         btnDeleteDish.TabIndex = 3;
         btnDeleteDish.Text = "删除菜品";
         btnDeleteDish.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -638,9 +695,9 @@ partial class Form1
         layoutDishEdit.SetColumnSpan(lblPicture, 2);
         lblPicture.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblPicture.ForeColor = Color.FromArgb(48, 48, 48);
-        lblPicture.Location = new Point(819, 146);
+        lblPicture.Location = new Point(973, 144);
         lblPicture.Name = "lblPicture";
-        lblPicture.Size = new Size(150, 34);
+        lblPicture.Size = new Size(572, 34);
         lblPicture.TabIndex = 19;
         lblPicture.Text = "图片预览：";
         lblPicture.TextAlign = ContentAlignment.MiddleCenter;
@@ -650,9 +707,9 @@ partial class Form1
         lblSpicyCondition.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         lblSpicyCondition.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblSpicyCondition.ForeColor = Color.FromArgb(48, 48, 48);
-        lblSpicyCondition.Location = new Point(186, 146);
+        lblSpicyCondition.Location = new Point(27, 144);
         lblSpicyCondition.Name = "lblSpicyCondition";
-        lblSpicyCondition.Size = new Size(133, 34);
+        lblSpicyCondition.Size = new Size(150, 34);
         lblSpicyCondition.TabIndex = 14;
         lblSpicyCondition.Text = "辣度：";
         lblSpicyCondition.TextAlign = ContentAlignment.MiddleCenter;
@@ -665,41 +722,25 @@ partial class Form1
         cmbSpicyLevel.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         cmbSpicyLevel.ItemHoverColor = Color.FromArgb(155, 200, 255);
         cmbSpicyLevel.ItemSelectForeColor = Color.FromArgb(235, 243, 255);
-        cmbSpicyLevel.Location = new Point(346, 148);
+        cmbSpicyLevel.Location = new Point(184, 145);
         cmbSpicyLevel.Margin = new Padding(4, 5, 4, 5);
         cmbSpicyLevel.MinimumSize = new Size(63, 0);
         cmbSpicyLevel.Name = "cmbSpicyLevel";
         cmbSpicyLevel.Padding = new Padding(0, 0, 30, 2);
-        cmbSpicyLevel.Size = new Size(155, 31);
+        cmbSpicyLevel.Size = new Size(389, 31);
         cmbSpicyLevel.SymbolSize = 24;
         cmbSpicyLevel.TabIndex = 15;
         cmbSpicyLevel.Text = "空";
         cmbSpicyLevel.TextAlignment = ContentAlignment.MiddleLeft;
         cmbSpicyLevel.Watermark = "";
         // 
-        // btnLoadDishes
-        // 
-        btnLoadDishes.Anchor = AnchorStyles.Left;
-        btnLoadDishes.FillColor = Color.FromArgb(51, 122, 183);
-        btnLoadDishes.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnLoadDishes.Location = new Point(557, 12);
-        btnLoadDishes.MinimumSize = new Size(1, 1);
-        btnLoadDishes.Name = "btnLoadDishes";
-        btnLoadDishes.Radius = 8;
-        btnLoadDishes.RectColor = Color.FromArgb(51, 122, 183);
-        btnLoadDishes.Size = new Size(110, 35);
-        btnLoadDishes.TabIndex = 0;
-        btnLoadDishes.Text = "刷新菜品";
-        btnLoadDishes.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        btnLoadDishes.Click += btnLoadDishes_Click;
-        // 
         // dgvDishes
         // 
         dgvDishes.AllowUserToAddRows = false;
-        dgvDishes.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dataGridViewCellStyle1.BackColor = Color.FromArgb(235, 243, 255);
         dgvDishes.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
         dgvDishes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        dgvDishes.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dgvDishes.BackgroundColor = Color.White;
         dgvDishes.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
@@ -711,7 +752,6 @@ partial class Form1
         dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
         dgvDishes.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
         dgvDishes.ColumnHeadersHeight = 38;
-        dgvDishes.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
         dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
         dataGridViewCellStyle3.BackColor = SystemColors.Window;
         dataGridViewCellStyle3.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -724,7 +764,7 @@ partial class Form1
         dgvDishes.EnableHeadersVisualStyles = false;
         dgvDishes.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         dgvDishes.GridColor = Color.FromArgb(80, 160, 255);
-        dgvDishes.Location = new Point(12, 65);
+        dgvDishes.Location = new Point(12, 80);
         dgvDishes.Margin = new Padding(12, 5, 12, 5);
         dgvDishes.Name = "dgvDishes";
         dgvDishes.ReadOnly = true;
@@ -744,7 +784,7 @@ partial class Form1
         dgvDishes.RowTemplate.Height = 34;
         dgvDishes.SelectedIndex = -1;
         dgvDishes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvDishes.Size = new Size(1200, 368);
+        dgvDishes.Size = new Size(1568, 560);
         dgvDishes.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvDishes.TabIndex = 4;
         dgvDishes.CellClick += dgvDishes_CellClick;
@@ -754,7 +794,7 @@ partial class Form1
         tabOrders.Controls.Add(layoutOrderPage);
         tabOrders.Location = new Point(0, 40);
         tabOrders.Name = "tabOrders";
-        tabOrders.Size = new Size(1224, 1005);
+        tabOrders.Size = new Size(1592, 1005);
         tabOrders.TabIndex = 1;
         tabOrders.Text = "订单管理";
         tabOrders.UseVisualStyleBackColor = true;
@@ -773,7 +813,7 @@ partial class Form1
         layoutOrderPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
         layoutOrderPage.RowStyles.Add(new RowStyle(SizeType.Percent, 65F));
         layoutOrderPage.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
-        layoutOrderPage.Size = new Size(1224, 1005);
+        layoutOrderPage.Size = new Size(1592, 1005);
         layoutOrderPage.TabIndex = 0;
         layoutOrderPage.TagString = null;
         // 
@@ -788,16 +828,17 @@ partial class Form1
         panelOrderTop.Name = "panelOrderTop";
         panelOrderTop.Padding = new Padding(2);
         panelOrderTop.ShowText = false;
-        panelOrderTop.Size = new Size(1216, 60);
+        panelOrderTop.Size = new Size(1584, 60);
         panelOrderTop.TabIndex = 0;
         panelOrderTop.Text = "uiFlowLayoutPanel1";
         panelOrderTop.TextAlignment = ContentAlignment.MiddleCenter;
         // 
         // btnLoadOrders
         // 
+        btnLoadOrders.Anchor = AnchorStyles.None;
         btnLoadOrders.FillColor = Color.FromArgb(51, 122, 183);
         btnLoadOrders.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnLoadOrders.Location = new Point(38, 9);
+        btnLoadOrders.Location = new Point(690, 5);
         btnLoadOrders.MinimumSize = new Size(1, 1);
         btnLoadOrders.Name = "btnLoadOrders";
         btnLoadOrders.Radius = 8;
@@ -820,7 +861,7 @@ partial class Form1
         layoutOrderMain.Name = "layoutOrderMain";
         layoutOrderMain.RowCount = 1;
         layoutOrderMain.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        layoutOrderMain.Size = new Size(1218, 601);
+        layoutOrderMain.Size = new Size(1586, 601);
         layoutOrderMain.TabIndex = 1;
         layoutOrderMain.TagString = null;
         // 
@@ -840,7 +881,6 @@ partial class Form1
         dataGridViewCellStyle7.WrapMode = DataGridViewTriState.True;
         dgvOrders.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
         dgvOrders.ColumnHeadersHeight = 38;
-        dgvOrders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
         dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
         dataGridViewCellStyle8.BackColor = SystemColors.Window;
         dataGridViewCellStyle8.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -870,7 +910,7 @@ partial class Form1
         dgvOrders.RowsDefaultCellStyle = dataGridViewCellStyle10;
         dgvOrders.RowTemplate.Height = 34;
         dgvOrders.SelectedIndex = -1;
-        dgvOrders.Size = new Size(763, 595);
+        dgvOrders.Size = new Size(995, 595);
         dgvOrders.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvOrders.TabIndex = 0;
         dgvOrders.CellClick += dgvOrders_CellClick;
@@ -893,12 +933,12 @@ partial class Form1
         grpOrderDetail.Controls.Add(panelOrderActions);
         grpOrderDetail.Dock = DockStyle.Fill;
         grpOrderDetail.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpOrderDetail.Location = new Point(773, 5);
+        grpOrderDetail.Location = new Point(1005, 5);
         grpOrderDetail.Margin = new Padding(4, 5, 4, 5);
         grpOrderDetail.MinimumSize = new Size(1, 1);
         grpOrderDetail.Name = "grpOrderDetail";
         grpOrderDetail.Padding = new Padding(0, 32, 0, 0);
-        grpOrderDetail.Size = new Size(441, 591);
+        grpOrderDetail.Size = new Size(577, 591);
         grpOrderDetail.TabIndex = 1;
         grpOrderDetail.Text = "订单详情";
         grpOrderDetail.TextAlignment = ContentAlignment.MiddleLeft;
@@ -966,7 +1006,7 @@ partial class Form1
         txtOrderNote.ReadOnly = true;
         txtOrderNote.ShowScrollBar = true;
         txtOrderNote.ShowText = false;
-        txtOrderNote.Size = new Size(325, 66);
+        txtOrderNote.Size = new Size(308, 66);
         txtOrderNote.TabIndex = 12;
         txtOrderNote.TextAlignment = ContentAlignment.TopLeft;
         txtOrderNote.Watermark = "";
@@ -994,7 +1034,7 @@ partial class Form1
         txtOrderAddress.ReadOnly = true;
         txtOrderAddress.ShowScrollBar = true;
         txtOrderAddress.ShowText = false;
-        txtOrderAddress.Size = new Size(325, 64);
+        txtOrderAddress.Size = new Size(308, 64);
         txtOrderAddress.TabIndex = 13;
         txtOrderAddress.TextAlignment = ContentAlignment.TopLeft;
         txtOrderAddress.Watermark = "";
@@ -1213,7 +1253,7 @@ partial class Form1
         grpOrderItems.MinimumSize = new Size(1, 1);
         grpOrderItems.Name = "grpOrderItems";
         grpOrderItems.Padding = new Padding(0, 32, 0, 0);
-        grpOrderItems.Size = new Size(1216, 318);
+        grpOrderItems.Size = new Size(1584, 318);
         grpOrderItems.TabIndex = 2;
         grpOrderItems.Text = "订单明细";
         grpOrderItems.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1234,7 +1274,6 @@ partial class Form1
         dataGridViewCellStyle12.WrapMode = DataGridViewTriState.True;
         dgvOrderItems.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle12;
         dgvOrderItems.ColumnHeadersHeight = 38;
-        dgvOrderItems.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
         dataGridViewCellStyle13.Alignment = DataGridViewContentAlignment.MiddleLeft;
         dataGridViewCellStyle13.BackColor = SystemColors.Window;
         dataGridViewCellStyle13.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -1264,7 +1303,7 @@ partial class Form1
         dgvOrderItems.RowsDefaultCellStyle = dataGridViewCellStyle15;
         dgvOrderItems.RowTemplate.Height = 34;
         dgvOrderItems.SelectedIndex = -1;
-        dgvOrderItems.Size = new Size(1216, 286);
+        dgvOrderItems.Size = new Size(1584, 286);
         dgvOrderItems.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvOrderItems.TabIndex = 0;
         // 
@@ -1273,27 +1312,27 @@ partial class Form1
         tabStatistics.Controls.Add(layoutStatisticsPage);
         tabStatistics.Location = new Point(0, 40);
         tabStatistics.Name = "tabStatistics";
-        tabStatistics.Size = new Size(1224, 1005);
+        tabStatistics.Size = new Size(200, 60);
         tabStatistics.TabIndex = 2;
         tabStatistics.Text = "统计分析";
         tabStatistics.UseVisualStyleBackColor = true;
         // 
         // layoutStatisticsPage
         // 
-        layoutStatisticsPage.Dock = DockStyle.Fill;
         layoutStatisticsPage.ColumnCount = 1;
         layoutStatisticsPage.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         layoutStatisticsPage.Controls.Add(layoutStatisticsTop, 0, 0);
         layoutStatisticsPage.Controls.Add(layoutStatisticsSummary, 0, 1);
         layoutStatisticsPage.Controls.Add(layoutStatisticsMain, 0, 2);
+        layoutStatisticsPage.Dock = DockStyle.Fill;
         layoutStatisticsPage.Location = new Point(0, 0);
         layoutStatisticsPage.Name = "layoutStatisticsPage";
         layoutStatisticsPage.Padding = new Padding(10);
         layoutStatisticsPage.RowCount = 3;
-        layoutStatisticsPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
-        layoutStatisticsPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 120F));
+        layoutStatisticsPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 91F));
+        layoutStatisticsPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 99F));
         layoutStatisticsPage.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        layoutStatisticsPage.Size = new Size(1224, 1005);
+        layoutStatisticsPage.Size = new Size(200, 60);
         layoutStatisticsPage.TabIndex = 0;
         layoutStatisticsPage.TagString = null;
         // 
@@ -1324,7 +1363,7 @@ partial class Form1
         layoutStatisticsTop.RowCount = 1;
         layoutStatisticsTop.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
         layoutStatisticsTop.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-        layoutStatisticsTop.Size = new Size(1198, 64);
+        layoutStatisticsTop.Size = new Size(174, 85);
         layoutStatisticsTop.TabIndex = 0;
         layoutStatisticsTop.TagString = null;
         // 
@@ -1333,7 +1372,7 @@ partial class Form1
         uiLabel4.Anchor = AnchorStyles.Left;
         uiLabel4.Font = new Font("宋体", 10F);
         uiLabel4.ForeColor = Color.FromArgb(48, 48, 48);
-        uiLabel4.Location = new Point(3, 15);
+        uiLabel4.Location = new Point(3, 25);
         uiLabel4.Name = "uiLabel4";
         uiLabel4.Size = new Size(124, 34);
         uiLabel4.TabIndex = 0;
@@ -1346,7 +1385,7 @@ partial class Form1
         dtpStatisticsStart.DateCultureInfo = new System.Globalization.CultureInfo("");
         dtpStatisticsStart.FillColor = Color.White;
         dtpStatisticsStart.Font = new Font("宋体", 10F);
-        dtpStatisticsStart.Location = new Point(134, 10);
+        dtpStatisticsStart.Location = new Point(134, 20);
         dtpStatisticsStart.Margin = new Padding(4, 5, 4, 5);
         dtpStatisticsStart.MaxLength = 10;
         dtpStatisticsStart.MinimumSize = new Size(63, 0);
@@ -1367,7 +1406,7 @@ partial class Form1
         lblTopCountTitle.Anchor = AnchorStyles.None;
         lblTopCountTitle.Font = new Font("宋体", 10F);
         lblTopCountTitle.ForeColor = Color.FromArgb(48, 48, 48);
-        lblTopCountTitle.Location = new Point(542, 15);
+        lblTopCountTitle.Location = new Point(542, 25);
         lblTopCountTitle.Name = "lblTopCountTitle";
         lblTopCountTitle.Size = new Size(119, 34);
         lblTopCountTitle.TabIndex = 3;
@@ -1380,7 +1419,7 @@ partial class Form1
         dtpStatisticsEnd.DateCultureInfo = new System.Globalization.CultureInfo("");
         dtpStatisticsEnd.FillColor = Color.White;
         dtpStatisticsEnd.Font = new Font("宋体", 10F);
-        dtpStatisticsEnd.Location = new Point(403, 10);
+        dtpStatisticsEnd.Location = new Point(403, 20);
         dtpStatisticsEnd.Margin = new Padding(4, 5, 4, 5);
         dtpStatisticsEnd.MaxLength = 10;
         dtpStatisticsEnd.MinimumSize = new Size(63, 0);
@@ -1401,7 +1440,7 @@ partial class Form1
         btnResetStatistics.Anchor = AnchorStyles.None;
         btnResetStatistics.FillColor = Color.FromArgb(51, 122, 183);
         btnResetStatistics.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnResetStatistics.Location = new Point(957, 6);
+        btnResetStatistics.Location = new Point(957, 16);
         btnResetStatistics.MinimumSize = new Size(1, 1);
         btnResetStatistics.Name = "btnResetStatistics";
         btnResetStatistics.Radius = 8;
@@ -1417,7 +1456,7 @@ partial class Form1
         uiLabel5.Anchor = AnchorStyles.None;
         uiLabel5.Font = new Font("宋体", 10F);
         uiLabel5.ForeColor = Color.FromArgb(48, 48, 48);
-        uiLabel5.Location = new Point(283, 15);
+        uiLabel5.Location = new Point(283, 25);
         uiLabel5.Name = "uiLabel5";
         uiLabel5.Size = new Size(113, 34);
         uiLabel5.TabIndex = 2;
@@ -1430,7 +1469,7 @@ partial class Form1
         txtTopCount.DoubleValue = 5D;
         txtTopCount.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         txtTopCount.IntValue = 5;
-        txtTopCount.Location = new Point(668, 10);
+        txtTopCount.Location = new Point(668, 20);
         txtTopCount.Margin = new Padding(4, 5, 4, 5);
         txtTopCount.MinimumSize = new Size(1, 16);
         txtTopCount.Name = "txtTopCount";
@@ -1447,7 +1486,7 @@ partial class Form1
         btnLoadStatistics.Anchor = AnchorStyles.None;
         btnLoadStatistics.FillColor = Color.FromArgb(51, 122, 183);
         btnLoadStatistics.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnLoadStatistics.Location = new Point(795, 6);
+        btnLoadStatistics.Location = new Point(795, 16);
         btnLoadStatistics.MinimumSize = new Size(1, 1);
         btnLoadStatistics.Name = "btnLoadStatistics";
         btnLoadStatistics.Radius = 8;
@@ -1470,24 +1509,25 @@ partial class Form1
         layoutStatisticsSummary.Controls.Add(grpTopDishCount, 3, 0);
         layoutStatisticsSummary.Controls.Add(grpAverageOrderAmount, 2, 0);
         layoutStatisticsSummary.Dock = DockStyle.Fill;
-        layoutStatisticsSummary.Location = new Point(13, 83);
+        layoutStatisticsSummary.Location = new Point(13, 104);
         layoutStatisticsSummary.Name = "layoutStatisticsSummary";
         layoutStatisticsSummary.RowCount = 1;
         layoutStatisticsSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        layoutStatisticsSummary.Size = new Size(1198, 114);
+        layoutStatisticsSummary.Size = new Size(174, 93);
         layoutStatisticsSummary.TabIndex = 1;
         layoutStatisticsSummary.TagString = null;
         // 
         // grpTotalOrders
         // 
         grpTotalOrders.Controls.Add(lblTotalOrders);
+        grpTotalOrders.Dock = DockStyle.Fill;
         grpTotalOrders.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         grpTotalOrders.Location = new Point(4, 5);
         grpTotalOrders.Margin = new Padding(4, 5, 4, 5);
         grpTotalOrders.MinimumSize = new Size(1, 1);
         grpTotalOrders.Name = "grpTotalOrders";
         grpTotalOrders.Padding = new Padding(0, 32, 0, 0);
-        grpTotalOrders.Size = new Size(291, 104);
+        grpTotalOrders.Size = new Size(35, 83);
         grpTotalOrders.TabIndex = 0;
         grpTotalOrders.Text = "订单数";
         grpTotalOrders.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1499,20 +1539,21 @@ partial class Form1
         lblTotalOrders.ForeColor = Color.FromArgb(48, 48, 48);
         lblTotalOrders.Location = new Point(0, 32);
         lblTotalOrders.Name = "lblTotalOrders";
-        lblTotalOrders.Size = new Size(291, 72);
+        lblTotalOrders.Size = new Size(35, 51);
         lblTotalOrders.TabIndex = 0;
         lblTotalOrders.Text = "订单数：暂无数据";
         // 
         // grpTotalRevenue
         // 
         grpTotalRevenue.Controls.Add(lblTotalRevenue);
+        grpTotalRevenue.Dock = DockStyle.Fill;
         grpTotalRevenue.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpTotalRevenue.Location = new Point(303, 5);
+        grpTotalRevenue.Location = new Point(47, 5);
         grpTotalRevenue.Margin = new Padding(4, 5, 4, 5);
         grpTotalRevenue.MinimumSize = new Size(1, 1);
         grpTotalRevenue.Name = "grpTotalRevenue";
         grpTotalRevenue.Padding = new Padding(0, 32, 0, 0);
-        grpTotalRevenue.Size = new Size(291, 104);
+        grpTotalRevenue.Size = new Size(35, 83);
         grpTotalRevenue.TabIndex = 1;
         grpTotalRevenue.Text = "销售额";
         grpTotalRevenue.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1524,20 +1565,21 @@ partial class Form1
         lblTotalRevenue.ForeColor = Color.FromArgb(48, 48, 48);
         lblTotalRevenue.Location = new Point(0, 32);
         lblTotalRevenue.Name = "lblTotalRevenue";
-        lblTotalRevenue.Size = new Size(291, 72);
+        lblTotalRevenue.Size = new Size(35, 51);
         lblTotalRevenue.TabIndex = 0;
         lblTotalRevenue.Text = "销售额：暂无数据";
         // 
         // grpTopDishCount
         // 
         grpTopDishCount.Controls.Add(lblTopDishCount);
+        grpTopDishCount.Dock = DockStyle.Fill;
         grpTopDishCount.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpTopDishCount.Location = new Point(901, 5);
+        grpTopDishCount.Location = new Point(133, 5);
         grpTopDishCount.Margin = new Padding(4, 5, 4, 5);
         grpTopDishCount.MinimumSize = new Size(1, 1);
         grpTopDishCount.Name = "grpTopDishCount";
         grpTopDishCount.Padding = new Padding(0, 32, 0, 0);
-        grpTopDishCount.Size = new Size(293, 104);
+        grpTopDishCount.Size = new Size(37, 83);
         grpTopDishCount.TabIndex = 3;
         grpTopDishCount.Text = "热销菜品";
         grpTopDishCount.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1549,20 +1591,21 @@ partial class Form1
         lblTopDishCount.ForeColor = Color.FromArgb(48, 48, 48);
         lblTopDishCount.Location = new Point(0, 32);
         lblTopDishCount.Name = "lblTopDishCount";
-        lblTopDishCount.Size = new Size(293, 72);
+        lblTopDishCount.Size = new Size(37, 51);
         lblTopDishCount.TabIndex = 0;
         lblTopDishCount.Text = "热销菜品数：暂无数据";
         // 
         // grpAverageOrderAmount
         // 
         grpAverageOrderAmount.Controls.Add(lblAverageOrderAmount);
+        grpAverageOrderAmount.Dock = DockStyle.Fill;
         grpAverageOrderAmount.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpAverageOrderAmount.Location = new Point(602, 5);
+        grpAverageOrderAmount.Location = new Point(90, 5);
         grpAverageOrderAmount.Margin = new Padding(4, 5, 4, 5);
         grpAverageOrderAmount.MinimumSize = new Size(1, 1);
         grpAverageOrderAmount.Name = "grpAverageOrderAmount";
         grpAverageOrderAmount.Padding = new Padding(0, 32, 0, 0);
-        grpAverageOrderAmount.Size = new Size(291, 104);
+        grpAverageOrderAmount.Size = new Size(35, 83);
         grpAverageOrderAmount.TabIndex = 2;
         grpAverageOrderAmount.Text = "平均客单价";
         grpAverageOrderAmount.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1574,7 +1617,7 @@ partial class Form1
         lblAverageOrderAmount.ForeColor = Color.FromArgb(48, 48, 48);
         lblAverageOrderAmount.Location = new Point(0, 32);
         lblAverageOrderAmount.Name = "lblAverageOrderAmount";
-        lblAverageOrderAmount.Size = new Size(291, 72);
+        lblAverageOrderAmount.Size = new Size(35, 51);
         lblAverageOrderAmount.TabIndex = 0;
         lblAverageOrderAmount.Text = "平均客单价：暂无数据";
         // 
@@ -1593,7 +1636,7 @@ partial class Form1
         layoutStatisticsMain.RowCount = 2;
         layoutStatisticsMain.RowStyles.Add(new RowStyle(SizeType.Percent, 62F));
         layoutStatisticsMain.RowStyles.Add(new RowStyle(SizeType.Percent, 38F));
-        layoutStatisticsMain.Size = new Size(1198, 430);
+        layoutStatisticsMain.Size = new Size(174, 1);
         layoutStatisticsMain.TabIndex = 2;
         layoutStatisticsMain.TagString = null;
         // 
@@ -1607,7 +1650,7 @@ partial class Form1
         grpTopDishes.MinimumSize = new Size(1, 1);
         grpTopDishes.Name = "grpTopDishes";
         grpTopDishes.Padding = new Padding(0, 32, 0, 0);
-        grpTopDishes.Size = new Size(710, 269);
+        grpTopDishes.Size = new Size(96, 1);
         grpTopDishes.TabIndex = 0;
         grpTopDishes.Text = "热销菜品排行";
         grpTopDishes.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1660,7 +1703,7 @@ partial class Form1
         dgvTopDishes.RowsDefaultCellStyle = dataGridViewCellStyle20;
         dgvTopDishes.SelectedIndex = -1;
         dgvTopDishes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvTopDishes.Size = new Size(710, 237);
+        dgvTopDishes.Size = new Size(96, 0);
         dgvTopDishes.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvTopDishes.TabIndex = 0;
         // 
@@ -1669,12 +1712,12 @@ partial class Form1
         grpTopDishesChart.Controls.Add(panelTopDishesChart);
         grpTopDishesChart.Dock = DockStyle.Fill;
         grpTopDishesChart.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpTopDishesChart.Location = new Point(722, 5);
+        grpTopDishesChart.Location = new Point(108, 5);
         grpTopDishesChart.Margin = new Padding(4, 5, 4, 5);
         grpTopDishesChart.MinimumSize = new Size(1, 1);
         grpTopDishesChart.Name = "grpTopDishesChart";
         grpTopDishesChart.Padding = new Padding(0, 32, 0, 0);
-        grpTopDishesChart.Size = new Size(472, 269);
+        grpTopDishesChart.Size = new Size(62, 1);
         grpTopDishesChart.TabIndex = 4;
         grpTopDishesChart.Text = "热销菜品柱状图";
         grpTopDishesChart.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1689,7 +1732,7 @@ partial class Form1
         panelTopDishesChart.Margin = new Padding(4, 5, 4, 5);
         panelTopDishesChart.MinimumSize = new Size(1, 1);
         panelTopDishesChart.Name = "panelTopDishesChart";
-        panelTopDishesChart.Size = new Size(472, 237);
+        panelTopDishesChart.Size = new Size(62, 1);
         panelTopDishesChart.TabIndex = 0;
         panelTopDishesChart.Text = null;
         panelTopDishesChart.TextAlignment = ContentAlignment.MiddleCenter;
@@ -1701,7 +1744,7 @@ partial class Form1
         lblChartPlaceholder.ForeColor = Color.FromArgb(48, 48, 48);
         lblChartPlaceholder.Location = new Point(0, 0);
         lblChartPlaceholder.Name = "lblChartPlaceholder";
-        lblChartPlaceholder.Size = new Size(472, 237);
+        lblChartPlaceholder.Size = new Size(62, 1);
         lblChartPlaceholder.TabIndex = 0;
         lblChartPlaceholder.Text = "图表区域：后续显示热销菜品柱状图";
         lblChartPlaceholder.TextAlign = ContentAlignment.MiddleCenter;
@@ -1711,12 +1754,12 @@ partial class Form1
         grpRevenueStatistics.Controls.Add(dgvRevenueStatistics);
         grpRevenueStatistics.Dock = DockStyle.Fill;
         grpRevenueStatistics.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpRevenueStatistics.Location = new Point(4, 284);
+        grpRevenueStatistics.Location = new Point(4, 5);
         grpRevenueStatistics.Margin = new Padding(4, 5, 4, 5);
         grpRevenueStatistics.MinimumSize = new Size(1, 1);
         grpRevenueStatistics.Name = "grpRevenueStatistics";
         grpRevenueStatistics.Padding = new Padding(0, 32, 0, 0);
-        grpRevenueStatistics.Size = new Size(710, 141);
+        grpRevenueStatistics.Size = new Size(96, 1);
         grpRevenueStatistics.TabIndex = 5;
         grpRevenueStatistics.Text = "营收统计";
         grpRevenueStatistics.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1768,7 +1811,7 @@ partial class Form1
         dgvRevenueStatistics.RowsDefaultCellStyle = dataGridViewCellStyle25;
         dgvRevenueStatistics.SelectedIndex = -1;
         dgvRevenueStatistics.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvRevenueStatistics.Size = new Size(710, 109);
+        dgvRevenueStatistics.Size = new Size(96, 0);
         dgvRevenueStatistics.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvRevenueStatistics.TabIndex = 0;
         // 
@@ -1777,12 +1820,12 @@ partial class Form1
         grpStatisticsRemark.Controls.Add(txtStatisticsRemark);
         grpStatisticsRemark.Dock = DockStyle.Fill;
         grpStatisticsRemark.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpStatisticsRemark.Location = new Point(722, 284);
+        grpStatisticsRemark.Location = new Point(108, 5);
         grpStatisticsRemark.Margin = new Padding(4, 5, 4, 5);
         grpStatisticsRemark.MinimumSize = new Size(1, 1);
         grpStatisticsRemark.Name = "grpStatisticsRemark";
         grpStatisticsRemark.Padding = new Padding(0, 32, 0, 0);
-        grpStatisticsRemark.Size = new Size(472, 141);
+        grpStatisticsRemark.Size = new Size(62, 1);
         grpStatisticsRemark.TabIndex = 6;
         grpStatisticsRemark.Text = "统计说明";
         grpStatisticsRemark.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1801,7 +1844,7 @@ partial class Form1
         txtStatisticsRemark.RightToLeft = RightToLeft.No;
         txtStatisticsRemark.ShowScrollBar = true;
         txtStatisticsRemark.ShowText = false;
-        txtStatisticsRemark.Size = new Size(472, 109);
+        txtStatisticsRemark.Size = new Size(62, 16);
         txtStatisticsRemark.TabIndex = 0;
         txtStatisticsRemark.Text = "统计数据来源于订单和订单明细，已取消订单不计入营收。";
         txtStatisticsRemark.TextAlignment = ContentAlignment.TopLeft;
@@ -1812,7 +1855,7 @@ partial class Form1
         tabAi.Controls.Add(layoutAiPage);
         tabAi.Location = new Point(0, 40);
         tabAi.Name = "tabAi";
-        tabAi.Size = new Size(1224, 1005);
+        tabAi.Size = new Size(200, 60);
         tabAi.TabIndex = 3;
         tabAi.Text = "AI 建议";
         tabAi.UseVisualStyleBackColor = true;
@@ -1832,7 +1875,7 @@ partial class Form1
         layoutAiPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
         layoutAiPage.RowStyles.Add(new RowStyle(SizeType.Percent, 75F));
         layoutAiPage.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-        layoutAiPage.Size = new Size(1224, 1005);
+        layoutAiPage.Size = new Size(200, 60);
         layoutAiPage.TabIndex = 0;
         layoutAiPage.TagString = null;
         // 
@@ -1849,7 +1892,7 @@ partial class Form1
         layoutAiTop.Name = "layoutAiTop";
         layoutAiTop.RowCount = 1;
         layoutAiTop.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        layoutAiTop.Size = new Size(1198, 64);
+        layoutAiTop.Size = new Size(174, 64);
         layoutAiTop.TabIndex = 0;
         layoutAiTop.TagString = null;
         // 
@@ -1876,7 +1919,7 @@ partial class Form1
         lblAiHint.ForeColor = Color.FromArgb(48, 48, 48);
         lblAiHint.Location = new Point(173, 0);
         lblAiHint.Name = "lblAiHint";
-        lblAiHint.Size = new Size(1015, 64);
+        lblAiHint.Size = new Size(1, 64);
         lblAiHint.TabIndex = 1;
         lblAiHint.Text = "根据热销菜品、低销量菜品和订单统计数据生成经营建议";
         lblAiHint.TextAlign = ContentAlignment.MiddleCenter;
@@ -1891,7 +1934,7 @@ partial class Form1
         grpAiSuggestion.MinimumSize = new Size(1, 1);
         grpAiSuggestion.Name = "grpAiSuggestion";
         grpAiSuggestion.Padding = new Padding(0, 32, 0, 0);
-        grpAiSuggestion.Size = new Size(1196, 670);
+        grpAiSuggestion.Size = new Size(172, 1);
         grpAiSuggestion.TabIndex = 1;
         grpAiSuggestion.Text = "AI经营建议";
         grpAiSuggestion.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1909,7 +1952,7 @@ partial class Form1
         txtAiSuggestion.ReadOnly = true;
         txtAiSuggestion.ShowScrollBar = true;
         txtAiSuggestion.ShowText = false;
-        txtAiSuggestion.Size = new Size(1196, 638);
+        txtAiSuggestion.Size = new Size(172, 16);
         txtAiSuggestion.TabIndex = 0;
         txtAiSuggestion.Text = "暂无经营建议，请点击“获取经营建议”。";
         txtAiSuggestion.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1920,12 +1963,12 @@ partial class Form1
         grpAiError.Controls.Add(txtAiError);
         grpAiError.Dock = DockStyle.Fill;
         grpAiError.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpAiError.Location = new Point(14, 760);
+        grpAiError.Location = new Point(14, 63);
         grpAiError.Margin = new Padding(4, 5, 4, 5);
         grpAiError.MinimumSize = new Size(1, 1);
         grpAiError.Name = "grpAiError";
         grpAiError.Padding = new Padding(0, 32, 0, 0);
-        grpAiError.Size = new Size(1196, 221);
+        grpAiError.Size = new Size(172, 1);
         grpAiError.TabIndex = 2;
         grpAiError.Text = "错误提示";
         grpAiError.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1942,7 +1985,7 @@ partial class Form1
         txtAiError.Padding = new Padding(5);
         txtAiError.ShowScrollBar = true;
         txtAiError.ShowText = false;
-        txtAiError.Size = new Size(1196, 189);
+        txtAiError.Size = new Size(172, 16);
         txtAiError.TabIndex = 0;
         txtAiError.Text = "暂无错误。";
         txtAiError.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1953,7 +1996,7 @@ partial class Form1
         tabDeliveryZones.Controls.Add(layoutDeliveryZonesPage);
         tabDeliveryZones.Location = new Point(0, 40);
         tabDeliveryZones.Name = "tabDeliveryZones";
-        tabDeliveryZones.Size = new Size(1224, 1005);
+        tabDeliveryZones.Size = new Size(200, 60);
         tabDeliveryZones.TabIndex = 4;
         tabDeliveryZones.Text = "配送区域";
         tabDeliveryZones.UseVisualStyleBackColor = true;
@@ -1973,7 +2016,7 @@ partial class Form1
         layoutDeliveryZonesPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
         layoutDeliveryZonesPage.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         layoutDeliveryZonesPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 260F));
-        layoutDeliveryZonesPage.Size = new Size(1224, 1005);
+        layoutDeliveryZonesPage.Size = new Size(200, 60);
         layoutDeliveryZonesPage.TabIndex = 0;
         layoutDeliveryZonesPage.TagString = null;
         // 
@@ -1988,7 +2031,7 @@ partial class Form1
         panelDeliveryZoneTop.Name = "panelDeliveryZoneTop";
         panelDeliveryZoneTop.Padding = new Padding(2);
         panelDeliveryZoneTop.ShowText = false;
-        panelDeliveryZoneTop.Size = new Size(1196, 50);
+        panelDeliveryZoneTop.Size = new Size(172, 50);
         panelDeliveryZoneTop.TabIndex = 0;
         panelDeliveryZoneTop.Text = null;
         panelDeliveryZoneTop.TextAlignment = ContentAlignment.MiddleCenter;
@@ -2011,11 +2054,10 @@ partial class Form1
         // 
         dgvDeliveryZones.AllowUserToAddRows = false;
         dgvDeliveryZones.AllowUserToDeleteRows = false;
-        dgvDeliveryZones.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dataGridViewCellStyle26.BackColor = Color.FromArgb(235, 243, 255);
         dgvDeliveryZones.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle26;
-        dgvDeliveryZones.Dock = DockStyle.Fill;
         dgvDeliveryZones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        dgvDeliveryZones.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dgvDeliveryZones.BackgroundColor = Color.White;
         dgvDeliveryZones.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         dataGridViewCellStyle27.Alignment = DataGridViewContentAlignment.MiddleCenter;
@@ -2027,7 +2069,7 @@ partial class Form1
         dataGridViewCellStyle27.WrapMode = DataGridViewTriState.True;
         dgvDeliveryZones.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle27;
         dgvDeliveryZones.ColumnHeadersHeight = 38;
-        dgvDeliveryZones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+        dgvDeliveryZones.Dock = DockStyle.Fill;
         dgvDeliveryZones.EnableHeadersVisualStyles = false;
         dgvDeliveryZones.Font = new Font("宋体", 10.5F, FontStyle.Regular, GraphicsUnit.Point, 134);
         dgvDeliveryZones.GridColor = Color.FromArgb(80, 160, 255);
@@ -2052,7 +2094,7 @@ partial class Form1
         dgvDeliveryZones.RowTemplate.Height = 34;
         dgvDeliveryZones.SelectedIndex = -1;
         dgvDeliveryZones.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvDeliveryZones.Size = new Size(1204, 649);
+        dgvDeliveryZones.Size = new Size(160, 1);
         dgvDeliveryZones.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvDeliveryZones.TabIndex = 1;
         // 
@@ -2062,25 +2104,24 @@ partial class Form1
         grpDeliveryZoneEditor.Controls.Add(panelDeliveryZoneActions);
         grpDeliveryZoneEditor.Dock = DockStyle.Fill;
         grpDeliveryZoneEditor.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpDeliveryZoneEditor.Location = new Point(20, 727);
+        grpDeliveryZoneEditor.Location = new Point(20, -200);
         grpDeliveryZoneEditor.Margin = new Padding(10);
         grpDeliveryZoneEditor.MinimumSize = new Size(1, 1);
         grpDeliveryZoneEditor.Name = "grpDeliveryZoneEditor";
         grpDeliveryZoneEditor.Padding = new Padding(0, 32, 0, 0);
-        grpDeliveryZoneEditor.Size = new Size(1204, 258);
+        grpDeliveryZoneEditor.Size = new Size(160, 240);
         grpDeliveryZoneEditor.TabIndex = 2;
         grpDeliveryZoneEditor.Text = "配送区域编辑";
         grpDeliveryZoneEditor.TextAlignment = ContentAlignment.MiddleLeft;
         // 
         // layoutDeliveryZoneEditor
         // 
-        layoutDeliveryZoneEditor.Dock = DockStyle.Top;
         layoutDeliveryZoneEditor.ColumnCount = 6;
         layoutDeliveryZoneEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
         layoutDeliveryZoneEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
         layoutDeliveryZoneEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
         layoutDeliveryZoneEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-        layoutDeliveryZoneEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
+        layoutDeliveryZoneEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 123F));
         layoutDeliveryZoneEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
         layoutDeliveryZoneEditor.Controls.Add(lblZoneProvince, 0, 0);
         layoutDeliveryZoneEditor.Controls.Add(txtZoneProvince, 1, 0);
@@ -2093,21 +2134,22 @@ partial class Form1
         layoutDeliveryZoneEditor.Controls.Add(lblZoneSortOrder, 2, 1);
         layoutDeliveryZoneEditor.Controls.Add(txtZoneSortOrder, 3, 1);
         layoutDeliveryZoneEditor.Controls.Add(chkZoneIsActive, 4, 1);
-        layoutDeliveryZoneEditor.Location = new Point(20, 40);
+        layoutDeliveryZoneEditor.Dock = DockStyle.Top;
+        layoutDeliveryZoneEditor.Location = new Point(0, 32);
         layoutDeliveryZoneEditor.Name = "layoutDeliveryZoneEditor";
         layoutDeliveryZoneEditor.RowCount = 2;
-        layoutDeliveryZoneEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
-        layoutDeliveryZoneEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
-        layoutDeliveryZoneEditor.Size = new Size(1164, 104);
+        layoutDeliveryZoneEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 49F));
+        layoutDeliveryZoneEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 41F));
+        layoutDeliveryZoneEditor.Size = new Size(160, 104);
         layoutDeliveryZoneEditor.TabIndex = 0;
         layoutDeliveryZoneEditor.TagString = null;
         // 
         // lblZoneProvince
         // 
         lblZoneProvince.Anchor = AnchorStyles.None;
-        lblZoneProvince.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        lblZoneProvince.Font = new Font("宋体", 10F);
         lblZoneProvince.ForeColor = Color.FromArgb(48, 48, 48);
-        lblZoneProvince.Location = new Point(3, 5);
+        lblZoneProvince.Location = new Point(3, 7);
         lblZoneProvince.Name = "lblZoneProvince";
         lblZoneProvince.Size = new Size(74, 34);
         lblZoneProvince.TabIndex = 0;
@@ -2117,13 +2159,13 @@ partial class Form1
         // 
         txtZoneProvince.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtZoneProvince.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtZoneProvince.Location = new Point(84, 5);
+        txtZoneProvince.Location = new Point(84, 7);
         txtZoneProvince.Margin = new Padding(4, 5, 4, 5);
         txtZoneProvince.MinimumSize = new Size(1, 16);
         txtZoneProvince.Name = "txtZoneProvince";
         txtZoneProvince.Padding = new Padding(5);
         txtZoneProvince.ShowText = false;
-        txtZoneProvince.Size = new Size(210, 35);
+        txtZoneProvince.Size = new Size(1, 35);
         txtZoneProvince.TabIndex = 1;
         txtZoneProvince.TextAlignment = ContentAlignment.MiddleLeft;
         txtZoneProvince.Watermark = "";
@@ -2131,9 +2173,9 @@ partial class Form1
         // lblZoneCity
         // 
         lblZoneCity.Anchor = AnchorStyles.None;
-        lblZoneCity.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        lblZoneCity.Font = new Font("宋体", 10F);
         lblZoneCity.ForeColor = Color.FromArgb(48, 48, 48);
-        lblZoneCity.Location = new Point(37, 5);
+        lblZoneCity.Location = new Point(42, 7);
         lblZoneCity.Name = "lblZoneCity";
         lblZoneCity.Size = new Size(74, 34);
         lblZoneCity.TabIndex = 2;
@@ -2143,13 +2185,13 @@ partial class Form1
         // 
         txtZoneCity.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtZoneCity.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtZoneCity.Location = new Point(118, 5);
+        txtZoneCity.Location = new Point(123, 7);
         txtZoneCity.Margin = new Padding(4, 5, 4, 5);
         txtZoneCity.MinimumSize = new Size(1, 16);
         txtZoneCity.Name = "txtZoneCity";
         txtZoneCity.Padding = new Padding(5);
         txtZoneCity.ShowText = false;
-        txtZoneCity.Size = new Size(210, 35);
+        txtZoneCity.Size = new Size(1, 35);
         txtZoneCity.TabIndex = 3;
         txtZoneCity.TextAlignment = ContentAlignment.MiddleLeft;
         txtZoneCity.Watermark = "";
@@ -2157,9 +2199,9 @@ partial class Form1
         // lblZoneDistrict
         // 
         lblZoneDistrict.Anchor = AnchorStyles.None;
-        lblZoneDistrict.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        lblZoneDistrict.Font = new Font("宋体", 10F);
         lblZoneDistrict.ForeColor = Color.FromArgb(48, 48, 48);
-        lblZoneDistrict.Location = new Point(71, 5);
+        lblZoneDistrict.Location = new Point(92, 7);
         lblZoneDistrict.Name = "lblZoneDistrict";
         lblZoneDistrict.Size = new Size(94, 34);
         lblZoneDistrict.TabIndex = 4;
@@ -2169,13 +2211,13 @@ partial class Form1
         // 
         txtZoneDistrict.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtZoneDistrict.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtZoneDistrict.Location = new Point(172, 5);
+        txtZoneDistrict.Location = new Point(205, 7);
         txtZoneDistrict.Margin = new Padding(4, 5, 4, 5);
         txtZoneDistrict.MinimumSize = new Size(1, 16);
         txtZoneDistrict.Name = "txtZoneDistrict";
         txtZoneDistrict.Padding = new Padding(5);
         txtZoneDistrict.ShowText = false;
-        txtZoneDistrict.Size = new Size(210, 35);
+        txtZoneDistrict.Size = new Size(1, 35);
         txtZoneDistrict.TabIndex = 5;
         txtZoneDistrict.TextAlignment = ContentAlignment.MiddleLeft;
         txtZoneDistrict.Watermark = "";
@@ -2183,25 +2225,25 @@ partial class Form1
         // lblZoneFee
         // 
         lblZoneFee.Anchor = AnchorStyles.None;
-        lblZoneFee.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        lblZoneFee.Font = new Font("宋体", 10F);
         lblZoneFee.ForeColor = Color.FromArgb(48, 48, 48);
-        lblZoneFee.Location = new Point(3, 50);
+        lblZoneFee.Location = new Point(3, 59);
         lblZoneFee.Name = "lblZoneFee";
         lblZoneFee.Size = new Size(74, 34);
         lblZoneFee.TabIndex = 6;
-        lblZoneFee.Text = "配送费：";
+        lblZoneFee.Text = "配送费";
         // 
         // txtZoneFee
         // 
         txtZoneFee.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtZoneFee.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtZoneFee.Location = new Point(84, 50);
+        txtZoneFee.Location = new Point(84, 59);
         txtZoneFee.Margin = new Padding(4, 5, 4, 5);
         txtZoneFee.MinimumSize = new Size(1, 16);
         txtZoneFee.Name = "txtZoneFee";
         txtZoneFee.Padding = new Padding(5);
         txtZoneFee.ShowText = false;
-        txtZoneFee.Size = new Size(210, 35);
+        txtZoneFee.Size = new Size(1, 35);
         txtZoneFee.TabIndex = 7;
         txtZoneFee.TextAlignment = ContentAlignment.MiddleLeft;
         txtZoneFee.Watermark = "";
@@ -2209,9 +2251,9 @@ partial class Form1
         // lblZoneSortOrder
         // 
         lblZoneSortOrder.Anchor = AnchorStyles.None;
-        lblZoneSortOrder.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        lblZoneSortOrder.Font = new Font("宋体", 10F);
         lblZoneSortOrder.ForeColor = Color.FromArgb(48, 48, 48);
-        lblZoneSortOrder.Location = new Point(37, 50);
+        lblZoneSortOrder.Location = new Point(42, 59);
         lblZoneSortOrder.Name = "lblZoneSortOrder";
         lblZoneSortOrder.Size = new Size(74, 34);
         lblZoneSortOrder.TabIndex = 8;
@@ -2221,13 +2263,13 @@ partial class Form1
         // 
         txtZoneSortOrder.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtZoneSortOrder.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtZoneSortOrder.Location = new Point(118, 50);
+        txtZoneSortOrder.Location = new Point(123, 59);
         txtZoneSortOrder.Margin = new Padding(4, 5, 4, 5);
         txtZoneSortOrder.MinimumSize = new Size(1, 16);
         txtZoneSortOrder.Name = "txtZoneSortOrder";
         txtZoneSortOrder.Padding = new Padding(5);
         txtZoneSortOrder.ShowText = false;
-        txtZoneSortOrder.Size = new Size(210, 35);
+        txtZoneSortOrder.Size = new Size(1, 35);
         txtZoneSortOrder.TabIndex = 9;
         txtZoneSortOrder.TextAlignment = ContentAlignment.MiddleLeft;
         txtZoneSortOrder.Watermark = "";
@@ -2237,28 +2279,28 @@ partial class Form1
         chkZoneIsActive.Anchor = AnchorStyles.None;
         chkZoneIsActive.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         chkZoneIsActive.ForeColor = Color.FromArgb(48, 48, 48);
-        chkZoneIsActive.Location = new Point(71, 48);
+        chkZoneIsActive.Location = new Point(88, 57);
         chkZoneIsActive.MinimumSize = new Size(1, 1);
         chkZoneIsActive.Name = "chkZoneIsActive";
-        chkZoneIsActive.Size = new Size(94, 38);
+        chkZoneIsActive.Size = new Size(102, 38);
         chkZoneIsActive.TabIndex = 10;
         chkZoneIsActive.Text = "可配送";
         // 
         // panelDeliveryZoneActions
         // 
-        panelDeliveryZoneActions.Dock = DockStyle.Bottom;
         panelDeliveryZoneActions.Controls.Add(btnAddDeliveryZone);
         panelDeliveryZoneActions.Controls.Add(btnUpdateDeliveryZone);
         panelDeliveryZoneActions.Controls.Add(btnDeleteDeliveryZone);
         panelDeliveryZoneActions.Controls.Add(btnRestoreDeliveryZone);
+        panelDeliveryZoneActions.Dock = DockStyle.Bottom;
         panelDeliveryZoneActions.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        panelDeliveryZoneActions.Location = new Point(0, 200);
+        panelDeliveryZoneActions.Location = new Point(0, 182);
         panelDeliveryZoneActions.Margin = new Padding(4, 5, 4, 5);
         panelDeliveryZoneActions.MinimumSize = new Size(1, 1);
         panelDeliveryZoneActions.Name = "panelDeliveryZoneActions";
         panelDeliveryZoneActions.Padding = new Padding(2);
         panelDeliveryZoneActions.ShowText = false;
-        panelDeliveryZoneActions.Size = new Size(1204, 58);
+        panelDeliveryZoneActions.Size = new Size(160, 58);
         panelDeliveryZoneActions.TabIndex = 1;
         panelDeliveryZoneActions.Text = null;
         panelDeliveryZoneActions.TextAlignment = ContentAlignment.MiddleCenter;
@@ -2324,7 +2366,7 @@ partial class Form1
         tabDiningTables.Controls.Add(layoutDiningTablesPage);
         tabDiningTables.Location = new Point(0, 40);
         tabDiningTables.Name = "tabDiningTables";
-        tabDiningTables.Size = new Size(1224, 1005);
+        tabDiningTables.Size = new Size(200, 60);
         tabDiningTables.TabIndex = 5;
         tabDiningTables.Text = "餐桌管理";
         tabDiningTables.UseVisualStyleBackColor = true;
@@ -2344,7 +2386,7 @@ partial class Form1
         layoutDiningTablesPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
         layoutDiningTablesPage.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         layoutDiningTablesPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 230F));
-        layoutDiningTablesPage.Size = new Size(1224, 1005);
+        layoutDiningTablesPage.Size = new Size(200, 60);
         layoutDiningTablesPage.TabIndex = 0;
         layoutDiningTablesPage.TagString = null;
         // 
@@ -2359,7 +2401,7 @@ partial class Form1
         panelDiningTableTop.Name = "panelDiningTableTop";
         panelDiningTableTop.Padding = new Padding(2);
         panelDiningTableTop.ShowText = false;
-        panelDiningTableTop.Size = new Size(1196, 50);
+        panelDiningTableTop.Size = new Size(172, 50);
         panelDiningTableTop.TabIndex = 0;
         panelDiningTableTop.Text = null;
         panelDiningTableTop.TextAlignment = ContentAlignment.MiddleCenter;
@@ -2382,11 +2424,10 @@ partial class Form1
         // 
         dgvDiningTables.AllowUserToAddRows = false;
         dgvDiningTables.AllowUserToDeleteRows = false;
-        dgvDiningTables.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dataGridViewCellStyle30.BackColor = Color.FromArgb(235, 243, 255);
         dgvDiningTables.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle30;
-        dgvDiningTables.Dock = DockStyle.Fill;
         dgvDiningTables.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        dgvDiningTables.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dgvDiningTables.BackgroundColor = Color.White;
         dgvDiningTables.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         dataGridViewCellStyle31.Alignment = DataGridViewContentAlignment.MiddleCenter;
@@ -2398,7 +2439,7 @@ partial class Form1
         dataGridViewCellStyle31.WrapMode = DataGridViewTriState.True;
         dgvDiningTables.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle31;
         dgvDiningTables.ColumnHeadersHeight = 38;
-        dgvDiningTables.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+        dgvDiningTables.Dock = DockStyle.Fill;
         dgvDiningTables.EnableHeadersVisualStyles = false;
         dgvDiningTables.Font = new Font("宋体", 10.5F, FontStyle.Regular, GraphicsUnit.Point, 134);
         dgvDiningTables.GridColor = Color.FromArgb(80, 160, 255);
@@ -2423,7 +2464,7 @@ partial class Form1
         dgvDiningTables.RowTemplate.Height = 34;
         dgvDiningTables.SelectedIndex = -1;
         dgvDiningTables.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvDiningTables.Size = new Size(1204, 679);
+        dgvDiningTables.Size = new Size(160, 1);
         dgvDiningTables.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvDiningTables.TabIndex = 1;
         // 
@@ -2433,19 +2474,18 @@ partial class Form1
         grpDiningTableEditor.Controls.Add(panelDiningTableActions);
         grpDiningTableEditor.Dock = DockStyle.Fill;
         grpDiningTableEditor.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpDiningTableEditor.Location = new Point(20, 757);
+        grpDiningTableEditor.Location = new Point(20, -170);
         grpDiningTableEditor.Margin = new Padding(10);
         grpDiningTableEditor.MinimumSize = new Size(1, 1);
         grpDiningTableEditor.Name = "grpDiningTableEditor";
         grpDiningTableEditor.Padding = new Padding(0, 32, 0, 0);
-        grpDiningTableEditor.Size = new Size(1204, 228);
+        grpDiningTableEditor.Size = new Size(160, 210);
         grpDiningTableEditor.TabIndex = 2;
         grpDiningTableEditor.Text = "餐桌编辑";
         grpDiningTableEditor.TextAlignment = ContentAlignment.MiddleLeft;
         // 
         // layoutDiningTableEditor
         // 
-        layoutDiningTableEditor.Dock = DockStyle.Top;
         layoutDiningTableEditor.ColumnCount = 4;
         layoutDiningTableEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
         layoutDiningTableEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -2457,12 +2497,13 @@ partial class Form1
         layoutDiningTableEditor.Controls.Add(txtDiningTableSeats, 3, 0);
         layoutDiningTableEditor.Controls.Add(chkDiningTableOccupied, 0, 1);
         layoutDiningTableEditor.Controls.Add(chkDiningTableEnabled, 2, 1);
-        layoutDiningTableEditor.Location = new Point(20, 40);
+        layoutDiningTableEditor.Dock = DockStyle.Top;
+        layoutDiningTableEditor.Location = new Point(0, 32);
         layoutDiningTableEditor.Name = "layoutDiningTableEditor";
         layoutDiningTableEditor.RowCount = 2;
         layoutDiningTableEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
         layoutDiningTableEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
-        layoutDiningTableEditor.Size = new Size(1164, 104);
+        layoutDiningTableEditor.Size = new Size(160, 104);
         layoutDiningTableEditor.TabIndex = 0;
         layoutDiningTableEditor.TagString = null;
         // 
@@ -2475,7 +2516,7 @@ partial class Form1
         lblDiningTableNumber.Name = "lblDiningTableNumber";
         lblDiningTableNumber.Size = new Size(74, 34);
         lblDiningTableNumber.TabIndex = 0;
-        lblDiningTableNumber.Text = "桌号：";
+        lblDiningTableNumber.Text = "桌号";
         // 
         // txtDiningTableNumber
         // 
@@ -2487,7 +2528,7 @@ partial class Form1
         txtDiningTableNumber.Name = "txtDiningTableNumber";
         txtDiningTableNumber.Padding = new Padding(5);
         txtDiningTableNumber.ShowText = false;
-        txtDiningTableNumber.Size = new Size(260, 35);
+        txtDiningTableNumber.Size = new Size(1, 35);
         txtDiningTableNumber.TabIndex = 1;
         txtDiningTableNumber.TextAlignment = ContentAlignment.MiddleLeft;
         txtDiningTableNumber.Watermark = "";
@@ -2497,7 +2538,7 @@ partial class Form1
         lblDiningTableSeats.Anchor = AnchorStyles.None;
         lblDiningTableSeats.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblDiningTableSeats.ForeColor = Color.FromArgb(48, 48, 48);
-        lblDiningTableSeats.Location = new Point(53, 5);
+        lblDiningTableSeats.Location = new Point(73, 5);
         lblDiningTableSeats.Name = "lblDiningTableSeats";
         lblDiningTableSeats.Size = new Size(94, 34);
         lblDiningTableSeats.TabIndex = 2;
@@ -2507,13 +2548,13 @@ partial class Form1
         // 
         txtDiningTableSeats.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtDiningTableSeats.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtDiningTableSeats.Location = new Point(154, 5);
+        txtDiningTableSeats.Location = new Point(174, 5);
         txtDiningTableSeats.Margin = new Padding(4, 5, 4, 5);
         txtDiningTableSeats.MinimumSize = new Size(1, 16);
         txtDiningTableSeats.Name = "txtDiningTableSeats";
         txtDiningTableSeats.Padding = new Padding(5);
         txtDiningTableSeats.ShowText = false;
-        txtDiningTableSeats.Size = new Size(260, 35);
+        txtDiningTableSeats.Size = new Size(1, 35);
         txtDiningTableSeats.TabIndex = 3;
         txtDiningTableSeats.TextAlignment = ContentAlignment.MiddleLeft;
         txtDiningTableSeats.Watermark = "";
@@ -2523,7 +2564,7 @@ partial class Form1
         chkDiningTableOccupied.Anchor = AnchorStyles.None;
         chkDiningTableOccupied.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         chkDiningTableOccupied.ForeColor = Color.FromArgb(48, 48, 48);
-        chkDiningTableOccupied.Location = new Point(3, 48);
+        chkDiningTableOccupied.Location = new Point(3, 55);
         chkDiningTableOccupied.MinimumSize = new Size(1, 1);
         chkDiningTableOccupied.Name = "chkDiningTableOccupied";
         chkDiningTableOccupied.Size = new Size(74, 38);
@@ -2535,7 +2576,7 @@ partial class Form1
         chkDiningTableEnabled.Anchor = AnchorStyles.None;
         chkDiningTableEnabled.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         chkDiningTableEnabled.ForeColor = Color.FromArgb(48, 48, 48);
-        chkDiningTableEnabled.Location = new Point(53, 48);
+        chkDiningTableEnabled.Location = new Point(73, 55);
         chkDiningTableEnabled.MinimumSize = new Size(1, 1);
         chkDiningTableEnabled.Name = "chkDiningTableEnabled";
         chkDiningTableEnabled.Size = new Size(94, 38);
@@ -2544,19 +2585,19 @@ partial class Form1
         // 
         // panelDiningTableActions
         // 
-        panelDiningTableActions.Dock = DockStyle.Bottom;
         panelDiningTableActions.Controls.Add(btnAddDiningTable);
         panelDiningTableActions.Controls.Add(btnUpdateDiningTable);
         panelDiningTableActions.Controls.Add(btnDeleteDiningTable);
         panelDiningTableActions.Controls.Add(btnRestoreDiningTable);
+        panelDiningTableActions.Dock = DockStyle.Bottom;
         panelDiningTableActions.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        panelDiningTableActions.Location = new Point(0, 170);
+        panelDiningTableActions.Location = new Point(0, 152);
         panelDiningTableActions.Margin = new Padding(4, 5, 4, 5);
         panelDiningTableActions.MinimumSize = new Size(1, 1);
         panelDiningTableActions.Name = "panelDiningTableActions";
         panelDiningTableActions.Padding = new Padding(2);
         panelDiningTableActions.ShowText = false;
-        panelDiningTableActions.Size = new Size(1204, 58);
+        panelDiningTableActions.Size = new Size(160, 58);
         panelDiningTableActions.TabIndex = 1;
         panelDiningTableActions.Text = null;
         panelDiningTableActions.TextAlignment = ContentAlignment.MiddleCenter;
@@ -2622,7 +2663,7 @@ partial class Form1
         tabUsers.Controls.Add(layoutUsersPage);
         tabUsers.Location = new Point(0, 40);
         tabUsers.Name = "tabUsers";
-        tabUsers.Size = new Size(1224, 1005);
+        tabUsers.Size = new Size(200, 60);
         tabUsers.TabIndex = 6;
         tabUsers.Text = "账号管理";
         tabUsers.UseVisualStyleBackColor = true;
@@ -2642,7 +2683,7 @@ partial class Form1
         layoutUsersPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
         layoutUsersPage.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         layoutUsersPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 260F));
-        layoutUsersPage.Size = new Size(1224, 1005);
+        layoutUsersPage.Size = new Size(200, 60);
         layoutUsersPage.TabIndex = 0;
         layoutUsersPage.TagString = null;
         // 
@@ -2657,7 +2698,7 @@ partial class Form1
         panelUsersTop.Name = "panelUsersTop";
         panelUsersTop.Padding = new Padding(2);
         panelUsersTop.ShowText = false;
-        panelUsersTop.Size = new Size(1196, 50);
+        panelUsersTop.Size = new Size(172, 50);
         panelUsersTop.TabIndex = 0;
         panelUsersTop.Text = null;
         panelUsersTop.TextAlignment = ContentAlignment.MiddleCenter;
@@ -2681,17 +2722,16 @@ partial class Form1
         dgvUsers.AllowUserToAddRows = false;
         dgvUsers.AllowUserToDeleteRows = false;
         dgvUsers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle30;
-        dgvUsers.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        dgvUsers.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         dgvUsers.BackgroundColor = Color.White;
         dgvUsers.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         dgvUsers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle31;
         dgvUsers.ColumnHeadersHeight = 38;
-        dgvUsers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+        dgvUsers.Dock = DockStyle.Fill;
         dgvUsers.EnableHeadersVisualStyles = false;
         dgvUsers.Font = new Font("宋体", 10.5F, FontStyle.Regular, GraphicsUnit.Point, 134);
         dgvUsers.GridColor = Color.FromArgb(80, 160, 255);
-        dgvUsers.Dock = DockStyle.Fill;
         dgvUsers.Location = new Point(20, 80);
         dgvUsers.Margin = new Padding(10);
         dgvUsers.MultiSelect = false;
@@ -2704,7 +2744,7 @@ partial class Form1
         dgvUsers.RowTemplate.Height = 34;
         dgvUsers.SelectedIndex = -1;
         dgvUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvUsers.Size = new Size(1204, 649);
+        dgvUsers.Size = new Size(160, 1);
         dgvUsers.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvUsers.TabIndex = 1;
         // 
@@ -2714,19 +2754,18 @@ partial class Form1
         grpUserEditor.Controls.Add(panelUserActions);
         grpUserEditor.Dock = DockStyle.Fill;
         grpUserEditor.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpUserEditor.Location = new Point(20, 727);
+        grpUserEditor.Location = new Point(20, -200);
         grpUserEditor.Margin = new Padding(10);
         grpUserEditor.MinimumSize = new Size(1, 1);
         grpUserEditor.Name = "grpUserEditor";
         grpUserEditor.Padding = new Padding(0, 32, 0, 0);
-        grpUserEditor.Size = new Size(1204, 258);
+        grpUserEditor.Size = new Size(160, 240);
         grpUserEditor.TabIndex = 2;
         grpUserEditor.Text = "账号查看与状态管理";
         grpUserEditor.TextAlignment = ContentAlignment.MiddleLeft;
         // 
         // layoutUserEditor
         // 
-        layoutUserEditor.Dock = DockStyle.Top;
         layoutUserEditor.ColumnCount = 6;
         layoutUserEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 90F));
         layoutUserEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
@@ -2742,14 +2781,14 @@ partial class Form1
         layoutUserEditor.Controls.Add(txtUserPhone, 5, 0);
         layoutUserEditor.Controls.Add(lblUserAddress, 0, 1);
         layoutUserEditor.Controls.Add(txtUserAddress, 1, 1);
-        layoutUserEditor.SetColumnSpan(txtUserAddress, 3);
         layoutUserEditor.Controls.Add(chkIsActive, 4, 1);
-        layoutUserEditor.Location = new Point(20, 40);
+        layoutUserEditor.Dock = DockStyle.Top;
+        layoutUserEditor.Location = new Point(0, 32);
         layoutUserEditor.Name = "layoutUserEditor";
         layoutUserEditor.RowCount = 2;
         layoutUserEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
         layoutUserEditor.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
-        layoutUserEditor.Size = new Size(1164, 130);
+        layoutUserEditor.Size = new Size(160, 130);
         layoutUserEditor.TabIndex = 0;
         layoutUserEditor.TagString = null;
         // 
@@ -2758,7 +2797,7 @@ partial class Form1
         lblUsername.Anchor = AnchorStyles.None;
         lblUsername.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblUsername.ForeColor = Color.FromArgb(48, 48, 48);
-        lblUsername.Location = new Point(3, 5);
+        lblUsername.Location = new Point(8, 5);
         lblUsername.Name = "lblUsername";
         lblUsername.Size = new Size(74, 34);
         lblUsername.TabIndex = 0;
@@ -2768,14 +2807,14 @@ partial class Form1
         // 
         txtUsername.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtUsername.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtUsername.Location = new Point(84, 5);
+        txtUsername.Location = new Point(94, 5);
         txtUsername.Margin = new Padding(4, 5, 4, 5);
         txtUsername.MinimumSize = new Size(1, 16);
         txtUsername.Name = "txtUsername";
         txtUsername.Padding = new Padding(5);
         txtUsername.ReadOnly = true;
         txtUsername.ShowText = false;
-        txtUsername.Size = new Size(210, 35);
+        txtUsername.Size = new Size(1, 35);
         txtUsername.TabIndex = 1;
         txtUsername.TextAlignment = ContentAlignment.MiddleLeft;
         txtUsername.Watermark = "";
@@ -2783,26 +2822,26 @@ partial class Form1
         // lblRealName
         // 
         lblRealName.Anchor = AnchorStyles.None;
-        lblRealName.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        lblRealName.Font = new Font("宋体", 12F);
         lblRealName.ForeColor = Color.FromArgb(48, 48, 48);
-        lblRealName.Location = new Point(37, 5);
+        lblRealName.Location = new Point(59, 5);
         lblRealName.Name = "lblRealName";
         lblRealName.Size = new Size(74, 34);
         lblRealName.TabIndex = 2;
-        lblRealName.Text = "姓名：";
+        lblRealName.Text = "姓名";
         // 
         // txtRealName
         // 
         txtRealName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtRealName.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtRealName.Location = new Point(118, 5);
+        txtRealName.Location = new Point(145, 5);
         txtRealName.Margin = new Padding(4, 5, 4, 5);
         txtRealName.MinimumSize = new Size(1, 16);
         txtRealName.Name = "txtRealName";
         txtRealName.Padding = new Padding(5);
         txtRealName.ReadOnly = true;
         txtRealName.ShowText = false;
-        txtRealName.Size = new Size(210, 35);
+        txtRealName.Size = new Size(1, 35);
         txtRealName.TabIndex = 3;
         txtRealName.TextAlignment = ContentAlignment.MiddleLeft;
         txtRealName.Watermark = "";
@@ -2812,7 +2851,7 @@ partial class Form1
         lblUserPhone.Anchor = AnchorStyles.None;
         lblUserPhone.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblUserPhone.ForeColor = Color.FromArgb(48, 48, 48);
-        lblUserPhone.Location = new Point(71, 5);
+        lblUserPhone.Location = new Point(105, 5);
         lblUserPhone.Name = "lblUserPhone";
         lblUserPhone.Size = new Size(94, 34);
         lblUserPhone.TabIndex = 4;
@@ -2822,14 +2861,14 @@ partial class Form1
         // 
         txtUserPhone.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         txtUserPhone.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtUserPhone.Location = new Point(172, 5);
+        txtUserPhone.Location = new Point(206, 5);
         txtUserPhone.Margin = new Padding(4, 5, 4, 5);
         txtUserPhone.MinimumSize = new Size(1, 16);
         txtUserPhone.Name = "txtUserPhone";
         txtUserPhone.Padding = new Padding(5);
         txtUserPhone.ReadOnly = true;
         txtUserPhone.ShowText = false;
-        txtUserPhone.Size = new Size(210, 35);
+        txtUserPhone.Size = new Size(1, 35);
         txtUserPhone.TabIndex = 5;
         txtUserPhone.TextAlignment = ContentAlignment.MiddleLeft;
         txtUserPhone.Watermark = "";
@@ -2839,17 +2878,18 @@ partial class Form1
         lblUserAddress.Anchor = AnchorStyles.None;
         lblUserAddress.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         lblUserAddress.ForeColor = Color.FromArgb(48, 48, 48);
-        lblUserAddress.Location = new Point(3, 50);
+        lblUserAddress.Location = new Point(8, 70);
         lblUserAddress.Name = "lblUserAddress";
         lblUserAddress.Size = new Size(74, 34);
         lblUserAddress.TabIndex = 6;
-        lblUserAddress.Text = "地址：";
+        lblUserAddress.Text = "地址";
         // 
         // txtUserAddress
         // 
         txtUserAddress.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        layoutUserEditor.SetColumnSpan(txtUserAddress, 3);
         txtUserAddress.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtUserAddress.Location = new Point(84, 50);
+        txtUserAddress.Location = new Point(94, 58);
         txtUserAddress.Margin = new Padding(4, 5, 4, 5);
         txtUserAddress.MinimumSize = new Size(1, 16);
         txtUserAddress.Multiline = true;
@@ -2858,7 +2898,7 @@ partial class Form1
         txtUserAddress.ReadOnly = true;
         txtUserAddress.ShowScrollBar = true;
         txtUserAddress.ShowText = false;
-        txtUserAddress.Size = new Size(600, 58);
+        txtUserAddress.Size = new Size(4, 58);
         txtUserAddress.TabIndex = 7;
         txtUserAddress.TextAlignment = ContentAlignment.TopLeft;
         txtUserAddress.Watermark = "";
@@ -2868,7 +2908,7 @@ partial class Form1
         chkIsActive.Anchor = AnchorStyles.None;
         chkIsActive.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         chkIsActive.ForeColor = Color.FromArgb(48, 48, 48);
-        chkIsActive.Location = new Point(37, 48);
+        chkIsActive.Location = new Point(115, 68);
         chkIsActive.MinimumSize = new Size(1, 1);
         chkIsActive.Name = "chkIsActive";
         chkIsActive.Size = new Size(74, 38);
@@ -2877,33 +2917,19 @@ partial class Form1
         // 
         // panelUserActions
         // 
-        panelUserActions.Dock = DockStyle.Bottom;
         panelUserActions.Controls.Add(btnUpdateUser);
+        panelUserActions.Dock = DockStyle.Bottom;
         panelUserActions.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        panelUserActions.Location = new Point(0, 200);
+        panelUserActions.Location = new Point(0, 182);
         panelUserActions.Margin = new Padding(4, 5, 4, 5);
         panelUserActions.MinimumSize = new Size(1, 1);
         panelUserActions.Name = "panelUserActions";
         panelUserActions.Padding = new Padding(2);
         panelUserActions.ShowText = false;
-        panelUserActions.Size = new Size(1204, 58);
+        panelUserActions.Size = new Size(160, 58);
         panelUserActions.TabIndex = 1;
         panelUserActions.Text = null;
         panelUserActions.TextAlignment = ContentAlignment.MiddleCenter;
-        // 
-        // btnAddUser
-        // 
-        btnAddUser.FillColor = Color.FromArgb(51, 122, 183);
-        btnAddUser.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnAddUser.Location = new Point(10, 6);
-        btnAddUser.MinimumSize = new Size(1, 1);
-        btnAddUser.Name = "btnAddUser";
-        btnAddUser.Radius = 8;
-        btnAddUser.RectColor = Color.FromArgb(51, 122, 183);
-        btnAddUser.Size = new Size(110, 38);
-        btnAddUser.TabIndex = 0;
-        btnAddUser.Text = "新增用户";
-        btnAddUser.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         // 
         // btnUpdateUser
         // 
@@ -2918,6 +2944,20 @@ partial class Form1
         btnUpdateUser.TabIndex = 1;
         btnUpdateUser.Text = "保存启用状态";
         btnUpdateUser.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        // 
+        // btnAddUser
+        // 
+        btnAddUser.FillColor = Color.FromArgb(51, 122, 183);
+        btnAddUser.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnAddUser.Location = new Point(10, 6);
+        btnAddUser.MinimumSize = new Size(1, 1);
+        btnAddUser.Name = "btnAddUser";
+        btnAddUser.Radius = 8;
+        btnAddUser.RectColor = Color.FromArgb(51, 122, 183);
+        btnAddUser.Size = new Size(110, 38);
+        btnAddUser.TabIndex = 0;
+        btnAddUser.Text = "新增用户";
+        btnAddUser.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         // 
         // btnDeleteUser
         // 
@@ -2950,7 +2990,7 @@ partial class Form1
         // Form1
         // 
         AutoScaleMode = AutoScaleMode.None;
-        ClientSize = new Size(1228, 1083);
+        ClientSize = new Size(1596, 1083);
         Controls.Add(tabMain);
         Font = new Font("Microsoft YaHei UI", 10F);
         IconImage = (Image)resources.GetObject("$this.IconImage");
@@ -2964,8 +3004,11 @@ partial class Form1
         tabMain.ResumeLayout(false);
         tabDishes.ResumeLayout(false);
         layoutDishPage.ResumeLayout(false);
+        panelDishTop.ResumeLayout(false);
         grpDishEdit.ResumeLayout(false);
         layoutDishEdit.ResumeLayout(false);
+        cmbDishCategory.ResumeLayout(false);
+        cmbDishCategory.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)picDishImage).EndInit();
         ((System.ComponentModel.ISupportInitialize)dgvDishes).EndInit();
         tabOrders.ResumeLayout(false);
@@ -3028,12 +3071,14 @@ partial class Form1
     private Sunny.UI.UIButton btnUpdateDish;
     private Sunny.UI.UIButton btnAddDish;
     private Sunny.UI.UIButton btnLoadDishes;
+    private Sunny.UI.UIButton btnToggleDeletedDishes;
     private TabPage tabStatistics;
     private TabPage tabAi;
     private Sunny.UI.UITextBox txtPrice;
     private Sunny.UI.UITextBox txtCategory;
     private Sunny.UI.UIDataGridView dgvDishes;
     private Sunny.UI.UITableLayoutPanel layoutDishPage;
+    private Sunny.UI.UIFlowLayoutPanel panelDishTop;
     private Sunny.UI.UIGroupBox grpDishEdit;
     private Sunny.UI.UITableLayoutPanel layoutDishEdit;
     private Sunny.UI.UITextBox txtDishName;

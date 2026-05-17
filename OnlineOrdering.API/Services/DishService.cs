@@ -96,7 +96,7 @@ namespace OnlineOrdering.API.Services
             dish.SaleStatus = DishSaleStatuses.OffSale;
             dish.DeletedAt = DateTime.Now;
             dish.DeletedByUserId = null;
-            dish.DeleteReason = string.IsNullOrWhiteSpace(dto?.DeleteReason) ? "管理员隐藏菜品" : dto!.DeleteReason!.Trim();
+            dish.DeleteReason = string.IsNullOrWhiteSpace(dto?.DeleteReason) ? "管理员删除菜品" : dto!.DeleteReason!.Trim();
             dish.UpdatedAt = DateTime.Now;
 
             await _db.SaveChangesAsync();

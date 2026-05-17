@@ -50,7 +50,7 @@ namespace OnlineOrdering.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"获取已隐藏菜品失败：{ex.Message}" });
+                return StatusCode(500, new { message = $"获取已删除菜品失败：{ex.Message}" });
             }
         }
 

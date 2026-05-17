@@ -82,6 +82,7 @@ public partial class OrderHistoryForm : Form
 
     private void SetGridHeaders()
     {
+        ApplyGridDensity(dgvOrders);
         dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
         if (dgvOrders.Columns["OrderNo"] != null)
@@ -201,6 +202,7 @@ public partial class OrderHistoryForm : Form
 
     private void SetOrderItemGridHeaders()
     {
+        ApplyGridDensity(dgvOrderItems);
         dgvOrderItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
         if (dgvOrderItems.Columns["DishName"] != null)
@@ -227,6 +229,20 @@ public partial class OrderHistoryForm : Form
             if (dgvOrderItems.Columns[col] != null)
                 dgvOrderItems.Columns[col].Visible = false;
         }
+    }
+
+    private static void ApplyGridDensity(DataGridView dgv)
+    {
+        dgv.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+        dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+        dgv.ColumnHeadersHeight = 42;
+        dgv.RowTemplate.Height = 40;
+        dgv.RowTemplate.MinimumHeight = 40;
+        dgv.DefaultCellStyle.Padding = new Padding(4, 6, 4, 6);
+        dgv.DefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
+        dgv.RowsDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
+        dgv.ColumnHeadersDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        dgv.RowHeadersDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
     }
 
     private static void Grid_CellToolTipTextNeeded(object? sender, DataGridViewCellToolTipTextNeededEventArgs e)

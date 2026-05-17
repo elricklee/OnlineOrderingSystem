@@ -227,11 +227,11 @@ namespace ClientAdmin
                 dgvDishes.DataSource = dishes;
 
                 SetDishGridHeaders();
-                btnLoadDishes.Text = recycleBin ? "返回菜品列表" : "查看已隐藏";
-                btnDeleteDish.Text = recycleBin ? "恢复菜品" : "隐藏菜品";
+                btnDeleteDish.Text = recycleBin ? "恢复菜品" : "删除菜品";
                 btnAddDish.Enabled = !recycleBin;
                 btnUpdateDish.Enabled = !recycleBin;
-                grpDishEdit.Text = recycleBin ? "已隐藏菜品 / 回收站" : "菜品编辑";
+                grpDishEdit.Text = recycleBin ? "已删除菜品 / 回收站" : "菜品编辑";
+                btnToggleDeletedDishes.Text = recycleBin ? "返回菜品列表" : "查看已删除";
             }
             catch (Exception ex)
             {
@@ -319,14 +319,14 @@ namespace ClientAdmin
 
             if (dgvDishes.Columns["DeletedAt"] != null)
             {
-                dgvDishes.Columns["DeletedAt"].HeaderText = "隐藏时间";
+                dgvDishes.Columns["DeletedAt"].HeaderText = "删除时间";
                 dgvDishes.Columns["DeletedAt"].MinimumWidth = 145;
                 dgvDishes.Columns["DeletedAt"].Visible = _showDeletedDishes;
             }
 
             if (dgvDishes.Columns["DeleteReason"] != null)
             {
-                dgvDishes.Columns["DeleteReason"].HeaderText = "隐藏原因";
+                dgvDishes.Columns["DeleteReason"].HeaderText = "删除原因";
                 dgvDishes.Columns["DeleteReason"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgvDishes.Columns["DeleteReason"].FillWeight = 160;
                 dgvDishes.Columns["DeleteReason"].MinimumWidth = 220;
@@ -334,6 +334,11 @@ namespace ClientAdmin
             }
         }
         private async void btnLoadDishes_Click(object sender, EventArgs e)
+        {
+            await LoadDishesAsync(_showDeletedDishes);
+        }
+
+        private async void btnToggleDeletedDishes_Click(object sender, EventArgs e)
         {
             await LoadDishesAsync(!_showDeletedDishes);
         }
@@ -445,7 +450,7 @@ namespace ClientAdmin
             try
             {
                 using var dialog = new Form();
-                dialog.Text = "隐藏菜品原因";
+                dialog.Text = "删除菜品原因";
                 dialog.Size = new Size(420, 210);
                 dialog.StartPosition = FormStartPosition.CenterParent;
                 dialog.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -454,7 +459,7 @@ namespace ClientAdmin
 
                 var label = new Label
                 {
-                    Text = "请输入隐藏原因：",
+                    Text = "请输入删除原因：",
                     Location = new Point(20, 20),
                     Size = new Size(340, 24)
                 };
@@ -495,14 +500,14 @@ namespace ClientAdmin
                     $"api/Dishes/{selectedDishId.Value}",
                     new DishDeleteDto { DeleteReason = textBox.Text.Trim() });
 
-                MessageBox.Show("菜品已隐藏");
+                MessageBox.Show("菜品已删除");
 
                 ClearDishInputs();
                 await LoadDishesAsync();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("隐藏菜品失败：" + ex.Message);
+                MessageBox.Show("删除菜品失败：" + ex.Message);
             }
         }
 
@@ -1298,6 +1303,7 @@ namespace ClientAdmin
             dgvTopDishes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvTopDishes.MultiSelect = false;
             dgvTopDishes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            PrepareAdminGrid(dgvTopDishes);
 
             dgvRevenueStatistics.ReadOnly = true;
             dgvRevenueStatistics.AllowUserToAddRows = false;
@@ -1305,6 +1311,7 @@ namespace ClientAdmin
             dgvRevenueStatistics.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvRevenueStatistics.MultiSelect = false;
             dgvRevenueStatistics.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            PrepareAdminGrid(dgvRevenueStatistics);
 
             dtpStatisticsStart.Value = DateTime.Today.AddDays(-7);
             dtpStatisticsEnd.Value = DateTime.Today;
@@ -1698,7 +1705,7 @@ namespace ClientAdmin
             btnLoadDishes.Text = "加载菜品";
             btnAddDish.Text = "新增菜品";
             btnUpdateDish.Text = "更新菜品";
-            btnDeleteDish.Text = "隐藏菜品";
+            btnDeleteDish.Text = "删除菜品";
             btnLoadOrders.Text = "加载订单";
             btnLoadStatistics.Text = "加载统计";
             btnResetStatistics.Text = "重置";
@@ -2248,14 +2255,19 @@ namespace ClientAdmin
         private static void PrepareAdminGrid(DataGridView dgv)
         {
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgv.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgv.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
             dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-            dgv.ColumnHeadersHeight = 38;
-            dgv.RowTemplate.Height = 34;
+            dgv.ColumnHeadersHeight = 42;
+            dgv.RowTemplate.Height = 40;
+            dgv.RowTemplate.MinimumHeight = 40;
             dgv.DefaultCellStyle.WrapMode = DataGridViewTriState.False;
             dgv.RowsDefaultCellStyle.WrapMode = DataGridViewTriState.False;
             dgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dgv.DefaultCellStyle.Padding = new Padding(2);
+            dgv.DefaultCellStyle.Padding = new Padding(4, 6, 4, 6);
+            dgv.DefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
+            dgv.RowsDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
+            dgv.ColumnHeadersDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+            dgv.RowHeadersDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
         }
 
         private static void AttachGridTooltips(DataGridView dgv)

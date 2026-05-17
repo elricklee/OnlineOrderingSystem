@@ -9,7 +9,7 @@ namespace ClientCustomer
     {
         private static readonly HttpClient _client = new HttpClient
         {
-            BaseAddress = new Uri("http://localhost:5000/"),
+            BaseAddress = new Uri("http://127.0.0.1:5000/"),
             Timeout = TimeSpan.FromSeconds(30)
         };
 

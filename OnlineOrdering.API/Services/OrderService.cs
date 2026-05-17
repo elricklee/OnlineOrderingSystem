@@ -70,7 +70,7 @@ namespace OnlineOrdering.API.Services
                 var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == item.DishId);
                 if (dish == null)
                 {
-                    throw new InvalidOperationException("菜品不存在或已隐藏。");
+                    throw new InvalidOperationException("菜品不存在或已删除。");
                 }
 
                 if (!dish.IsAvailable || dish.SaleStatus != DishSaleStatuses.OnSale)
