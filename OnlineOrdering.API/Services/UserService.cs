@@ -100,6 +100,12 @@ public class UserService
             return new LoginResponse { Success = false, Message = "常用地址不能为空" };
         }
 
+        var matchedZone = await FindMatchingDeliveryZoneAsync(address);
+        if (matchedZone == null)
+        {
+            return new LoginResponse { Success = false, Message = "常用地址必须位于已开通的配送区域内" };
+        }
+
         var existingUser = await _db.Users
             .FirstOrDefaultAsync(u => u.Username == username);
 
@@ -115,7 +121,7 @@ public class UserService
             Role = UserRoles.Customer,
             RealName = realName,
             Phone = phone,
-            Address = address,
+            Address = NormalizeAddress(address, matchedZone),
             CreatedAt = DateTime.Now,
             IsActive = true
         };
@@ -222,6 +228,50 @@ public class UserService
         user.PasswordHash = HashPassword(request.NewPassword);
         await _db.SaveChangesAsync();
         return true;
+    }
+
+    private async Task<DeliveryZone?> FindMatchingDeliveryZoneAsync(string address)
+    {
+        var normalizedAddress = NormalizeWhitespace(address);
+        var zones = await _db.DeliveryZones
+            .Where(zone => zone.IsActive)
+            .OrderByDescending(zone => (zone.Province + zone.City + zone.District).Length)
+            .ToListAsync();
+
+        return zones.FirstOrDefault(zone => GetZonePrefixes(zone).Any(prefix =>
+            normalizedAddress.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    private static string NormalizeAddress(string address, DeliveryZone zone)
+    {
+        var normalizedAddress = NormalizeWhitespace(address);
+        var detail = normalizedAddress;
+
+        foreach (var prefix in GetZonePrefixes(zone))
+        {
+            if (normalizedAddress.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                detail = normalizedAddress[prefix.Length..].Trim();
+                break;
+            }
+        }
+
+        return string.Join(
+            " ",
+            new[] { zone.Province.Trim(), zone.City.Trim(), zone.District.Trim(), detail }
+                .Where(value => !string.IsNullOrWhiteSpace(value)));
+    }
+
+    private static IEnumerable<string> GetZonePrefixes(DeliveryZone zone)
+    {
+        yield return NormalizeWhitespace($"{zone.Province} {zone.City} {zone.District}");
+        yield return NormalizeWhitespace($"{zone.Province}{zone.City}{zone.District}");
+        yield return NormalizeWhitespace($"{zone.Province} / {zone.City} / {zone.District}");
+    }
+
+    private static string NormalizeWhitespace(string value)
+    {
+        return Regex.Replace(value, "\\s+", " ").Trim();
     }
 
     private static void ValidatePassword(string password)

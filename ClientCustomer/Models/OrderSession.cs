@@ -11,6 +11,7 @@ namespace ClientCustomer.Models
         public string? DeliveryRegion { get; set; }
         public string? DeliveryAddressDetail { get; set; }
         public decimal DeliveryFee { get; set; }
+        public int? TableSessionId { get; set; }
 
         public string? FullDeliveryAddress
         {

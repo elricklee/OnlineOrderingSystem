@@ -22,6 +22,8 @@ public partial class OrderHistoryForm : Form
         Load += OrderHistoryForm_Load;
         dgvOrders.CellClick += DgvOrders_CellClick;
         dgvOrders.CellFormatting += DgvOrders_CellFormatting;
+        dgvOrders.CellToolTipTextNeeded += Grid_CellToolTipTextNeeded;
+        dgvOrderItems.CellToolTipTextNeeded += Grid_CellToolTipTextNeeded;
         btnRefresh.Click += BtnRefresh_Click;
         btnClose.Click += BtnClose_Click;
         _statusRefreshTimer.Tick += StatusRefreshTimer_Tick;
@@ -80,41 +82,58 @@ public partial class OrderHistoryForm : Form
 
     private void SetGridHeaders()
     {
-        dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+        dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+        if (dgvOrders.Columns["OrderNo"] != null)
+        {
+            dgvOrders.Columns["OrderNo"].HeaderText = "订单编号";
+            dgvOrders.Columns["OrderNo"].FillWeight = 130;
+            dgvOrders.Columns["OrderNo"].MinimumWidth = 150;
+        }
 
         if (dgvOrders.Columns["Id"] != null)
         {
-            dgvOrders.Columns["Id"].HeaderText = "订单号";
-            dgvOrders.Columns["Id"].Width = 90;
+            dgvOrders.Columns["Id"].Visible = false;
         }
 
         if (dgvOrders.Columns["OrderType"] != null)
         {
             dgvOrders.Columns["OrderType"].HeaderText = "类型";
-            dgvOrders.Columns["OrderType"].Width = 80;
+            dgvOrders.Columns["OrderType"].FillWeight = 70;
+            dgvOrders.Columns["OrderType"].MinimumWidth = 80;
+        }
+
+        if (dgvOrders.Columns["TableSessionNo"] != null)
+        {
+            dgvOrders.Columns["TableSessionNo"].HeaderText = "桌次";
+            dgvOrders.Columns["TableSessionNo"].FillWeight = 120;
+            dgvOrders.Columns["TableSessionNo"].MinimumWidth = 135;
         }
 
         if (dgvOrders.Columns["TotalAmount"] != null)
         {
             dgvOrders.Columns["TotalAmount"].HeaderText = "总金额";
-            dgvOrders.Columns["TotalAmount"].Width = 95;
+            dgvOrders.Columns["TotalAmount"].FillWeight = 85;
+            dgvOrders.Columns["TotalAmount"].MinimumWidth = 95;
             dgvOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "¥0.00";
         }
 
         if (dgvOrders.Columns["Status"] != null)
         {
             dgvOrders.Columns["Status"].HeaderText = "状态";
-            dgvOrders.Columns["Status"].Width = 90;
+            dgvOrders.Columns["Status"].FillWeight = 80;
+            dgvOrders.Columns["Status"].MinimumWidth = 90;
         }
 
         if (dgvOrders.Columns["CreatedAt"] != null)
         {
             dgvOrders.Columns["CreatedAt"].HeaderText = "下单时间";
-            dgvOrders.Columns["CreatedAt"].Width = 145;
+            dgvOrders.Columns["CreatedAt"].FillWeight = 105;
+            dgvOrders.Columns["CreatedAt"].MinimumWidth = 125;
             dgvOrders.Columns["CreatedAt"].DefaultCellStyle.Format = "MM-dd HH:mm";
         }
 
-        foreach (var col in new[] { "UserId", "CustomerName", "Phone", "Address", "TableNumber", "DiningTableId", "Note", "DeliveryFee", "DeliveryZoneId", "DeliveryRegion", "EstimatedMinutes", "OrderItems" })
+        foreach (var col in new[] { "UserId", "CustomerName", "Phone", "Address", "TableNumber", "DiningTableId", "TableSessionId", "Note", "DeliveryFee", "DeliveryZoneId", "DeliveryRegion", "EstimatedMinutes", "OrderItems" })
         {
             if (dgvOrders.Columns[col] != null)
                 dgvOrders.Columns[col].Visible = false;
@@ -154,7 +173,7 @@ public partial class OrderHistoryForm : Form
 
     private void ShowOrderDetail(OrderDto order)
     {
-        lblOrderId.Text = $"订单编号：{order.Id}";
+        lblOrderId.Text = $"订单编号：{(string.IsNullOrWhiteSpace(order.OrderNo) ? order.Id.ToString() : order.OrderNo)}";
         lblOrderType.Text = $"订单类型：{GetOrderTypeText(order.OrderType)}";
         lblStatus.Text = $"状态：{GetStatusText(order.Status)}";
         lblTotalAmount.Text = $"总金额：¥{order.TotalAmount:F2}";
@@ -162,7 +181,7 @@ public partial class OrderHistoryForm : Form
         var fullAddress = string.Join(" ", new[] { order.DeliveryRegion, order.Address }.Where(x => !string.IsNullOrWhiteSpace(x)));
         lblAddress.Text = order.OrderType == "Delivery"
             ? $"配送地址：{(string.IsNullOrWhiteSpace(fullAddress) ? "无" : fullAddress)}"
-            : $"桌号：{order.TableNumber ?? "无"}";
+            : $"桌号 / 桌次：{order.TableNumber ?? "无"} / {order.TableSessionNo ?? "无"}";
 
         // 计算并显示预计完成时间
         var activeStatuses = new[] { "Pending", "Confirmed", "Preparing" };
@@ -208,6 +227,17 @@ public partial class OrderHistoryForm : Form
             if (dgvOrderItems.Columns[col] != null)
                 dgvOrderItems.Columns[col].Visible = false;
         }
+    }
+
+    private static void Grid_CellToolTipTextNeeded(object? sender, DataGridViewCellToolTipTextNeededEventArgs e)
+    {
+        if (sender is not DataGridView dgv || e.RowIndex < 0 || e.ColumnIndex < 0)
+        {
+            return;
+        }
+
+        var value = dgv.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+        e.ToolTipText = value?.ToString() ?? string.Empty;
     }
 
     private void ClearDetail()
@@ -319,7 +349,13 @@ public partial class OrderHistoryForm : Form
 
         dgvOrders.ClearSelection();
         dgvOrders.Rows[rowIndex].Selected = true;
-        dgvOrders.CurrentCell = dgvOrders.Rows[rowIndex].Cells[0];
+        var firstVisibleCell = dgvOrders.Rows[rowIndex].Cells
+            .Cast<DataGridViewCell>()
+            .FirstOrDefault(cell => cell.Visible);
+        if (firstVisibleCell != null)
+        {
+            dgvOrders.CurrentCell = firstVisibleCell;
+        }
     }
 
     private void BtnClose_Click(object? sender, EventArgs e)

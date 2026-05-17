@@ -11,6 +11,7 @@ namespace ClientCustomer
         private static readonly Regex PhoneRegex = new("^1[3-9]\\d{9}$", RegexOptions.Compiled);
         private List<DiningTableDto> _availableTables = new();
         private List<DeliveryZoneDto> _deliveryZones = new();
+        private TableSessionDto? _currentUserSession;
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public OrderSession Session { get; private set; } = new();
@@ -97,6 +98,7 @@ namespace ClientCustomer
                     .ThenBy(zone => zone.DisplayName)
                     .ToList();
 
+                await AppendCurrentDineInSessionOptionAsync();
                 BindDiningTables();
                 BindProvinces();
                 ApplyCurrentUserDeliveryDefaults();
@@ -124,6 +126,7 @@ namespace ClientCustomer
             try
             {
                 _availableTables = await ApiHelper.GetAvailableTablesAsync();
+                await AppendCurrentDineInSessionOptionAsync();
                 BindDiningTables();
             }
             catch (Exception ex)
@@ -139,18 +142,41 @@ namespace ClientCustomer
 
         private void BindDiningTables()
         {
+            var preferredTableId = _currentUserSession?.DiningTableId;
+            if (preferredTableId == null && cmbDiningTable.SelectedItem is ComboOption<DiningTableDto> selectedOption)
+            {
+                preferredTableId = selectedOption.Value.Id;
+            }
+
             cmbDiningTable.Items.Clear();
             foreach (var table in _availableTables.Where(table => table.IsEnabled))
             {
                 var remaining = table.RemainingSeats;
+                var isCurrentSessionTable = _currentUserSession != null && _currentUserSession.DiningTableId == table.Id;
                 cmbDiningTable.Items.Add(new ComboOption<DiningTableDto>(
-                    $"{table.TableNumber} · {table.SeatCount}座(余{remaining})",
+                    isCurrentSessionTable
+                        ? $"{table.TableNumber} · 当前桌次续单 · {_currentUserSession!.SessionNo}"
+                        : $"{table.TableNumber} · {table.SeatCount}座(余{remaining})",
                     table));
             }
 
             if (cmbDiningTable.Items.Count > 0)
             {
-                cmbDiningTable.SelectedIndex = 0;
+                var selectedIndex = -1;
+                if (preferredTableId.HasValue)
+                {
+                    for (var index = 0; index < cmbDiningTable.Items.Count; index++)
+                    {
+                        if (cmbDiningTable.Items[index] is ComboOption<DiningTableDto> option &&
+                            option.Value.Id == preferredTableId.Value)
+                        {
+                            selectedIndex = index;
+                            break;
+                        }
+                    }
+                }
+
+                cmbDiningTable.SelectedIndex = selectedIndex >= 0 ? selectedIndex : 0;
             }
 
             UpdateDiningTableHint();
@@ -173,6 +199,18 @@ namespace ClientCustomer
                 var table = option.Value;
                 var remaining = table.RemainingSeats;
                 var dinerCount = (int)nudDinerCount.Value;
+                var isCurrentSession = _currentUserSession != null && _currentUserSession.DiningTableId == table.Id;
+
+                if (isCurrentSession)
+                {
+                    lblDiningTableHint.ForeColor = Color.FromArgb(2, 119, 189);
+                    lblDiningTableHint.Text = $"↺ 继续当前桌次：{_currentUserSession!.SessionNo}，当前就餐人数 {_currentUserSession.PartySize} 人";
+                    if (nudDinerCount.Value != _currentUserSession.PartySize)
+                    {
+                        nudDinerCount.Value = Math.Max(nudDinerCount.Minimum, Math.Min(nudDinerCount.Maximum, _currentUserSession.PartySize));
+                    }
+                    return;
+                }
 
                 if (dinerCount > remaining)
                 {
@@ -318,6 +356,57 @@ namespace ClientCustomer
             }
         }
 
+        private async Task AppendCurrentDineInSessionOptionAsync()
+        {
+            _currentUserSession = null;
+            if (Program.CurrentUser == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var orders = await ApiHelper.GetOrdersByUserIdAsync(Program.CurrentUser.Id);
+                var activeOrder = orders
+                    .Where(order => order.OrderType == "DineIn"
+                        && order.DiningTableId.HasValue
+                        && order.TableSessionId.HasValue
+                        && order.Status != "Completed"
+                        && order.Status != "Cancelled")
+                    .OrderByDescending(order => order.CreatedAt)
+                    .FirstOrDefault();
+
+                if (activeOrder?.DiningTableId == null)
+                {
+                    return;
+                }
+
+                var currentSession = await ApiHelper.GetCurrentTableSessionAsync(activeOrder.DiningTableId.Value);
+                if (currentSession == null || currentSession.Id != activeOrder.TableSessionId)
+                {
+                    return;
+                }
+
+                _currentUserSession = currentSession;
+
+                if (_availableTables.All(table => table.Id != activeOrder.DiningTableId.Value))
+                {
+                    _availableTables.Insert(0, new DiningTableDto
+                    {
+                        Id = activeOrder.DiningTableId.Value,
+                        TableNumber = activeOrder.TableNumber ?? currentSession.TableNumber,
+                        SeatCount = currentSession.PartySize,
+                        RemainingSeats = 0,
+                        IsEnabled = true,
+                        IsOccupied = true
+                    });
+                }
+            }
+            catch
+            {
+            }
+        }
+
         private void UpdateSelectedDeliveryZone()
         {
             var selectedZone = _deliveryZones.FirstOrDefault(zone =>
@@ -379,7 +468,7 @@ namespace ClientCustomer
             txtCustomerPhone.Enabled = enabled;
         }
 
-        private void BtnConfirm_Click(object? sender, EventArgs e)
+        private async void BtnConfirm_Click(object? sender, EventArgs e)
         {
             if (Session.OrderType == "DineIn")
             {
@@ -390,10 +479,27 @@ namespace ClientCustomer
                 }
 
                 var dinerCount = (int)nudDinerCount.Value;
-                if (dinerCount > option.Value.RemainingSeats)
+                var isCurrentSession = _currentUserSession != null && _currentUserSession.DiningTableId == option.Value.Id;
+
+                if (!isCurrentSession && dinerCount > option.Value.RemainingSeats)
                 {
                     MessageBox.Show($"该餐桌剩余 {option.Value.RemainingSeats} 座，无法容纳 {dinerCount} 人。\n请减少人数或选择其他餐桌。", "座位不足", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
+                }
+
+                // 获取当前桌次（如果有）
+                int? tableSessionId = isCurrentSession ? _currentUserSession?.Id : null;
+                try
+                {
+                    if (!isCurrentSession)
+                    {
+                        var currentSession = await ApiHelper.GetCurrentTableSessionAsync(option.Value.Id);
+                        tableSessionId = currentSession?.Id;
+                    }
+                }
+                catch
+                {
+                    // 忽略错误，可能是没有进行中的桌次
                 }
 
                 Session = new OrderSession
@@ -401,7 +507,8 @@ namespace ClientCustomer
                     OrderType = "DineIn",
                     DiningTableId = option.Value.Id,
                     TableNumber = option.Value.TableNumber,
-                    DinerCount = dinerCount,
+                    TableSessionId = tableSessionId,
+                    DinerCount = isCurrentSession && _currentUserSession != null ? _currentUserSession.PartySize : dinerCount,
                     DeliveryFee = 0m
                 };
             }

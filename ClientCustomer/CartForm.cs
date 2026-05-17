@@ -374,6 +374,7 @@ namespace ClientCustomer
                     OrderType = _session.OrderType,
                     TableNumber = _session.TableNumber,
                     DiningTableId = _session.DiningTableId,
+                    TableSessionId = _session.TableSessionId, // 加单时传递桌次ID
                     DinerCount = _session.DinerCount,
                     Address = _session.DeliveryAddressDetail,
                     DeliveryZoneId = _session.DeliveryZoneId,
@@ -388,6 +389,13 @@ namespace ClientCustomer
                 };
 
                 var orderResult = await ApiHelper.CreateOrderAsync(orderCreate);
+
+                // 保存桌次ID用于加单
+                if (orderResult.TableSessionId.HasValue)
+                {
+                    _session.TableSessionId = orderResult.TableSessionId;
+                }
+
                 _cart.Clear();
 
                 MessageBox.Show(

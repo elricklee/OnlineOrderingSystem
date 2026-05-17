@@ -23,6 +23,7 @@ namespace ClientAdmin
         private int? _selectedDiningTableId;
         private bool _managementTabsInitialized;
         private bool _showDeletedDishes;
+        private System.Collections.Generic.List<DishCategoryDto> _dishCategories = new();
 
         private static readonly System.Collections.Generic.Dictionary<string, string> StatusMap = new()
         {
@@ -58,7 +59,6 @@ namespace ClientAdmin
             dgvDishes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvDishes.MultiSelect = false;
             dgvDishes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvDishes.CellFormatting += DgvDishes_CellFormatting;
 
 
             cmbSpicyLevel.Items.Clear();
@@ -114,9 +114,9 @@ namespace ClientAdmin
         {
             cmbSaleStatus.SelectedIndex = saleStatus switch
             {
-                "OnSale" => 0,
-                "OffSale" => 1,
-                "OutOfStock" => 2,
+                "OnSale" or "可售" => 0,
+                "OffSale" or "停售" => 1,
+                "OutOfStock" or "缺货" => 2,
                 _ => 0
             };
         }
@@ -211,6 +211,18 @@ namespace ClientAdmin
                 var endpoint = recycleBin ? "api/dishes/recycle-bin" : "api/dishes";
                 var dishes = await ApiHelper.GetListAsync<DishDto>(endpoint);
 
+                // 转换 SaleStatus 为中文显示
+                foreach (var dish in dishes)
+                {
+                    dish.SaleStatus = dish.SaleStatus switch
+                    {
+                        "OnSale" => "可售",
+                        "OffSale" => "停售",
+                        "OutOfStock" => "缺货",
+                        _ => dish.SaleStatus
+                    };
+                }
+
                 dgvDishes.DataSource = null;
                 dgvDishes.DataSource = dishes;
 
@@ -228,48 +240,96 @@ namespace ClientAdmin
         }
         private void SetDishGridHeaders()
         {
+            PrepareAdminGrid(dgvDishes);
+
             if (dgvDishes.Columns["Id"] != null)
+            {
                 dgvDishes.Columns["Id"].HeaderText = "编号";
+                dgvDishes.Columns["Id"].FillWeight = 50;
+                dgvDishes.Columns["Id"].MinimumWidth = 60;
+            }
 
             if (dgvDishes.Columns["Name"] != null)
+            {
                 dgvDishes.Columns["Name"].HeaderText = "菜品名称";
+                dgvDishes.Columns["Name"].FillWeight = 130;
+                dgvDishes.Columns["Name"].MinimumWidth = 140;
+            }
 
             if (dgvDishes.Columns["Category"] != null)
+            {
                 dgvDishes.Columns["Category"].HeaderText = "分类";
+                dgvDishes.Columns["Category"].FillWeight = 90;
+                dgvDishes.Columns["Category"].MinimumWidth = 90;
+            }
 
             if (dgvDishes.Columns["Price"] != null)
             {
                 dgvDishes.Columns["Price"].HeaderText = "价格";
                 dgvDishes.Columns["Price"].DefaultCellStyle.Format = "0.00";
+                dgvDishes.Columns["Price"].FillWeight = 80;
+                dgvDishes.Columns["Price"].MinimumWidth = 90;
             }
 
             if (dgvDishes.Columns["ImagePath"] != null)
+            {
                 dgvDishes.Columns["ImagePath"].HeaderText = "图片路径";
+                dgvDishes.Columns["ImagePath"].FillWeight = 120;
+                dgvDishes.Columns["ImagePath"].MinimumWidth = 140;
+            }
 
             if (dgvDishes.Columns["SpicyLevel"] != null)
+            {
                 dgvDishes.Columns["SpicyLevel"].HeaderText = "辣度";
+                dgvDishes.Columns["SpicyLevel"].FillWeight = 70;
+                dgvDishes.Columns["SpicyLevel"].MinimumWidth = 80;
+            }
 
             if (dgvDishes.Columns["IsAvailable"] != null)
+            {
                 dgvDishes.Columns["IsAvailable"].HeaderText = "是否可售";
+                dgvDishes.Columns["IsAvailable"].FillWeight = 80;
+                dgvDishes.Columns["IsAvailable"].MinimumWidth = 90;
+            }
 
             if (dgvDishes.Columns["Description"] != null)
+            {
                 dgvDishes.Columns["Description"].HeaderText = "描述";
+                dgvDishes.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgvDishes.Columns["Description"].FillWeight = 180;
+                dgvDishes.Columns["Description"].MinimumWidth = 220;
+            }
+
+            if (dgvDishes.Columns["CategoryId"] != null)
+                dgvDishes.Columns["CategoryId"].Visible = false;
 
             if (dgvDishes.Columns["SaleStatus"] != null)
+            {
                 dgvDishes.Columns["SaleStatus"].HeaderText = "销售状态";
+                dgvDishes.Columns["SaleStatus"].FillWeight = 90;
+                dgvDishes.Columns["SaleStatus"].MinimumWidth = 100;
+            }
 
             if (dgvDishes.Columns["SortOrder"] != null)
+            {
                 dgvDishes.Columns["SortOrder"].HeaderText = "排序";
+                dgvDishes.Columns["SortOrder"].FillWeight = 70;
+                dgvDishes.Columns["SortOrder"].MinimumWidth = 80;
+            }
 
             if (dgvDishes.Columns["DeletedAt"] != null)
             {
                 dgvDishes.Columns["DeletedAt"].HeaderText = "隐藏时间";
+                dgvDishes.Columns["DeletedAt"].MinimumWidth = 145;
                 dgvDishes.Columns["DeletedAt"].Visible = _showDeletedDishes;
             }
 
             if (dgvDishes.Columns["DeleteReason"] != null)
             {
                 dgvDishes.Columns["DeleteReason"].HeaderText = "隐藏原因";
+                dgvDishes.Columns["DeleteReason"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgvDishes.Columns["DeleteReason"].FillWeight = 160;
+                dgvDishes.Columns["DeleteReason"].MinimumWidth = 220;
                 dgvDishes.Columns["DeleteReason"].Visible = _showDeletedDishes;
             }
         }
@@ -290,6 +350,7 @@ namespace ClientAdmin
                 var dish = new DishDto
                 {
                     Name = txtDishName.Text.Trim(),
+                    CategoryId = GetSelectedDishCategoryId(),
                     Category = txtCategory.Text.Trim(),
                     Price = price,
                     ImagePath = txtImagePath.Text.Trim(),
@@ -332,6 +393,7 @@ namespace ClientAdmin
                 {
                     Id = selectedDishId.Value,
                     Name = txtDishName.Text.Trim(),
+                    CategoryId = GetSelectedDishCategoryId(),
                     Category = txtCategory.Text.Trim(),
                     Price = price,
                     ImagePath = txtImagePath.Text.Trim(),
@@ -444,45 +506,6 @@ namespace ClientAdmin
             }
         }
 
-        private void DgvDishes_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
-        {
-            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
-
-            var colName = dgvDishes.Columns[e.ColumnIndex]?.DataPropertyName;
-            if (colName == null) return;
-
-            if (colName == "SaleStatus" && e.Value is string status)
-            {
-                e.Value = status switch
-                {
-                    "OnSale" => "可售",
-                    "OffSale" => "停售",
-                    "OutOfStock" => "缺货",
-                    _ => status
-                };
-                e.FormattingApplied = true;
-            }
-
-            if (colName == "IsAvailable" && e.Value is bool available)
-            {
-                e.Value = available ? "是" : "否";
-                e.FormattingApplied = true;
-            }
-
-            if (colName == "SpicyLevel" && e.Value is int spicy)
-            {
-                e.Value = spicy switch
-                {
-                    0 => "不辣",
-                    1 => "微辣",
-                    2 => "中辣",
-                    3 => "特辣",
-                    _ => spicy.ToString()
-                };
-                e.FormattingApplied = true;
-            }
-        }
-
         private void dgvDishes_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
@@ -508,6 +531,7 @@ namespace ClientAdmin
 
             SetSelectedSpicyLevel(dish.SpicyLevel);
             SetSelectedSaleStatus(dish.SaleStatus);
+            SelectDishCategory(dish.CategoryId, dish.Category);
 
             ShowDishImage(dish.ImagePath);
         }
@@ -552,6 +576,7 @@ namespace ClientAdmin
             txtPrice.Text = string.Empty;
             txtImagePath.Text = string.Empty;
             txtDescription.Text = string.Empty;
+            cmbDishCategory.SelectedIndex = -1;
 
             SetSelectedSpicyLevel(0);
             SetSelectedSaleStatus("OnSale");
@@ -690,12 +715,13 @@ namespace ClientAdmin
 
         private void SetOrderGridHeaders()
         {
-            dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            PrepareAdminGrid(dgvOrders);
 
             if (dgvOrders.Columns["OrderNo"] != null)
             {
                 dgvOrders.Columns["OrderNo"].HeaderText = "业务单号";
-                dgvOrders.Columns["OrderNo"].FillWeight = 90;
+                dgvOrders.Columns["OrderNo"].FillWeight = 120;
+                dgvOrders.Columns["OrderNo"].MinimumWidth = 150;
                 dgvOrders.Columns["OrderNo"].DisplayIndex = 0;
             }
 
@@ -703,6 +729,7 @@ namespace ClientAdmin
             {
                 dgvOrders.Columns["Id"].HeaderText = "内部编号";
                 dgvOrders.Columns["Id"].FillWeight = 50;
+                dgvOrders.Columns["Id"].MinimumWidth = 70;
                 dgvOrders.Columns["Id"].DisplayIndex = 1;
             }
 
@@ -710,35 +737,49 @@ namespace ClientAdmin
             {
                 dgvOrders.Columns["OrderType"].HeaderText = "类型";
                 dgvOrders.Columns["OrderType"].FillWeight = 50;
-                dgvOrders.Columns["OrderType"].DisplayIndex = 1;
+                dgvOrders.Columns["OrderType"].MinimumWidth = 80;
+                dgvOrders.Columns["OrderType"].DisplayIndex = 2;
             }
 
             if (dgvOrders.Columns["TableNumber"] != null)
             {
                 dgvOrders.Columns["TableNumber"].HeaderText = "桌号";
                 dgvOrders.Columns["TableNumber"].FillWeight = 50;
-                dgvOrders.Columns["TableNumber"].DisplayIndex = 2;
+                dgvOrders.Columns["TableNumber"].MinimumWidth = 80;
+                dgvOrders.Columns["TableNumber"].DisplayIndex = 3;
+            }
+
+            if (dgvOrders.Columns["TableSessionNo"] != null)
+            {
+                dgvOrders.Columns["TableSessionNo"].HeaderText = "桌次";
+                dgvOrders.Columns["TableSessionNo"].FillWeight = 115;
+                dgvOrders.Columns["TableSessionNo"].MinimumWidth = 150;
+                dgvOrders.Columns["TableSessionNo"].DisplayIndex = 4;
             }
 
             if (dgvOrders.Columns["CustomerName"] != null)
             {
                 dgvOrders.Columns["CustomerName"].HeaderText = "顾客";
                 dgvOrders.Columns["CustomerName"].FillWeight = 60;
-                dgvOrders.Columns["CustomerName"].DisplayIndex = 3;
+                dgvOrders.Columns["CustomerName"].MinimumWidth = 90;
+                dgvOrders.Columns["CustomerName"].DisplayIndex = 5;
             }
 
             if (dgvOrders.Columns["Phone"] != null)
             {
                 dgvOrders.Columns["Phone"].HeaderText = "电话";
                 dgvOrders.Columns["Phone"].FillWeight = 80;
-                dgvOrders.Columns["Phone"].DisplayIndex = 4;
+                dgvOrders.Columns["Phone"].MinimumWidth = 120;
+                dgvOrders.Columns["Phone"].DisplayIndex = 6;
             }
 
             if (dgvOrders.Columns["Address"] != null)
             {
                 dgvOrders.Columns["Address"].HeaderText = "配送地址";
-                dgvOrders.Columns["Address"].FillWeight = 120;
-                dgvOrders.Columns["Address"].DisplayIndex = 5;
+                dgvOrders.Columns["Address"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgvOrders.Columns["Address"].FillWeight = 180;
+                dgvOrders.Columns["Address"].MinimumWidth = 220;
+                dgvOrders.Columns["Address"].DisplayIndex = 7;
             }
 
             if (dgvOrders.Columns["TotalAmount"] != null)
@@ -746,14 +787,16 @@ namespace ClientAdmin
                 dgvOrders.Columns["TotalAmount"].HeaderText = "总金额";
                 dgvOrders.Columns["TotalAmount"].FillWeight = 70;
                 dgvOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "C2";
-                dgvOrders.Columns["TotalAmount"].DisplayIndex = 6;
+                dgvOrders.Columns["TotalAmount"].MinimumWidth = 90;
+                dgvOrders.Columns["TotalAmount"].DisplayIndex = 8;
             }
 
             if (dgvOrders.Columns["Status"] != null)
             {
                 dgvOrders.Columns["Status"].HeaderText = "状态";
                 dgvOrders.Columns["Status"].FillWeight = 60;
-                dgvOrders.Columns["Status"].DisplayIndex = 7;
+                dgvOrders.Columns["Status"].MinimumWidth = 90;
+                dgvOrders.Columns["Status"].DisplayIndex = 9;
             }
 
             if (dgvOrders.Columns["CreatedAt"] != null)
@@ -761,7 +804,8 @@ namespace ClientAdmin
                 dgvOrders.Columns["CreatedAt"].HeaderText = "下单时间";
                 dgvOrders.Columns["CreatedAt"].FillWeight = 80;
                 dgvOrders.Columns["CreatedAt"].DefaultCellStyle.Format = "MM-dd HH:mm";
-                dgvOrders.Columns["CreatedAt"].DisplayIndex = 8;
+                dgvOrders.Columns["CreatedAt"].MinimumWidth = 130;
+                dgvOrders.Columns["CreatedAt"].DisplayIndex = 10;
             }
 
             if (dgvOrders.Columns["OrderItems"] != null)
@@ -793,34 +837,41 @@ namespace ClientAdmin
 
             if (dgvOrders.Columns["DeliveryPersonPhone"] != null)
                 dgvOrders.Columns["DeliveryPersonPhone"].Visible = false;
+
+            if (dgvOrders.Columns["TableSessionId"] != null)
+                dgvOrders.Columns["TableSessionId"].Visible = false;
         }
 
         private void SetOrderItemGridHeaders()
         {
-            dgvOrderItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            PrepareAdminGrid(dgvOrderItems);
 
             if (dgvOrderItems.Columns["Id"] != null)
             {
                 dgvOrderItems.Columns["Id"].HeaderText = "明细编号";
                 dgvOrderItems.Columns["Id"].FillWeight = 60;
+                dgvOrderItems.Columns["Id"].MinimumWidth = 80;
             }
 
             if (dgvOrderItems.Columns["OrderId"] != null)
             {
                 dgvOrderItems.Columns["OrderId"].HeaderText = "订单编号";
                 dgvOrderItems.Columns["OrderId"].FillWeight = 60;
+                dgvOrderItems.Columns["OrderId"].MinimumWidth = 80;
             }
 
             if (dgvOrderItems.Columns["DishId"] != null)
             {
                 dgvOrderItems.Columns["DishId"].HeaderText = "菜品编号";
                 dgvOrderItems.Columns["DishId"].FillWeight = 60;
+                dgvOrderItems.Columns["DishId"].MinimumWidth = 80;
             }
 
             if (dgvOrderItems.Columns["DishName"] != null)
             {
                 dgvOrderItems.Columns["DishName"].HeaderText = "菜品名称";
                 dgvOrderItems.Columns["DishName"].FillWeight = 100;
+                dgvOrderItems.Columns["DishName"].MinimumWidth = 120;
             }
 
             if (dgvOrderItems.Columns["Price"] != null)
@@ -828,12 +879,14 @@ namespace ClientAdmin
                 dgvOrderItems.Columns["Price"].HeaderText = "单价";
                 dgvOrderItems.Columns["Price"].FillWeight = 70;
                 dgvOrderItems.Columns["Price"].DefaultCellStyle.Format = "C2";
+                dgvOrderItems.Columns["Price"].MinimumWidth = 90;
             }
 
             if (dgvOrderItems.Columns["Quantity"] != null)
             {
                 dgvOrderItems.Columns["Quantity"].HeaderText = "数量";
                 dgvOrderItems.Columns["Quantity"].FillWeight = 50;
+                dgvOrderItems.Columns["Quantity"].MinimumWidth = 80;
             }
 
             if (dgvOrderItems.Columns["DishCategorySnapshot"] != null)
@@ -844,6 +897,7 @@ namespace ClientAdmin
                 dgvOrderItems.Columns["Subtotal"].HeaderText = "小计";
                 dgvOrderItems.Columns["Subtotal"].FillWeight = 70;
                 dgvOrderItems.Columns["Subtotal"].DefaultCellStyle.Format = "C2";
+                dgvOrderItems.Columns["Subtotal"].MinimumWidth = 90;
             }
         }
 
@@ -883,7 +937,7 @@ namespace ClientAdmin
             lblOrderType.Text = $"订单类型：{GetDisplayText(order.OrderType)}";
             lblCustomerName.Text = $"顾客姓名：{order.CustomerName}";
             lblPhone.Text = $"电话：{GetDisplayText(order.Phone)}";
-            lblTableNumber.Text = $"桌号：{GetDisplayText(order.TableNumber)}";
+            lblTableNumber.Text = $"桌号 / 桌次：{GetDisplayText(order.TableNumber)} / {GetDisplayText(order.TableSessionNo)}";
             lblAddress.Text = "配送地址：";
             txtOrderAddress.Text = GetDisplayText(BuildFullDeliveryAddress(order));
             lblNote.Text = "备注 / 状态轨迹：";
@@ -1613,6 +1667,15 @@ namespace ClientAdmin
             btnUpdateUser.Click += async (_, _) => await UpdateUserAsync();
             dgvUsers.CellClick += UsersGrid_CellClick;
             dgvUsers.CellFormatting += UsersGrid_CellFormatting;
+
+            AttachGridTooltips(dgvDishes);
+            AttachGridTooltips(dgvOrders);
+            AttachGridTooltips(dgvOrderItems);
+            AttachGridTooltips(dgvDeliveryZones);
+            AttachGridTooltips(dgvDiningTables);
+            AttachGridTooltips(dgvUsers);
+            AttachGridTooltips(dgvTopDishes);
+            AttachGridTooltips(dgvRevenueStatistics);
         }
 
         private async void AdminForm_Load(object? sender, EventArgs e)
@@ -1642,10 +1705,7 @@ namespace ClientAdmin
             btnLoadAiSuggestion.Text = "获取建议";
             btnChooseImage.Text = "选择图片";
             grpUserEditor.Text = "账号查看与状态管理";
-            btnUpdateUser.Text = "保存账号状态";
-            btnAddUser.Visible = false;
-            btnDeleteUser.Visible = false;
-            btnResetPassword.Visible = false;
+            btnUpdateUser.Text = "保存启用状态";
             txtRealName.ReadOnly = true;
             txtUserPhone.ReadOnly = true;
             txtUserAddress.ReadOnly = true;
@@ -1665,29 +1725,66 @@ namespace ClientAdmin
         {
             try
             {
-                var dishes = await ApiHelper.GetListAsync<DishDto>("api/dishes");
-                var categories = _defaultCategories
-                    .Concat(dishes.Select(dish => dish.Category))
-                    .Where(category => !string.IsNullOrWhiteSpace(category))
-                    .Distinct()
-                    .OrderBy(category => category)
-                    .ToList();
+                _dishCategories = await ApiHelper.GetDishCategoriesAsync();
 
-                var current = cmbDishCategory.Text;
+                if (_dishCategories.Count == 0)
+                {
+                    var dishes = await ApiHelper.GetListAsync<DishDto>("api/dishes");
+                    _dishCategories = _defaultCategories
+                        .Concat(dishes.Select(dish => dish.Category))
+                        .Where(category => !string.IsNullOrWhiteSpace(category))
+                        .Distinct()
+                        .Select((name, index) => new DishCategoryDto
+                        {
+                            Id = index + 1,
+                            Name = name,
+                            SortOrder = index + 1,
+                            IsEnabled = true
+                        })
+                        .ToList();
+                }
+
+                var currentCategoryId = GetSelectedDishCategoryId();
+                var currentCategoryName = txtCategory.Text.Trim();
                 cmbDishCategory.Items.Clear();
-                foreach (var category in categories)
+                foreach (var category in _dishCategories.OrderBy(category => category.SortOrder).ThenBy(category => category.Name))
                 {
-                    cmbDishCategory.Items.Add(category);
+                    cmbDishCategory.Items.Add(new DishCategoryOption(category));
                 }
 
-                if (!string.IsNullOrWhiteSpace(current))
-                {
-                    cmbDishCategory.Text = current;
-                }
+                SelectDishCategory(currentCategoryId, currentCategoryName);
             }
             catch
             {
             }
+        }
+
+        private int? GetSelectedDishCategoryId()
+        {
+            return cmbDishCategory.SelectedItem is DishCategoryOption option ? option.Value.Id : null;
+        }
+
+        private void SelectDishCategory(int? categoryId, string? categoryName)
+        {
+            if (cmbDishCategory.Items.Count == 0)
+            {
+                cmbDishCategory.Text = categoryName ?? string.Empty;
+                return;
+            }
+
+            for (var index = 0; index < cmbDishCategory.Items.Count; index++)
+            {
+                if (cmbDishCategory.Items[index] is DishCategoryOption option &&
+                    ((categoryId.HasValue && option.Value.Id == categoryId.Value) ||
+                     (!categoryId.HasValue && string.Equals(option.Value.Name, categoryName, StringComparison.Ordinal))))
+                {
+                    cmbDishCategory.SelectedIndex = index;
+                    txtCategory.Text = option.Value.Name;
+                    return;
+                }
+            }
+
+            cmbDishCategory.Text = categoryName ?? string.Empty;
         }
 
         private async Task LoadDeliveryZonesAsync()
@@ -1700,7 +1797,7 @@ namespace ClientAdmin
 
         private void SetDeliveryZoneGridHeaders()
         {
-            dgvDeliveryZones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            PrepareAdminGrid(dgvDeliveryZones);
 
             var provinceColumn = dgvDeliveryZones.Columns["Province"];
             var cityColumn = dgvDeliveryZones.Columns["City"];
@@ -1723,7 +1820,15 @@ namespace ClientAdmin
             }
             if (isActiveColumn != null) { isActiveColumn.HeaderText = "启用配送"; isActiveColumn.FillWeight = 60; }
             if (sortOrderColumn != null) { sortOrderColumn.HeaderText = "排序"; sortOrderColumn.FillWeight = 55; }
-            if (displayNameColumn != null) { displayNameColumn.HeaderText = "显示名称"; displayNameColumn.FillWeight = 160; }
+            if (displayNameColumn != null)
+            {
+                displayNameColumn.HeaderText = "显示名称";
+                displayNameColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                displayNameColumn.FillWeight = 160;
+                displayNameColumn.MinimumWidth = 220;
+            }
+
+            HideColumnIfExists(dgvDeliveryZones, "IsDeleted");
         }
 
         private async Task AddDeliveryZoneAsync()
@@ -1878,7 +1983,7 @@ namespace ClientAdmin
 
         private void SetDiningTableGridHeaders()
         {
-            dgvDiningTables.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            PrepareAdminGrid(dgvDiningTables);
 
             var idColumn = dgvDiningTables.Columns["Id"];
             var tableNumberColumn = dgvDiningTables.Columns["TableNumber"];
@@ -1888,15 +1993,27 @@ namespace ClientAdmin
             var enabledColumn = dgvDiningTables.Columns["IsEnabled"];
             var statusColumn = dgvDiningTables.Columns["Status"];
             var currentOccupiedColumn = dgvDiningTables.Columns["CurrentOccupiedSeats"];
+            var currentSessionNoColumn = dgvDiningTables.Columns["CurrentSessionNo"];
 
-            if (idColumn != null) { idColumn.HeaderText = "编号"; idColumn.FillWeight = 45; }
-            if (tableNumberColumn != null) { tableNumberColumn.HeaderText = "桌号"; tableNumberColumn.FillWeight = 80; }
-            if (seatCountColumn != null) { seatCountColumn.HeaderText = "总座位"; seatCountColumn.FillWeight = 80; }
-            if (remainingColumn != null) { remainingColumn.HeaderText = "剩余座位"; remainingColumn.FillWeight = 80; }
-            if (occupiedColumn != null) { occupiedColumn.HeaderText = "占用中"; occupiedColumn.FillWeight = 70; }
-            if (enabledColumn != null) { enabledColumn.HeaderText = "启用"; enabledColumn.FillWeight = 70; }
-            if (statusColumn != null) { statusColumn.HeaderText = "状态"; statusColumn.FillWeight = 80; }
-            if (currentOccupiedColumn != null) { currentOccupiedColumn.HeaderText = "当前人数"; currentOccupiedColumn.FillWeight = 70; }
+            if (idColumn != null) { idColumn.HeaderText = "编号"; idColumn.FillWeight = 45; idColumn.MinimumWidth = 60; }
+            if (tableNumberColumn != null) { tableNumberColumn.HeaderText = "桌号"; tableNumberColumn.FillWeight = 90; tableNumberColumn.MinimumWidth = 90; }
+            if (seatCountColumn != null) { seatCountColumn.HeaderText = "总座位"; seatCountColumn.FillWeight = 80; seatCountColumn.MinimumWidth = 80; }
+            if (remainingColumn != null) { remainingColumn.HeaderText = "剩余座位"; remainingColumn.FillWeight = 90; remainingColumn.MinimumWidth = 90; }
+            if (occupiedColumn != null) { occupiedColumn.HeaderText = "占用中"; occupiedColumn.FillWeight = 80; occupiedColumn.MinimumWidth = 90; }
+            if (enabledColumn != null) { enabledColumn.HeaderText = "启用"; enabledColumn.FillWeight = 70; enabledColumn.MinimumWidth = 80; }
+            if (statusColumn != null) { statusColumn.HeaderText = "状态"; statusColumn.FillWeight = 90; statusColumn.MinimumWidth = 90; }
+            if (currentOccupiedColumn != null) { currentOccupiedColumn.HeaderText = "当前人数"; currentOccupiedColumn.FillWeight = 80; currentOccupiedColumn.MinimumWidth = 90; }
+            if (currentSessionNoColumn != null) { currentSessionNoColumn.HeaderText = "当前桌次"; currentSessionNoColumn.FillWeight = 140; currentSessionNoColumn.MinimumWidth = 170; }
+
+            // 隐藏不需要显示的列
+            HideColumnIfExists(dgvDiningTables, "CurrentSessionId");
+            HideColumnIfExists(dgvDiningTables, "IsDeleted");
+        }
+
+        private static void HideColumnIfExists(DataGridView dgv, string columnName)
+        {
+            var col = dgv.Columns[columnName];
+            if (col != null) col.Visible = false;
         }
 
         private void DiningTablesGrid_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
@@ -1905,6 +2022,7 @@ namespace ClientAdmin
 
             if (dgvDiningTables.Columns[e.ColumnIndex].Name == "Status" && e.Value is string status)
             {
+                var cellStyle = dgvDiningTables.Rows[e.RowIndex].Cells[e.ColumnIndex].Style;
                 e.Value = status switch
                 {
                     "Available" => "可用",
@@ -1913,6 +2031,15 @@ namespace ClientAdmin
                     "Disabled" => "已停用",
                     _ => status
                 };
+                cellStyle.ForeColor = status switch
+                {
+                    "Available" => Color.FromArgb(46, 125, 50),
+                    "Occupied" => Color.FromArgb(230, 81, 0),
+                    "Cleaning" => Color.FromArgb(2, 119, 189),
+                    "Disabled" => Color.FromArgb(117, 117, 117),
+                    _ => Color.FromArgb(48, 48, 48)
+                };
+                cellStyle.Font = new Font(dgvDiningTables.Font, FontStyle.Bold);
                 e.FormattingApplied = true;
             }
         }
@@ -2019,7 +2146,7 @@ namespace ClientAdmin
 
             return new DiningTableCreateUpdateDto
             {
-                TableNumber = txtDiningTableNumber.Text.Trim(),
+                TableNumber = txtDiningTableNumber.Text.Trim().ToUpperInvariant(),
                 SeatCount = seatCount,
                 IsEnabled = chkDiningTableEnabled.Checked
             };
@@ -2058,11 +2185,7 @@ namespace ClientAdmin
             }
 
             var fullAddress = BuildFullDeliveryAddress(order);
-
-            if (!string.IsNullOrWhiteSpace(fullAddress))
-            {
-                txtOrderAddress.Text = fullAddress;
-            }
+            txtOrderAddress.Text = string.IsNullOrWhiteSpace(fullAddress) ? string.Empty : fullAddress;
         }
 
         private sealed class StatisticsGridRow
@@ -2090,7 +2213,7 @@ namespace ClientAdmin
 
         private void SetUserGridHeaders()
         {
-            dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            PrepareAdminGrid(dgvUsers);
 
             var idColumn = dgvUsers.Columns["Id"];
             var usernameColumn = dgvUsers.Columns["Username"];
@@ -2101,19 +2224,56 @@ namespace ClientAdmin
             var createdAtColumn = dgvUsers.Columns["CreatedAt"];
             var isActiveColumn = dgvUsers.Columns["IsActive"];
 
-            if (idColumn != null) { idColumn.HeaderText = "编号"; idColumn.FillWeight = 45; }
-            if (usernameColumn != null) { usernameColumn.HeaderText = "用户名"; usernameColumn.FillWeight = 90; }
-            if (roleColumn != null) { roleColumn.HeaderText = "角色"; roleColumn.FillWeight = 80; }
-            if (realNameColumn != null) { realNameColumn.HeaderText = "姓名"; realNameColumn.FillWeight = 90; }
-            if (phoneColumn != null) { phoneColumn.HeaderText = "电话"; phoneColumn.FillWeight = 110; }
-            if (addressColumn != null) { addressColumn.HeaderText = "地址"; addressColumn.FillWeight = 200; }
+            if (idColumn != null) { idColumn.HeaderText = "编号"; idColumn.FillWeight = 45; idColumn.MinimumWidth = 60; }
+            if (usernameColumn != null) { usernameColumn.HeaderText = "用户名"; usernameColumn.FillWeight = 90; usernameColumn.MinimumWidth = 110; }
+            if (roleColumn != null) { roleColumn.HeaderText = "角色"; roleColumn.FillWeight = 80; roleColumn.MinimumWidth = 90; }
+            if (realNameColumn != null) { realNameColumn.HeaderText = "姓名"; realNameColumn.FillWeight = 90; realNameColumn.MinimumWidth = 100; }
+            if (phoneColumn != null) { phoneColumn.HeaderText = "电话"; phoneColumn.FillWeight = 110; phoneColumn.MinimumWidth = 120; }
+            if (addressColumn != null)
+            {
+                addressColumn.HeaderText = "地址";
+                addressColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                addressColumn.FillWeight = 180;
+                addressColumn.MinimumWidth = 260;
+            }
             if (createdAtColumn != null)
             {
                 createdAtColumn.HeaderText = "创建时间";
-                createdAtColumn.FillWeight = 120;
+                createdAtColumn.MinimumWidth = 135;
                 createdAtColumn.DefaultCellStyle.Format = "yyyy-MM-dd HH:mm";
             }
             if (isActiveColumn != null) { isActiveColumn.HeaderText = "启用"; isActiveColumn.FillWeight = 60; }
+        }
+
+        private static void PrepareAdminGrid(DataGridView dgv)
+        {
+            dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgv.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dgv.ColumnHeadersHeight = 38;
+            dgv.RowTemplate.Height = 34;
+            dgv.DefaultCellStyle.WrapMode = DataGridViewTriState.False;
+            dgv.RowsDefaultCellStyle.WrapMode = DataGridViewTriState.False;
+            dgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dgv.DefaultCellStyle.Padding = new Padding(2);
+        }
+
+        private static void AttachGridTooltips(DataGridView dgv)
+        {
+            dgv.ShowCellToolTips = true;
+            dgv.CellToolTipTextNeeded -= AdminGrid_CellToolTipTextNeeded;
+            dgv.CellToolTipTextNeeded += AdminGrid_CellToolTipTextNeeded;
+        }
+
+        private static void AdminGrid_CellToolTipTextNeeded(object? sender, DataGridViewCellToolTipTextNeededEventArgs e)
+        {
+            if (sender is not DataGridView dgv || e.RowIndex < 0 || e.ColumnIndex < 0)
+            {
+                return;
+            }
+
+            var value = dgv.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+            e.ToolTipText = value?.ToString() ?? string.Empty;
         }
 
         private void UsersGrid_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
@@ -2126,9 +2286,27 @@ namespace ClientAdmin
                 {
                     "Admin" => "管理员",
                     "Customer" => "顾客",
+                    "Kitchen" => "后厨",
+                    "Rider" => "配送员",
+                    "SuperAdmin" => "超级管理员",
                     _ => role
                 };
                 e.FormattingApplied = true;
+            }
+        }
+
+        private sealed class DishCategoryOption
+        {
+            public DishCategoryOption(DishCategoryDto value)
+            {
+                Value = value;
+            }
+
+            public DishCategoryDto Value { get; }
+
+            public override string ToString()
+            {
+                return Value.Name;
             }
         }
 

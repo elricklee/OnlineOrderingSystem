@@ -57,6 +57,7 @@ public class TableSessionsController : ControllerBase
     }
 
     [HttpGet("/api/diningtables/{diningTableId}/sessions/current")]
+    [RequireClientRole(UserRoles.Customer, UserRoles.Admin, UserRoles.SuperAdmin)]
     public async Task<IActionResult> GetCurrentByTable(int diningTableId)
     {
         try

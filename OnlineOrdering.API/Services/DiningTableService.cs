@@ -76,14 +76,23 @@ namespace OnlineOrdering.API.Services
                 return false;
             }
 
+            var isBusy = await IsTableBusyAsync(entity.Id, entity);
+
             if (entity.CurrentOccupiedSeats > entity.SeatCount && dto.SeatCount < entity.CurrentOccupiedSeats)
             {
                 throw new InvalidOperationException("当前餐桌已有顾客占用，座位数不能小于当前占用人数。");
             }
 
-            if (!dto.IsEnabled && await IsTableBusyAsync(entity.Id, entity))
+            if (!dto.IsEnabled && isBusy)
             {
                 throw new InvalidOperationException("当前餐桌正在使用中，不能停用。");
+            }
+
+            if (isBusy &&
+                (!string.Equals(entity.TableNumber, dto.TableNumber.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                 entity.SeatCount != dto.SeatCount))
+            {
+                throw new InvalidOperationException("当前餐桌正在使用中，不能修改桌号或座位数。");
             }
 
             ApplyChanges(entity, dto);
@@ -152,7 +161,7 @@ namespace OnlineOrdering.API.Services
 
         private static void ApplyChanges(DiningTable entity, DiningTableCreateUpdateDto dto)
         {
-            entity.TableNumber = dto.TableNumber.Trim();
+            entity.TableNumber = dto.TableNumber.Trim().ToUpperInvariant();
             entity.SeatCount = dto.SeatCount;
             entity.IsEnabled = dto.IsEnabled;
         }

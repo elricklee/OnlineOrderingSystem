@@ -96,6 +96,22 @@ namespace ClientCustomer
                 ?? throw new Exception("订单查询返回数据异常");
         }
 
+        public static async Task<TableSessionDto?> GetCurrentTableSessionAsync(int diningTableId)
+        {
+            ApplyClientHeaders();
+            var response = await _client.GetAsync($"api/diningtables/{diningTableId}/sessions/current");
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<TableSessionDto>(json);
+        }
+
         public static async Task<RecommendationResponseDto> GetRecommendationAsync(RecommendationRequestDto request)
         {
             ApplyClientHeaders();

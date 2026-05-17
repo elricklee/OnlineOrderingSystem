@@ -48,7 +48,7 @@ partial class OrderHistoryForm
         dgvOrders.RowHeadersVisible = false;
         dgvOrders.RowTemplate.Height = 32;
         dgvOrders.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvOrders.Size = new Size(500, 500);
+        dgvOrders.Size = new Size(560, 560);
         dgvOrders.TabIndex = 0;
         //
         // lblNotice
@@ -76,10 +76,10 @@ partial class OrderHistoryForm
         grpDetail.Controls.Add(lblAddress);
         grpDetail.Controls.Add(dgvOrderItems);
         grpDetail.Font = new Font("微软雅黑", 10F);
-        grpDetail.Location = new Point(522, 50);
+        grpDetail.Location = new Point(582, 50);
         grpDetail.Name = "grpDetail";
         grpDetail.Padding = new Padding(0, 28, 0, 0);
-        grpDetail.Size = new Size(540, 500);
+        grpDetail.Size = new Size(600, 560);
         grpDetail.TabIndex = 1;
         grpDetail.Text = "订单详情";
         //
@@ -129,7 +129,7 @@ partial class OrderHistoryForm
         lblCreatedAt.ForeColor = Color.FromArgb(51, 51, 51);
         lblCreatedAt.Location = new Point(15, 95);
         lblCreatedAt.Name = "lblCreatedAt";
-        lblCreatedAt.Size = new Size(500, 26);
+        lblCreatedAt.Size = new Size(560, 26);
         lblCreatedAt.TabIndex = 4;
         lblCreatedAt.Text = "下单时间：";
         //
@@ -139,7 +139,7 @@ partial class OrderHistoryForm
         lblEstimatedTime.ForeColor = Color.FromArgb(46, 125, 50);
         lblEstimatedTime.Location = new Point(15, 125);
         lblEstimatedTime.Name = "lblEstimatedTime";
-        lblEstimatedTime.Size = new Size(500, 26);
+        lblEstimatedTime.Size = new Size(560, 26);
         lblEstimatedTime.TabIndex = 5;
         lblEstimatedTime.Text = "预计完成时间：";
         //
@@ -149,7 +149,7 @@ partial class OrderHistoryForm
         lblAddress.ForeColor = Color.FromArgb(51, 51, 51);
         lblAddress.Location = new Point(15, 155);
         lblAddress.Name = "lblAddress";
-        lblAddress.Size = new Size(500, 26);
+        lblAddress.Size = new Size(560, 26);
         lblAddress.TabIndex = 6;
         lblAddress.Text = "配送地址：";
         //
@@ -167,7 +167,7 @@ partial class OrderHistoryForm
         dgvOrderItems.ReadOnly = true;
         dgvOrderItems.RowHeadersVisible = false;
         dgvOrderItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dgvOrderItems.Size = new Size(510, 295);
+        dgvOrderItems.Size = new Size(570, 355);
         dgvOrderItems.TabIndex = 6;
         //
         // btnRefresh
@@ -177,7 +177,7 @@ partial class OrderHistoryForm
         btnRefresh.FillColor = Color.FromArgb(255, 109, 0);
         btnRefresh.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
         btnRefresh.ForeColor = Color.White;
-        btnRefresh.Location = new Point(842, 562);
+        btnRefresh.Location = new Point(962, 622);
         btnRefresh.MinimumSize = new Size(1, 1);
         btnRefresh.Name = "btnRefresh";
         btnRefresh.Radius = 8;
@@ -193,7 +193,7 @@ partial class OrderHistoryForm
         btnClose.FillColor = Color.FromArgb(117, 117, 117);
         btnClose.Font = new Font("微软雅黑", 10F);
         btnClose.ForeColor = Color.White;
-        btnClose.Location = new Point(962, 562);
+        btnClose.Location = new Point(1082, 622);
         btnClose.MinimumSize = new Size(1, 1);
         btnClose.Name = "btnClose";
         btnClose.Radius = 8;
@@ -206,15 +206,16 @@ partial class OrderHistoryForm
         //
         AutoScaleMode = AutoScaleMode.None;
         BackColor = Color.White;
-        ClientSize = new Size(1080, 610);
+        ClientSize = new Size(1200, 670);
         Controls.Add(btnClose);
         Controls.Add(btnRefresh);
         Controls.Add(lblNotice);
         Controls.Add(grpDetail);
         Controls.Add(dgvOrders);
         Font = new Font("微软雅黑", 10F);
-        MaximizeBox = false;
+        MaximizeBox = true;
         MinimizeBox = false;
+        MinimumSize = new Size(1180, 670);
         Name = "OrderHistoryForm";
         StartPosition = FormStartPosition.CenterParent;
         Text = "我的订单";
