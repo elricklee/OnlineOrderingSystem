@@ -5,7 +5,10 @@ namespace ClientCustomer;
 public partial class OrderHistoryForm : Form
 {
     private readonly int _userId;
+    private readonly System.Windows.Forms.Timer _statusRefreshTimer = new() { Interval = 15000 };
+    private readonly Dictionary<int, string> _knownOrderStatuses = new();
     private List<OrderDto> _orders = new();
+    private bool _isLoadingOrders;
 
     public OrderHistoryForm(int userId)
     {
@@ -18,69 +21,124 @@ public partial class OrderHistoryForm : Form
     {
         Load += OrderHistoryForm_Load;
         dgvOrders.CellClick += DgvOrders_CellClick;
+        dgvOrders.CellFormatting += DgvOrders_CellFormatting;
+        btnRefresh.Click += BtnRefresh_Click;
         btnClose.Click += BtnClose_Click;
+        _statusRefreshTimer.Tick += StatusRefreshTimer_Tick;
+        FormClosed += (_, _) => _statusRefreshTimer.Stop();
     }
 
     private async void OrderHistoryForm_Load(object? sender, EventArgs e)
     {
         await LoadOrdersAsync();
+        _statusRefreshTimer.Start();
     }
 
-    private async Task LoadOrdersAsync()
+    private async Task LoadOrdersAsync(bool notifyChanges = false)
     {
+        if (_isLoadingOrders)
+        {
+            return;
+        }
+
+        _isLoadingOrders = true;
+
         try
         {
-            _orders = await ApiHelper.GetOrdersByUserIdAsync(_userId);
+            var selectedOrderId = dgvOrders.CurrentRow?.DataBoundItem is OrderDto selectedOrder
+                ? selectedOrder.Id
+                : (int?)null;
+
+            var newOrders = await ApiHelper.GetOrdersByUserIdAsync(_userId);
+            NotifyStatusChanges(newOrders, notifyChanges);
+            _orders = newOrders;
+
             dgvOrders.DataSource = _orders;
             SetGridHeaders();
-            ClearDetail();
+
+            RestoreSelection(selectedOrderId);
+            if (dgvOrders.CurrentRow?.DataBoundItem is OrderDto currentOrder)
+            {
+                ShowOrderDetail(currentOrder);
+            }
+            else
+            {
+                ClearDetail();
+            }
+
+            RememberStatuses();
         }
         catch (Exception ex)
         {
             MessageBox.Show("加载订单失败：" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+        finally
+        {
+            _isLoadingOrders = false;
+        }
     }
 
     private void SetGridHeaders()
     {
-        dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
 
         if (dgvOrders.Columns["Id"] != null)
         {
             dgvOrders.Columns["Id"].HeaderText = "订单号";
-            dgvOrders.Columns["Id"].FillWeight = 50;
+            dgvOrders.Columns["Id"].Width = 90;
         }
 
         if (dgvOrders.Columns["OrderType"] != null)
         {
             dgvOrders.Columns["OrderType"].HeaderText = "类型";
-            dgvOrders.Columns["OrderType"].FillWeight = 50;
+            dgvOrders.Columns["OrderType"].Width = 80;
         }
 
         if (dgvOrders.Columns["TotalAmount"] != null)
         {
             dgvOrders.Columns["TotalAmount"].HeaderText = "总金额";
-            dgvOrders.Columns["TotalAmount"].FillWeight = 60;
-            dgvOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "C2";
+            dgvOrders.Columns["TotalAmount"].Width = 95;
+            dgvOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "¥0.00";
         }
 
         if (dgvOrders.Columns["Status"] != null)
         {
             dgvOrders.Columns["Status"].HeaderText = "状态";
-            dgvOrders.Columns["Status"].FillWeight = 50;
+            dgvOrders.Columns["Status"].Width = 90;
         }
 
         if (dgvOrders.Columns["CreatedAt"] != null)
         {
             dgvOrders.Columns["CreatedAt"].HeaderText = "下单时间";
-            dgvOrders.Columns["CreatedAt"].FillWeight = 80;
+            dgvOrders.Columns["CreatedAt"].Width = 145;
             dgvOrders.Columns["CreatedAt"].DefaultCellStyle.Format = "MM-dd HH:mm";
         }
 
-        foreach (var col in new[] { "UserId", "CustomerName", "Phone", "Address", "TableNumber", "DiningTableId", "Note", "DeliveryFee", "DeliveryZoneId", "DeliveryRegion", "OrderItems" })
+        foreach (var col in new[] { "UserId", "CustomerName", "Phone", "Address", "TableNumber", "DiningTableId", "Note", "DeliveryFee", "DeliveryZoneId", "DeliveryRegion", "EstimatedMinutes", "OrderItems" })
         {
             if (dgvOrders.Columns[col] != null)
                 dgvOrders.Columns[col].Visible = false;
+        }
+    }
+
+    private void DgvOrders_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+    {
+        if (e.RowIndex < 0 || e.ColumnIndex < 0)
+        {
+            return;
+        }
+
+        var columnName = dgvOrders.Columns[e.ColumnIndex].Name;
+        if (columnName == "OrderType" && e.Value is string orderType)
+        {
+            e.Value = GetOrderTypeText(orderType);
+            e.FormattingApplied = true;
+        }
+
+        if (columnName == "Status" && e.Value is string status)
+        {
+            e.Value = GetStatusText(status);
+            e.FormattingApplied = true;
         }
     }
 
@@ -97,12 +155,13 @@ public partial class OrderHistoryForm : Form
     private void ShowOrderDetail(OrderDto order)
     {
         lblOrderId.Text = $"订单编号：{order.Id}";
-        lblOrderType.Text = $"订单类型：{(order.OrderType == "DineIn" ? "堂食" : "外卖")}";
+        lblOrderType.Text = $"订单类型：{GetOrderTypeText(order.OrderType)}";
         lblStatus.Text = $"状态：{GetStatusText(order.Status)}";
         lblTotalAmount.Text = $"总金额：¥{order.TotalAmount:F2}";
         lblCreatedAt.Text = $"下单时间：{order.CreatedAt:yyyy-MM-dd HH:mm:ss}";
+        var fullAddress = string.Join(" ", new[] { order.DeliveryRegion, order.Address }.Where(x => !string.IsNullOrWhiteSpace(x)));
         lblAddress.Text = order.OrderType == "Delivery"
-            ? $"配送地址：{order.Address ?? "无"}"
+            ? $"配送地址：{(string.IsNullOrWhiteSpace(fullAddress) ? "无" : fullAddress)}"
             : $"桌号：{order.TableNumber ?? "无"}";
 
         // 计算并显示预计完成时间
@@ -174,8 +233,93 @@ public partial class OrderHistoryForm : Form
             "Delivering" => "配送中",
             "Completed" => "已完成",
             "Cancelled" => "已取消",
-            _ => status
+            _ => "未知状态"
         };
+    }
+
+    private static string GetOrderTypeText(string orderType)
+    {
+        return orderType switch
+        {
+            "DineIn" => "堂食",
+            "Delivery" => "外卖",
+            _ => "未知类型"
+        };
+    }
+
+    private async void BtnRefresh_Click(object? sender, EventArgs e)
+    {
+        btnRefresh.Enabled = false;
+        btnRefresh.Text = "刷新中";
+
+        try
+        {
+            await LoadOrdersAsync(true);
+            lblNotice.Text = "订单列表已刷新";
+            lblNotice.ForeColor = Color.FromArgb(46, 125, 50);
+        }
+        finally
+        {
+            btnRefresh.Enabled = true;
+            btnRefresh.Text = "刷新";
+        }
+    }
+
+    private async void StatusRefreshTimer_Tick(object? sender, EventArgs e)
+    {
+        await LoadOrdersAsync(true);
+    }
+
+    private void NotifyStatusChanges(List<OrderDto> newOrders, bool notifyChanges)
+    {
+        if (!notifyChanges || _knownOrderStatuses.Count == 0)
+        {
+            return;
+        }
+
+        var changedOrders = newOrders
+            .Where(order => _knownOrderStatuses.TryGetValue(order.Id, out var oldStatus) && oldStatus != order.Status)
+            .ToList();
+
+        if (changedOrders.Count == 0)
+        {
+            return;
+        }
+
+        var latest = changedOrders.OrderByDescending(order => order.CreatedAt).First();
+        lblNotice.Text = $"订单 {latest.Id} 状态已更新为：{GetStatusText(latest.Status)}";
+        lblNotice.ForeColor = Color.FromArgb(255, 109, 0);
+    }
+
+    private void RememberStatuses()
+    {
+        _knownOrderStatuses.Clear();
+        foreach (var order in _orders)
+        {
+            _knownOrderStatuses[order.Id] = order.Status;
+        }
+    }
+
+    private void RestoreSelection(int? selectedOrderId)
+    {
+        if (_orders.Count == 0)
+        {
+            return;
+        }
+
+        var rowIndex = 0;
+        if (selectedOrderId != null)
+        {
+            var index = _orders.FindIndex(order => order.Id == selectedOrderId.Value);
+            if (index >= 0)
+            {
+                rowIndex = index;
+            }
+        }
+
+        dgvOrders.ClearSelection();
+        dgvOrders.Rows[rowIndex].Selected = true;
+        dgvOrders.CurrentCell = dgvOrders.Rows[rowIndex].Cells[0];
     }
 
     private void BtnClose_Click(object? sender, EventArgs e)

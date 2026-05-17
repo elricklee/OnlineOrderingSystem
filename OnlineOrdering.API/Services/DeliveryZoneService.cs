@@ -27,7 +27,7 @@ namespace OnlineOrdering.API.Services
                 .ThenBy(x => x.Province)
                 .ThenBy(x => x.City)
                 .ThenBy(x => x.District)
-                .Select(MapToDtoExpression())
+                .Select(MapExpression())
                 .ToListAsync();
         }
 
@@ -35,7 +35,7 @@ namespace OnlineOrdering.API.Services
         {
             return await _db.DeliveryZones
                 .Where(x => x.Id == id)
-                .Select(MapToDtoExpression())
+                .Select(MapExpression())
                 .FirstOrDefaultAsync();
         }
 
@@ -43,6 +43,9 @@ namespace OnlineOrdering.API.Services
         {
             var entity = new DeliveryZone();
             ApplyChanges(entity, dto);
+            entity.IsDeleted = false;
+            entity.DeletedAt = null;
+            entity.DeletedByUserId = null;
 
             _db.DeliveryZones.Add(entity);
             await _db.SaveChangesAsync();
@@ -62,7 +65,7 @@ namespace OnlineOrdering.API.Services
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DisableAsync(int id)
         {
             var entity = await _db.DeliveryZones.FirstOrDefaultAsync(x => x.Id == id);
             if (entity == null)
@@ -70,7 +73,25 @@ namespace OnlineOrdering.API.Services
                 return false;
             }
 
-            _db.DeliveryZones.Remove(entity);
+            entity.IsActive = false;
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RestoreAsync(int id)
+        {
+            var entity = await _db.DeliveryZones
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            entity.IsDeleted = false;
+            entity.IsActive = true;
+            entity.DeletedAt = null;
+            entity.DeletedByUserId = null;
             await _db.SaveChangesAsync();
             return true;
         }
@@ -96,11 +117,12 @@ namespace OnlineOrdering.API.Services
                 DeliveryFee = entity.DeliveryFee,
                 IsActive = entity.IsActive,
                 SortOrder = entity.SortOrder,
-                DisplayName = $"{entity.Province} / {entity.City} / {entity.District}"
+                DisplayName = $"{entity.Province} / {entity.City} / {entity.District}",
+                IsDeleted = entity.IsDeleted
             };
         }
 
-        private static System.Linq.Expressions.Expression<Func<DeliveryZone, DeliveryZoneDto>> MapToDtoExpression()
+        private static System.Linq.Expressions.Expression<Func<DeliveryZone, DeliveryZoneDto>> MapExpression()
         {
             return entity => new DeliveryZoneDto
             {
@@ -111,7 +133,8 @@ namespace OnlineOrdering.API.Services
                 DeliveryFee = entity.DeliveryFee,
                 IsActive = entity.IsActive,
                 SortOrder = entity.SortOrder,
-                DisplayName = entity.Province + " / " + entity.City + " / " + entity.District
+                DisplayName = entity.Province + " / " + entity.City + " / " + entity.District,
+                IsDeleted = entity.IsDeleted
             };
         }
     }

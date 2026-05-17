@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineOrdering.API.DTOs;
+using OnlineOrdering.API.Models;
+using OnlineOrdering.API.Security;
 using OnlineOrdering.API.Services;
 
 namespace OnlineOrdering.API.Controllers;
@@ -16,6 +18,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
+    [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -30,6 +33,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -83,29 +87,39 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request)
+    [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+    public IActionResult Update(int id, [FromBody] UpdateUserRequest request)
+    {
+        return BadRequest(new { message = "后台不允许修改用户个人资料，请仅使用账号状态管理接口。" });
+    }
+
+    [HttpPut("{id}/status")]
+    [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateUserStatusRequest request)
     {
         try
         {
-            var success = await _userService.UpdateUserAsync(id, request);
+            var success = await _userService.UpdateUserStatusAsync(id, request.IsActive);
             if (!success) return NotFound();
             return Ok();
         }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = $"更新用户信息失败：{ex.Message}" });
+            return StatusCode(500, new { message = $"更新账号状态失败：{ex.Message}" });
         }
     }
 
     [HttpPost("{id}/change-password")]
+    [RequireClientRole(UserRoles.Customer, UserRoles.Admin, UserRoles.SuperAdmin)]
     public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordRequest request)
     {
         try
         {
+            if (!ClientRequestContext.IsAdmin(HttpContext) && ClientRequestContext.GetUserId(HttpContext) != id)
+            {
+                return StatusCode(403, new { message = "不能修改其他用户的密码。" });
+            }
+
             var success = await _userService.ChangePasswordAsync(id, request);
             if (!success) return BadRequest("密码修改失败，请检查原密码是否正确");
             return Ok();
@@ -120,13 +134,13 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPost("{id}/reset-password")]
-    public async Task<IActionResult> ResetPassword(int id, [FromBody] ResetPasswordRequest request)
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePasswordByUsername([FromBody] ChangePasswordByUsernameRequest request)
     {
         try
         {
-            var success = await _userService.ResetPasswordAsync(id, request.NewPassword);
-            if (!success) return NotFound();
+            var success = await _userService.ChangePasswordByUsernameAsync(request);
+            if (!success) return BadRequest(new { message = "用户名或原密码不正确" });
             return Ok();
         }
         catch (InvalidOperationException ex)
@@ -135,27 +149,41 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = $"重置密码失败：{ex.Message}" });
+            return StatusCode(500, new { message = $"修改密码失败：{ex.Message}" });
+        }
+    }
+
+    [HttpPost("{id}/reset-password")]
+    [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+    public IActionResult ResetPassword(int id, [FromBody] ResetPasswordRequest request)
+    {
+        return BadRequest(new { message = "后台不提供重置密码，请使用顾客端的忘记密码功能。" });
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        try
+        {
+            var success = await _userService.ForgotPasswordAsync(request);
+            if (!success) return BadRequest(new { message = "用户名或真实姓名不匹配" });
+            return Ok();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"找回密码失败：{ex.Message}" });
         }
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+    public IActionResult Delete(int id)
     {
-        try
-        {
-            var success = await _userService.DeleteUserAsync(id);
-            if (!success) return NotFound();
-            return Ok();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = $"删除用户失败：{ex.Message}" });
-        }
+        return BadRequest(new { message = "后台不允许删除用户账号，只能启用或停用。" });
     }
 }
 

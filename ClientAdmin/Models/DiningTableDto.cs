@@ -10,13 +10,15 @@ namespace ClientAdmin.Models
         public bool IsEnabled { get; set; }
         public string Status { get; set; } = "Available";
         public int CurrentOccupiedSeats { get; set; }
+        public int? CurrentSessionId { get; set; }
+        public string? CurrentSessionNo { get; set; }
+        public bool IsDeleted { get; set; }
     }
 
     public class DiningTableCreateUpdateDto
     {
         public string TableNumber { get; set; } = "";
         public int SeatCount { get; set; }
-        public bool IsOccupied { get; set; }
         public bool IsEnabled { get; set; } = true;
     }
 }

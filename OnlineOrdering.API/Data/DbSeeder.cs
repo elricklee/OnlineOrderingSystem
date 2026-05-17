@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineOrdering.API.Models;
-using System.Data;
 
 namespace OnlineOrdering.API.Data
 {
@@ -8,7 +7,18 @@ namespace OnlineOrdering.API.Data
     {
         public static async Task SeedAsync(AppDbContext db)
         {
-            await EnsureSchemaAsync(db);
+            if (!await db.DishCategories.AnyAsync())
+            {
+                db.DishCategories.AddRange(
+                    new DishCategory { Name = "热菜", SortOrder = 1, IsEnabled = true },
+                    new DishCategory { Name = "凉菜", SortOrder = 2, IsEnabled = true },
+                    new DishCategory { Name = "主食", SortOrder = 3, IsEnabled = true },
+                    new DishCategory { Name = "饮品", SortOrder = 4, IsEnabled = true },
+                    new DishCategory { Name = "汤类", SortOrder = 5, IsEnabled = true },
+                    new DishCategory { Name = "小吃", SortOrder = 6, IsEnabled = true }
+                );
+                await db.SaveChangesAsync();
+            }
 
             if (!await db.DeliveryZones.AnyAsync())
             {
@@ -46,101 +56,36 @@ namespace OnlineOrdering.API.Data
             if (!await db.DiningTables.AnyAsync())
             {
                 db.DiningTables.AddRange(
-                    new DiningTable { TableNumber = "A01", SeatCount = 2, IsEnabled = true, IsOccupied = false },
-                    new DiningTable { TableNumber = "A02", SeatCount = 2, IsEnabled = true, IsOccupied = false },
-                    new DiningTable { TableNumber = "B01", SeatCount = 4, IsEnabled = true, IsOccupied = false },
-                    new DiningTable { TableNumber = "B02", SeatCount = 4, IsEnabled = true, IsOccupied = false },
-                    new DiningTable { TableNumber = "C01", SeatCount = 6, IsEnabled = true, IsOccupied = false },
-                    new DiningTable { TableNumber = "C02", SeatCount = 8, IsEnabled = true, IsOccupied = false }
+                    new DiningTable { TableNumber = "A01", SeatCount = 2, IsEnabled = true, IsOccupied = false, Status = DiningTableStatuses.Available },
+                    new DiningTable { TableNumber = "A02", SeatCount = 2, IsEnabled = true, IsOccupied = false, Status = DiningTableStatuses.Available },
+                    new DiningTable { TableNumber = "B01", SeatCount = 4, IsEnabled = true, IsOccupied = false, Status = DiningTableStatuses.Available },
+                    new DiningTable { TableNumber = "B02", SeatCount = 4, IsEnabled = true, IsOccupied = false, Status = DiningTableStatuses.Available },
+                    new DiningTable { TableNumber = "C01", SeatCount = 6, IsEnabled = true, IsOccupied = false, Status = DiningTableStatuses.Available },
+                    new DiningTable { TableNumber = "C02", SeatCount = 8, IsEnabled = true, IsOccupied = false, Status = DiningTableStatuses.Available }
                 );
             }
 
+            var categories = await db.DishCategories.ToListAsync();
+            var uncategorizedDishes = await db.Dishes.Where(d => d.CategoryId == null && !string.IsNullOrWhiteSpace(d.Category)).ToListAsync();
+            foreach (var dish in uncategorizedDishes)
+            {
+                var category = categories.FirstOrDefault(c => c.Name == dish.Category);
+                if (category == null)
+                {
+                    category = new DishCategory
+                    {
+                        Name = dish.Category.Trim(),
+                        SortOrder = categories.Count + 1,
+                        IsEnabled = true
+                    };
+                    db.DishCategories.Add(category);
+                    categories.Add(category);
+                }
+
+                dish.CategoryEntity = category;
+            }
+
             await db.SaveChangesAsync();
-        }
-
-        private static async Task EnsureSchemaAsync(AppDbContext db)
-        {
-            await db.Database.ExecuteSqlRawAsync("""
-                CREATE TABLE IF NOT EXISTS `DeliveryZones` (
-                    `Id` int NOT NULL AUTO_INCREMENT,
-                    `Province` longtext NOT NULL,
-                    `City` longtext NOT NULL,
-                    `District` longtext NOT NULL,
-                    `DeliveryFee` decimal(65,30) NOT NULL,
-                    `IsActive` tinyint(1) NOT NULL,
-                    `SortOrder` int NOT NULL,
-                    PRIMARY KEY (`Id`)
-                ) CHARACTER SET=utf8mb4;
-                """);
-
-            await db.Database.ExecuteSqlRawAsync("""
-                CREATE TABLE IF NOT EXISTS `DiningTables` (
-                    `Id` int NOT NULL AUTO_INCREMENT,
-                    `TableNumber` longtext NOT NULL,
-                    `SeatCount` int NOT NULL,
-                    `IsOccupied` tinyint(1) NOT NULL,
-                    `IsEnabled` tinyint(1) NOT NULL,
-                    PRIMARY KEY (`Id`)
-                ) CHARACTER SET=utf8mb4;
-                """);
-
-            await EnsureColumnExistsAsync(db, "Orders", "DiningTableId", "int NULL");
-            await EnsureColumnExistsAsync(db, "Orders", "DeliveryZoneId", "int NULL");
-            await EnsureColumnExistsAsync(db, "Orders", "DeliveryRegion", "longtext NULL");
-        }
-
-        private static async Task EnsureColumnExistsAsync(
-            AppDbContext db,
-            string tableName,
-            string columnName,
-            string columnDefinition)
-        {
-            var connection = db.Database.GetDbConnection();
-            var shouldClose = connection.State != ConnectionState.Open;
-
-            if (shouldClose)
-            {
-                await connection.OpenAsync();
-            }
-
-            try
-            {
-                await using var existsCommand = connection.CreateCommand();
-                existsCommand.CommandText = """
-                    SELECT COUNT(*)
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_SCHEMA = DATABASE()
-                      AND TABLE_NAME = @tableName
-                      AND COLUMN_NAME = @columnName;
-                    """;
-
-                var tableParam = existsCommand.CreateParameter();
-                tableParam.ParameterName = "@tableName";
-                tableParam.Value = tableName;
-                existsCommand.Parameters.Add(tableParam);
-
-                var columnParam = existsCommand.CreateParameter();
-                columnParam.ParameterName = "@columnName";
-                columnParam.Value = columnName;
-                existsCommand.Parameters.Add(columnParam);
-
-                var exists = Convert.ToInt32(await existsCommand.ExecuteScalarAsync()) > 0;
-                if (exists)
-                {
-                    return;
-                }
-
-                var sql =
-                    "ALTER TABLE `" + tableName + "` ADD COLUMN `" + columnName + "` " + columnDefinition + ";";
-                await db.Database.ExecuteSqlRawAsync(sql);
-            }
-            finally
-            {
-                if (shouldClose)
-                {
-                    await connection.CloseAsync();
-                }
-            }
         }
     }
 }

@@ -18,6 +18,11 @@ namespace ClientCustomer
             InitializeComponent();
         }
 
+        private void BtnClose_Click(object? sender, EventArgs e)
+        {
+            Close();
+        }
+
         private async void BtnQuery_Click(object? sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtOrderId.Text))
@@ -115,7 +120,7 @@ namespace ClientCustomer
                 "Delivering" => "配送中",
                 "Completed" => "已完成",
                 "Cancelled" => "已取消",
-                _ => status
+                _ => "未知状态"
             };
         }
 
@@ -140,7 +145,7 @@ namespace ClientCustomer
             {
                 "DineIn" => "堂食",
                 "Delivery" => "外卖",
-                _ => orderType
+                _ => "未知类型"
             };
         }
 

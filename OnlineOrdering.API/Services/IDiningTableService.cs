@@ -8,6 +8,7 @@ namespace OnlineOrdering.API.Services
         Task<DiningTableDto?> GetByIdAsync(int id);
         Task<DiningTableDto> CreateAsync(DiningTableCreateUpdateDto dto);
         Task<bool> UpdateAsync(int id, DiningTableCreateUpdateDto dto);
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DisableAsync(int id);
+        Task<bool> RestoreAsync(int id);
     }
 }

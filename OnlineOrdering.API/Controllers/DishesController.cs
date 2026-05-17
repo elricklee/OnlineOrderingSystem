@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineOrdering.API.DTOs;
+using OnlineOrdering.API.Models;
+using OnlineOrdering.API.Security;
 using OnlineOrdering.API.Services;
 
 namespace OnlineOrdering.API.Controllers
@@ -12,6 +14,7 @@ namespace OnlineOrdering.API.Controllers
         public DishesController(IDishService dishService) => _dishService = dishService;
 
         [HttpGet]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -24,7 +27,35 @@ namespace OnlineOrdering.API.Controllers
             }
         }
 
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailable()
+        {
+            try
+            {
+                return Ok(await _dishService.GetAvailableAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取可售菜品失败：{ex.Message}" });
+            }
+        }
+
+        [HttpGet("recycle-bin")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+        public async Task<IActionResult> GetRecycleBin()
+        {
+            try
+            {
+                return Ok(await _dishService.GetRecycleBinAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"获取已隐藏菜品失败：{ex.Message}" });
+            }
+        }
+
         [HttpGet("{id}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -39,6 +70,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpPost]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Create(DishCreateUpdateDto dto)
         {
             try
@@ -57,6 +89,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Update(int id, DishCreateUpdateDto dto)
         {
             try
@@ -76,11 +109,12 @@ namespace OnlineOrdering.API.Controllers
 
         //逻辑删除
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+        public async Task<IActionResult> Delete(int id, [FromBody] DishDeleteDto? dto)
         {
             try
             {
-                var ok = await _dishService.DeleteAsync(id);
+                var ok = await _dishService.DeleteAsync(id, dto);
                 return ok ? NoContent() : NotFound();
             }
             catch (InvalidOperationException ex)
@@ -93,27 +127,8 @@ namespace OnlineOrdering.API.Controllers
             }
         }
 
-        //物理删除
-        [HttpDelete("{id}/hard")]
-        public async Task<IActionResult> HardDelete(int id)
-        {
-            try
-            {
-                var ok = await _dishService.HardDeleteAsync(id);
-                return ok ? NoContent() : NotFound();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"物理删除菜品失败：{ex.Message}" });
-            }
-        }
-
-        //恢复逻辑删除的菜品
         [HttpPut("{id}/restore")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Restore(int id)
         {
             try
@@ -128,6 +143,25 @@ namespace OnlineOrdering.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"恢复菜品失败：{ex.Message}" });
+            }
+        }
+
+        [HttpPut("{id}/sale-status")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+        public async Task<IActionResult> UpdateSaleStatus(int id, [FromBody] DishSaleStatusUpdateDto dto)
+        {
+            try
+            {
+                var ok = await _dishService.UpdateSaleStatusAsync(id, dto.SaleStatus);
+                return ok ? NoContent() : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"更新菜品销售状态失败：{ex.Message}" });
             }
         }
     }

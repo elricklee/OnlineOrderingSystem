@@ -10,6 +10,7 @@ namespace ClientAdmin.Models
         public bool IsActive { get; set; }
         public int SortOrder { get; set; }
         public string DisplayName { get; set; } = "";
+        public bool IsDeleted { get; set; }
     }
 
     public class DeliveryZoneCreateUpdateDto

@@ -83,10 +83,40 @@ public class UpdateUserRequest
     public bool? IsActive { get; set; }
 }
 
+public class UpdateUserStatusRequest
+{
+    [JsonPropertyName("isActive")]
+    public bool IsActive { get; set; }
+}
+
 public class ChangePasswordRequest
 {
     [JsonPropertyName("oldPassword")]
     public string OldPassword { get; set; } = string.Empty;
+
+    [JsonPropertyName("newPassword")]
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+public class ChangePasswordByUsernameRequest
+{
+    [JsonPropertyName("username")]
+    public string Username { get; set; } = string.Empty;
+
+    [JsonPropertyName("oldPassword")]
+    public string OldPassword { get; set; } = string.Empty;
+
+    [JsonPropertyName("newPassword")]
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+public class ForgotPasswordRequest
+{
+    [JsonPropertyName("username")]
+    public string Username { get; set; } = string.Empty;
+
+    [JsonPropertyName("realName")]
+    public string RealName { get; set; } = string.Empty;
 
     [JsonPropertyName("newPassword")]
     public string NewPassword { get; set; } = string.Empty;

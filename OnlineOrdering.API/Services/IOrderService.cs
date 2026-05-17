@@ -9,8 +9,6 @@ namespace OnlineOrdering.API.Services
         Task<List<OrderDto>> GetAllOrdersAsync();
         Task<List<OrderDto>> GetOrdersByUserIdAsync(int userId);
         Task<OrderDto?> GetOrderByIdAsync(int id);
-        Task<bool> DeleteOrderAsync(int id);
-        Task<bool> HardDeleteOrderAsync(int id);
-        Task<bool> RestoreOrderAsync(int id);
+        Task<List<OrderStatusHistoryDto>> GetStatusHistoryAsync(int id);
     }
 }

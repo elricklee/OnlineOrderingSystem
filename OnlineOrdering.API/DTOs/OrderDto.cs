@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using OnlineOrdering.API.Models;
 
 namespace OnlineOrdering.API.DTOs
 {
@@ -15,9 +16,10 @@ namespace OnlineOrdering.API.DTOs
         public int? UserId { get; set; }
         [Required] public string CustomerName { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
-        [Required] public string OrderType { get; set; } = "DineIn";
+        [Required] public string OrderType { get; set; } = OrderTypes.DineIn;
         public string? TableNumber { get; set; }
         public int? DiningTableId { get; set; }
+        public int? TableSessionId { get; set; }
         public int? DinerCount { get; set; }
         public string? Address { get; set; }
         public int? DeliveryZoneId { get; set; }
@@ -32,12 +34,15 @@ namespace OnlineOrdering.API.DTOs
     public class OrderDto
     {
         public int Id { get; set; }
+        public string OrderNo { get; set; } = string.Empty;
         public int? UserId { get; set; }
         public string CustomerName { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string? Address { get; set; }
         public string? TableNumber { get; set; }
         public int? DiningTableId { get; set; }
+        public int? TableSessionId { get; set; }
+        public string? TableSessionNo { get; set; }
         public string? Note { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal DeliveryFee { get; set; }
@@ -62,9 +67,10 @@ namespace OnlineOrdering.API.DTOs
     public class OrderItemResponseDto
     {
         public int Id { get; set; }
-        public int DishId { get; set; }
+        public int? DishId { get; set; }
         public string DishName { get; set; } = string.Empty;
         public decimal Price { get; set; }
+        public string? DishCategorySnapshot { get; set; }
         public int Quantity { get; set; }
     }
 
@@ -72,5 +78,47 @@ namespace OnlineOrdering.API.DTOs
     {
         [Required] public string Status { get; set; } = string.Empty;
         public string? CancelReason { get; set; }
+    }
+
+    public class OrderStatusHistoryDto
+    {
+        public int Id { get; set; }
+        public string FromStatus { get; set; } = string.Empty;
+        public string ToStatus { get; set; } = string.Empty;
+        public int? OperatorUserId { get; set; }
+        public string OperatorRole { get; set; } = string.Empty;
+        public string? Remark { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class TableSessionDto
+    {
+        public int Id { get; set; }
+        public int DiningTableId { get; set; }
+        public string TableNumber { get; set; } = string.Empty;
+        public string SessionNo { get; set; } = string.Empty;
+        public int PartySize { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public DateTime OpenedAt { get; set; }
+        public DateTime? ClosedAt { get; set; }
+        public string? Remark { get; set; }
+    }
+
+    public class TableSessionCreateDto
+    {
+        [Required]
+        public int DiningTableId { get; set; }
+
+        [Range(1, 99)]
+        public int PartySize { get; set; }
+
+        [StringLength(200)]
+        public string? Remark { get; set; }
+    }
+
+    public class TableSessionCloseDto
+    {
+        [StringLength(200)]
+        public string? Remark { get; set; }
     }
 }

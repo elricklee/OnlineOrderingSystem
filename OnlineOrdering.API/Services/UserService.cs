@@ -4,11 +4,13 @@ using OnlineOrdering.API.DTOs;
 using OnlineOrdering.API.Models;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OnlineOrdering.API.Services;
 
 public class UserService
 {
+    private static readonly Regex PhoneRegex = new("^1[3-9]\\d{9}$", RegexOptions.Compiled);
     private readonly AppDbContext _db;
 
     public UserService(AppDbContext db)
@@ -52,13 +54,54 @@ public class UserService
             return new LoginResponse { Success = false, Message = "密码错误" };
         }
 
+        if (NeedsPasswordUpgrade(user.PasswordHash))
+        {
+            user.PasswordHash = HashPassword(request.Password);
+            await _db.SaveChangesAsync();
+        }
+
         return new LoginResponse { Success = true, Message = "登录成功", User = MapToDto(user) };
     }
 
     public async Task<LoginResponse> RegisterAsync(RegisterRequest request)
     {
+        var username = request.Username.Trim();
+        var realName = request.RealName?.Trim();
+        var phone = request.Phone?.Trim();
+        var address = request.Address?.Trim();
+
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            return new LoginResponse { Success = false, Message = "用户名不能为空" };
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 6)
+        {
+            return new LoginResponse { Success = false, Message = "密码长度至少6个字符" };
+        }
+
+        if (string.IsNullOrWhiteSpace(realName))
+        {
+            return new LoginResponse { Success = false, Message = "真实姓名不能为空" };
+        }
+
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            return new LoginResponse { Success = false, Message = "手机号不能为空" };
+        }
+
+        if (!PhoneRegex.IsMatch(phone))
+        {
+            return new LoginResponse { Success = false, Message = "手机号格式不正确" };
+        }
+
+        if (string.IsNullOrWhiteSpace(address))
+        {
+            return new LoginResponse { Success = false, Message = "常用地址不能为空" };
+        }
+
         var existingUser = await _db.Users
-            .FirstOrDefaultAsync(u => u.Username == request.Username);
+            .FirstOrDefaultAsync(u => u.Username == username);
 
         if (existingUser != null)
         {
@@ -67,12 +110,12 @@ public class UserService
 
         var user = new User
         {
-            Username = request.Username,
+            Username = username,
             PasswordHash = HashPassword(request.Password),
-            Role = "Customer",
-            RealName = request.RealName,
-            Phone = request.Phone,
-            Address = request.Address,
+            Role = UserRoles.Customer,
+            RealName = realName,
+            Phone = phone,
+            Address = address,
             CreatedAt = DateTime.Now,
             IsActive = true
         };
@@ -88,11 +131,18 @@ public class UserService
         var user = await _db.Users.FindAsync(id);
         if (user == null || user.IsDeleted) return false;
 
-        if (request.RealName != null) user.RealName = request.RealName;
-        if (request.Phone != null) user.Phone = request.Phone;
-        if (request.Address != null) user.Address = request.Address;
         if (request.IsActive.HasValue) user.IsActive = request.IsActive.Value;
 
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UpdateUserStatusAsync(int id, bool isActive)
+    {
+        var user = await _db.Users.FindAsync(id);
+        if (user == null || user.IsDeleted) return false;
+
+        user.IsActive = isActive;
         await _db.SaveChangesAsync();
         return true;
     }
@@ -101,6 +151,26 @@ public class UserService
     {
         var user = await _db.Users.FindAsync(id);
         if (user == null || user.IsDeleted) return false;
+
+        ValidatePassword(request.NewPassword);
+
+        if (!VerifyPassword(request.OldPassword, user.PasswordHash))
+        {
+            return false;
+        }
+
+        user.PasswordHash = HashPassword(request.NewPassword);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> ChangePasswordByUsernameAsync(ChangePasswordByUsernameRequest request)
+    {
+        var username = request.Username.Trim();
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username && !u.IsDeleted);
+        if (user == null) return false;
+
+        ValidatePassword(request.NewPassword);
 
         if (!VerifyPassword(request.OldPassword, user.PasswordHash))
         {
@@ -127,21 +197,90 @@ public class UserService
         var user = await _db.Users.FindAsync(id);
         if (user == null || user.IsDeleted) return false;
 
+        ValidatePassword(newPassword);
         user.PasswordHash = HashPassword(newPassword);
         await _db.SaveChangesAsync();
         return true;
     }
 
+    public async Task<bool> ForgotPasswordAsync(ForgotPasswordRequest request)
+    {
+        var username = request.Username.Trim();
+        var realName = request.RealName.Trim();
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username && !u.IsDeleted);
+        if (user == null)
+        {
+            return false;
+        }
+
+        if (!string.Equals(user.RealName?.Trim(), realName, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        ValidatePassword(request.NewPassword);
+        user.PasswordHash = HashPassword(request.NewPassword);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    private static void ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+        {
+            throw new InvalidOperationException("新密码长度至少6个字符");
+        }
+    }
+
     private static string HashPassword(string password)
     {
-        using var sha256 = SHA256.Create();
-        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + "OrderingSystemSalt"));
-        return Convert.ToBase64String(bytes);
+        var salt = RandomNumberGenerator.GetBytes(16);
+        const int iterations = 100_000;
+        var hashBytes = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, 32);
+        return $"PBKDF2${iterations}${Convert.ToBase64String(salt)}${Convert.ToBase64String(hashBytes)}";
     }
 
     private static bool VerifyPassword(string password, string hash)
     {
-        return HashPassword(password) == hash;
+        if (string.IsNullOrWhiteSpace(hash))
+        {
+            return false;
+        }
+
+        if (!hash.StartsWith("PBKDF2$", StringComparison.Ordinal))
+        {
+            return VerifyLegacyPassword(password, hash);
+        }
+
+        var parts = hash.Split('$');
+        if (parts.Length != 4 || !int.TryParse(parts[1], out var iterations))
+        {
+            return false;
+        }
+
+        try
+        {
+            var salt = Convert.FromBase64String(parts[2]);
+            var expectedHash = Convert.FromBase64String(parts[3]);
+            var actualHash = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, expectedHash.Length);
+            return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool VerifyLegacyPassword(string password, string hash)
+    {
+        using var sha256 = SHA256.Create();
+        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + "OrderingSystemSalt"));
+        return Convert.ToBase64String(bytes) == hash;
+    }
+
+    private static bool NeedsPasswordUpgrade(string hash)
+    {
+        return !hash.StartsWith("PBKDF2$", StringComparison.Ordinal);
     }
 
     private static UserDto MapToDto(User user)

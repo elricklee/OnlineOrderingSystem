@@ -186,9 +186,9 @@ partial class CartForm
         lblDeliveryRegion.ForeColor = Color.FromArgb(51, 51, 51);
         lblDeliveryRegion.Location = new Point(15, 78);
         lblDeliveryRegion.Name = "lblDeliveryRegion";
-        lblDeliveryRegion.Size = new Size(80, 28);
+        lblDeliveryRegion.Size = new Size(90, 28);
         lblDeliveryRegion.TabIndex = 3;
-        lblDeliveryRegion.Text = "配送区域：";
+        lblDeliveryRegion.Text = "配送区域 *：";
         //
         // cmbDeliveryProvince
         //
@@ -253,20 +253,20 @@ partial class CartForm
         lblAddressDetailEditor.ForeColor = Color.FromArgb(51, 51, 51);
         lblAddressDetailEditor.Location = new Point(15, 112);
         lblAddressDetailEditor.Name = "lblAddressDetailEditor";
-        lblAddressDetailEditor.Size = new Size(80, 28);
+        lblAddressDetailEditor.Size = new Size(90, 28);
         lblAddressDetailEditor.TabIndex = 7;
-        lblAddressDetailEditor.Text = "详细地址：";
+        lblAddressDetailEditor.Text = "详细地址 *：";
         //
         // txtAddressDetail
         //
         txtAddressDetail.Font = new Font("微软雅黑", 10F);
-        txtAddressDetail.Location = new Point(100, 108);
+        txtAddressDetail.Location = new Point(110, 108);
         txtAddressDetail.Margin = new Padding(4, 5, 4, 5);
         txtAddressDetail.MinimumSize = new Size(1, 16);
         txtAddressDetail.Name = "txtAddressDetail";
         txtAddressDetail.Padding = new Padding(5);
         txtAddressDetail.ShowText = false;
-        txtAddressDetail.Size = new Size(740, 32);
+        txtAddressDetail.Size = new Size(395, 32);
         txtAddressDetail.TabIndex = 8;
         txtAddressDetail.TextAlignment = ContentAlignment.MiddleLeft;
         txtAddressDetail.Watermark = "请填写门牌号、楼栋、房间号等详细地址";
@@ -275,25 +275,25 @@ partial class CartForm
         //
         lblCustomerPhoneEditor.Font = new Font("微软雅黑", 10F);
         lblCustomerPhoneEditor.ForeColor = Color.FromArgb(51, 51, 51);
-        lblCustomerPhoneEditor.Location = new Point(530, 112);
+        lblCustomerPhoneEditor.Location = new Point(525, 112);
         lblCustomerPhoneEditor.Name = "lblCustomerPhoneEditor";
-        lblCustomerPhoneEditor.Size = new Size(60, 28);
+        lblCustomerPhoneEditor.Size = new Size(80, 28);
         lblCustomerPhoneEditor.TabIndex = 9;
-        lblCustomerPhoneEditor.Text = "手机号：";
+        lblCustomerPhoneEditor.Text = "手机号 *：";
         //
         // txtCustomerPhone
         //
         txtCustomerPhone.Font = new Font("微软雅黑", 10F);
-        txtCustomerPhone.Location = new Point(595, 108);
+        txtCustomerPhone.Location = new Point(610, 108);
         txtCustomerPhone.Margin = new Padding(4, 5, 4, 5);
         txtCustomerPhone.MinimumSize = new Size(1, 16);
         txtCustomerPhone.Name = "txtCustomerPhone";
         txtCustomerPhone.Padding = new Padding(5);
         txtCustomerPhone.ShowText = false;
-        txtCustomerPhone.Size = new Size(245, 32);
+        txtCustomerPhone.Size = new Size(230, 32);
         txtCustomerPhone.TabIndex = 10;
         txtCustomerPhone.TextAlignment = ContentAlignment.MiddleLeft;
-        txtCustomerPhone.Watermark = "外卖建议填写";
+        txtCustomerPhone.Watermark = "必填，11位手机号";
         //
         // totalPanel
         //

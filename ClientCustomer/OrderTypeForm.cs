@@ -1,12 +1,14 @@
 using ClientCustomer.Models;
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace ClientCustomer
 {
     public partial class OrderTypeForm : Form
     {
+        private static readonly Regex PhoneRegex = new("^1[3-9]\\d{9}$", RegexOptions.Compiled);
         private List<DiningTableDto> _availableTables = new();
         private List<DeliveryZoneDto> _deliveryZones = new();
 
@@ -37,7 +39,7 @@ namespace ClientCustomer
             ClientSize = new Size(820, 700);
             MinimumSize = new Size(820, 700);
 
-            lblAddress.Text = "配送区域：";
+            lblAddress.Text = "配送区域 *：";
             txtAddress.Location = new Point(286, 516);
             txtAddress.Size = new Size(400, 34);
             txtAddress.MaxLength = 240;
@@ -97,6 +99,7 @@ namespace ClientCustomer
 
                 BindDiningTables();
                 BindProvinces();
+                ApplyCurrentUserDeliveryDefaults();
             }
             catch (Exception ex)
             {
@@ -246,6 +249,75 @@ namespace ClientCustomer
             }
         }
 
+        private void ApplyCurrentUserDeliveryDefaults()
+        {
+            var currentUser = Program.CurrentUser;
+            if (currentUser == null)
+            {
+                return;
+            }
+
+            txtCustomerPhone.Text = currentUser.Phone ?? string.Empty;
+
+            var address = currentUser.Address?.Trim();
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                return;
+            }
+
+            var zone = FindZoneFromAddress(address);
+            if (zone == null)
+            {
+                txtAddress.Text = string.Empty;
+                return;
+            }
+
+            SelectComboText(cmbProvince, zone.Province);
+            SelectComboText(cmbCity, zone.City);
+            SelectComboText(cmbDistrict, zone.District);
+            txtAddress.Text = ExtractAddressDetail(address, zone);
+            UpdateSelectedDeliveryZone();
+        }
+
+        private DeliveryZoneDto? FindZoneFromAddress(string address)
+        {
+            return _deliveryZones
+                .OrderByDescending(zone => $"{zone.Province} {zone.City} {zone.District}".Length)
+                .FirstOrDefault(zone =>
+                    address.StartsWith($"{zone.Province} {zone.City} {zone.District}", StringComparison.OrdinalIgnoreCase) ||
+                    address.StartsWith(zone.DisplayName, StringComparison.OrdinalIgnoreCase) ||
+                    address.StartsWith($"{zone.Province}{zone.City}{zone.District}", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static string ExtractAddressDetail(string address, DeliveryZoneDto zone)
+        {
+            var prefixes = new[]
+            {
+                $"{zone.Province} {zone.City} {zone.District}",
+                zone.DisplayName,
+                $"{zone.Province}{zone.City}{zone.District}"
+            };
+
+            foreach (var prefix in prefixes.Where(prefix => !string.IsNullOrWhiteSpace(prefix)))
+            {
+                if (address.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return address[prefix.Length..].Trim();
+                }
+            }
+
+            return address;
+        }
+
+        private static void SelectComboText(ComboBox comboBox, string text)
+        {
+            var index = comboBox.Items.IndexOf(text);
+            if (index >= 0)
+            {
+                comboBox.SelectedIndex = index;
+            }
+        }
+
         private void UpdateSelectedDeliveryZone()
         {
             var selectedZone = _deliveryZones.FirstOrDefault(zone =>
@@ -336,14 +408,44 @@ namespace ClientCustomer
             else
             {
                 UpdateSelectedDeliveryZone();
+                var phone = NormalizeText(txtCustomerPhone.Text);
+                var address = NormalizeText(txtAddress.Text);
+
+                if (Session.DeliveryZoneId == null)
+                {
+                    MessageBox.Show("请先选择配送区域。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(address))
+                {
+                    MessageBox.Show("请填写详细配送地址。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtAddress.Focus();
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(phone))
+                {
+                    MessageBox.Show("请填写手机号。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCustomerPhone.Focus();
+                    return;
+                }
+
+                if (!PhoneRegex.IsMatch(phone))
+                {
+                    MessageBox.Show("手机号格式不正确，请输入11位大陆手机号。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCustomerPhone.Focus();
+                    return;
+                }
+
                 Session = new OrderSession
                 {
                     OrderType = "Delivery",
-                    Phone = NormalizeText(txtCustomerPhone.Text),
+                    Phone = phone,
                     DeliveryZoneId = Session.DeliveryZoneId,
                     DeliveryRegion = Session.DeliveryRegion,
                     DeliveryFee = Session.DeliveryFee,
-                    DeliveryAddressDetail = NormalizeText(txtAddress.Text)
+                    DeliveryAddressDetail = address
                 };
             }
 

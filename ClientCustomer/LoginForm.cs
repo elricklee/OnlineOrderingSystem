@@ -18,6 +18,8 @@ public partial class LoginForm : Form
         btnLogin.Click += BtnLogin_Click;
         btnRegister.Click += BtnRegister_Click;
         btnGuest.Click += BtnGuest_Click;
+        btnChangePassword.Click += BtnChangePassword_Click;
+        btnForgotPassword.Click += BtnForgotPassword_Click;
     }
 
     private async void BtnLogin_Click(object? sender, EventArgs e)
@@ -83,5 +85,17 @@ public partial class LoginForm : Form
         LoggedInUser = null;
         DialogResult = DialogResult.OK;
         Close();
+    }
+
+    private void BtnChangePassword_Click(object? sender, EventArgs e)
+    {
+        using var form = new ChangePasswordForm();
+        form.ShowDialog(this);
+    }
+
+    private void BtnForgotPassword_Click(object? sender, EventArgs e)
+    {
+        using var form = new ForgotPasswordForm();
+        form.ShowDialog(this);
     }
 }

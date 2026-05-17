@@ -10,6 +10,9 @@ namespace ClientCustomer.Models
         [JsonProperty("name")]
         public string Name { get; set; } = "";
 
+        [JsonProperty("categoryId")]
+        public int? CategoryId { get; set; }
+
         [JsonProperty("category")]
         public string Category { get; set; } = "";
 
@@ -27,5 +30,8 @@ namespace ClientCustomer.Models
 
         [JsonProperty("description")]
         public string? Description { get; set; }
+
+        [JsonProperty("saleStatus")]
+        public string SaleStatus { get; set; } = "OnSale";
     }
 }

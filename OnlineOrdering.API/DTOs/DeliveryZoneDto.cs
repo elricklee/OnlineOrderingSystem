@@ -12,6 +12,7 @@ namespace OnlineOrdering.API.DTOs
         public bool IsActive { get; set; }
         public int SortOrder { get; set; }
         public string DisplayName { get; set; } = string.Empty;
+        public bool IsDeleted { get; set; }
     }
 
     public class DeliveryZoneCreateUpdateDto

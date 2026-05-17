@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineOrdering.API.DTOs;
+using OnlineOrdering.API.Models;
+using OnlineOrdering.API.Security;
 using OnlineOrdering.API.Services;
 
 namespace OnlineOrdering.API.Controllers
@@ -12,6 +14,7 @@ namespace OnlineOrdering.API.Controllers
         public OrdersController(IOrderService orderService) => _orderService = orderService;
 
         [HttpGet]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -25,10 +28,16 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpGet("user/{userId}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin, UserRoles.Customer)]
         public async Task<IActionResult> GetByUserId(int userId)
         {
             try
             {
+                if (!ClientRequestContext.IsAdmin(HttpContext) && ClientRequestContext.GetUserId(HttpContext) != userId)
+                {
+                    return StatusCode(403, new { message = "只能查看自己的订单。" });
+                }
+
                 return Ok(await _orderService.GetOrdersByUserIdAsync(userId));
             }
             catch (Exception ex)
@@ -38,12 +47,23 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin, UserRoles.Customer)]
         public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var order = await _orderService.GetOrderByIdAsync(id);
-                return order == null ? NotFound(new { message = "订单不存在" }) : Ok(order);
+                if (order == null)
+                {
+                    return NotFound(new { message = "订单不存在" });
+                }
+
+                if (!ClientRequestContext.IsAdmin(HttpContext) && ClientRequestContext.GetUserId(HttpContext) != order.UserId)
+                {
+                    return StatusCode(403, new { message = "只能查看自己的订单详情。" });
+                }
+
+                return Ok(order);
             }
             catch (Exception ex)
             {
@@ -52,10 +72,18 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpPost]
+        [RequireClientRole(UserRoles.Customer)]
         public async Task<IActionResult> Create(OrderCreateDto dto)
         {
             try
             {
+                var userId = ClientRequestContext.GetUserId(HttpContext);
+                if (userId == null)
+                {
+                    return StatusCode(403, new { message = "请先登录顾客账号后再下单。" });
+                }
+
+                dto.UserId = userId.Value;
                 var order = await _orderService.CreateOrderAsync(dto);
                 return CreatedAtAction(nameof(GetAll), new { id = order.Id }, order);
             }
@@ -70,6 +98,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpPut("{id}/status")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] OrderUpdateStatusDto dto)
         {
             try
@@ -87,14 +116,19 @@ namespace OnlineOrdering.API.Controllers
             }
         }
 
-        //逻辑删除订单
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpGet("{id}/status-history")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+        public async Task<IActionResult> GetStatusHistory(int id)
         {
             try
             {
-                var ok = await _orderService.DeleteOrderAsync(id);
-                return ok ? NoContent() : NotFound(new { message = "订单不存在" });
+                var order = await _orderService.GetOrderByIdAsync(id);
+                if (order == null)
+                {
+                    return NotFound(new { message = "订单不存在" });
+                }
+
+                return Ok(await _orderService.GetStatusHistoryAsync(id));
             }
             catch (InvalidOperationException ex)
             {
@@ -102,38 +136,15 @@ namespace OnlineOrdering.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"删除订单失败：{ex.Message}" });
+                return StatusCode(500, new { message = $"获取订单状态轨迹失败：{ex.Message}" });
             }
         }
 
-        //物理删除订单
-        [HttpDelete("{id}/hard")]
-        public async Task<IActionResult> HardDelete(int id)
+        [HttpDelete("{id}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+        public IActionResult Delete(int id)
         {
-            try
-            {
-                var ok = await _orderService.HardDeleteOrderAsync(id);
-                return ok ? NoContent() : NotFound(new { message = "订单不存在" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"删除订单失败：{ex.Message}" });
-            }
-        }
-
-        //恢复逻辑删除
-        [HttpPut("{id}/restore")]
-        public async Task<IActionResult> RestoreOrder(int id)
-        {
-            try
-            {
-                var ok = await _orderService.RestoreOrderAsync(id);
-                return ok ? NoContent() : NotFound(new { message = "订单不存在" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"恢复订单失败：{ex.Message}" });
-            }
+            return BadRequest(new { message = "订单不允许业务删除，请改用状态流转取消订单。" });
         }
     }
 }

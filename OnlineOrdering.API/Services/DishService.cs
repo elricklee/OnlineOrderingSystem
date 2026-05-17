@@ -2,125 +2,230 @@ using Microsoft.EntityFrameworkCore;
 using OnlineOrdering.API.Data;
 using OnlineOrdering.API.DTOs;
 using OnlineOrdering.API.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace OnlineOrdering.API.Services
 {
     public class DishService : IDishService
     {
         private readonly AppDbContext _db;
-        public DishService(AppDbContext db) => _db = db;
+
+        public DishService(AppDbContext db)
+        {
+            _db = db;
+        }
 
         public async Task<List<DishDto>> GetAllAsync()
         {
-            //≤È—Ø ±π˝¬À“—¬ﬂº≠…æ≥˝µƒ≤À∆∑
             return await _db.Dishes
-                .Where(d => !d.IsDeleted)
-                .Select(d => new DishDto
-                {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Category = d.Category,
-                    Price = d.Price,
-                    ImagePath = d.ImagePath,
-                    SpicyLevel = d.SpicyLevel,
-                    IsAvailable = d.IsAvailable,
-                    Description = d.Description
-                }).ToListAsync();
+                .Include(d => d.CategoryEntity)
+                .OrderBy(d => d.SortOrder)
+                .ThenBy(d => d.Id)
+                .Select(MapExpression())
+                .ToListAsync();
+        }
+
+        public async Task<List<DishDto>> GetAvailableAsync()
+        {
+            return await _db.Dishes
+                .Include(d => d.CategoryEntity)
+                .Where(d => d.IsAvailable && d.SaleStatus == DishSaleStatuses.OnSale)
+                .OrderBy(d => d.SortOrder)
+                .ThenBy(d => d.Id)
+                .Select(MapExpression())
+                .ToListAsync();
+        }
+
+        public async Task<List<DishDto>> GetRecycleBinAsync()
+        {
+            return await _db.Dishes
+                .IgnoreQueryFilters()
+                .Include(d => d.CategoryEntity)
+                .Where(d => d.IsDeleted)
+                .OrderByDescending(d => d.DeletedAt)
+                .ThenByDescending(d => d.Id)
+                .Select(MapExpression())
+                .ToListAsync();
         }
 
         public async Task<DishDto?> GetByIdAsync(int id)
         {
-            //≤È—Ø ±π˝¬À“—¬ﬂº≠…æ≥˝µƒ≤À∆∑
-            var d = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
-            if (d == null) return null;
-            return new DishDto
-            {
-                Id = d.Id,
-                Name = d.Name,
-                Category = d.Category,
-                Price = d.Price,
-                ImagePath = d.ImagePath,
-                SpicyLevel = d.SpicyLevel,
-                IsAvailable = d.IsAvailable,
-                Description = d.Description
-            };
+            return await _db.Dishes
+                .Include(d => d.CategoryEntity)
+                .Where(d => d.Id == id)
+                .Select(MapExpression())
+                .FirstOrDefaultAsync();
         }
 
         public async Task<DishDto> CreateAsync(DishCreateUpdateDto dto)
         {
-            var dish = new Dish
-            {
-                Name = dto.Name,
-                Category = dto.Category,
-                Price = dto.Price,
-                ImagePath = dto.ImagePath,
-                SpicyLevel = dto.SpicyLevel,
-                IsAvailable = dto.IsAvailable,
-                Description = dto.Description,
-                IsDeleted = false //–¬‘ˆ ±ƒ¨»œŒ¥…æ≥˝
-            };
+            var dish = new Dish();
+            await ApplyChangesAsync(dish, dto);
+            dish.CreatedAt = DateTime.Now;
+            dish.UpdatedAt = DateTime.Now;
+            dish.IsDeleted = false;
+
             _db.Dishes.Add(dish);
             await _db.SaveChangesAsync();
+            return MapToDto(dish);
+        }
+
+        public async Task<bool> UpdateAsync(int id, DishCreateUpdateDto dto)
+        {
+            var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == id);
+            if (dish == null)
+            {
+                return false;
+            }
+
+            await ApplyChangesAsync(dish, dto);
+            dish.UpdatedAt = DateTime.Now;
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(int id, DishDeleteDto? dto)
+        {
+            var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == id);
+            if (dish == null)
+            {
+                return false;
+            }
+
+            dish.IsDeleted = true;
+            dish.IsAvailable = false;
+            dish.SaleStatus = DishSaleStatuses.OffSale;
+            dish.DeletedAt = DateTime.Now;
+            dish.DeletedByUserId = null;
+            dish.DeleteReason = string.IsNullOrWhiteSpace(dto?.DeleteReason) ? "ÁÆ°ÁêÜÂëòÈöêËóèËèúÂìÅ" : dto!.DeleteReason!.Trim();
+            dish.UpdatedAt = DateTime.Now;
+
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RestoreDeletedAsync(int id)
+        {
+            var dish = await _db.Dishes
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(d => d.Id == id && d.IsDeleted);
+            if (dish == null)
+            {
+                return false;
+            }
+
+            dish.IsDeleted = false;
+            dish.DeletedAt = null;
+            dish.DeletedByUserId = null;
+            dish.DeleteReason = null;
+            dish.UpdatedAt = DateTime.Now;
+
+            if (string.IsNullOrWhiteSpace(dish.SaleStatus))
+            {
+                dish.SaleStatus = DishSaleStatuses.OffSale;
+            }
+
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateSaleStatusAsync(int id, string saleStatus)
+        {
+            if (saleStatus != DishSaleStatuses.OnSale &&
+                saleStatus != DishSaleStatuses.OffSale &&
+                saleStatus != DishSaleStatuses.OutOfStock)
+            {
+                throw new InvalidOperationException("‰∏çÊîØÊåÅÁöÑËèúÂìÅÈîÄÂîÆÁä∂ÊÄÅ„ÄÇ");
+            }
+
+            var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == id);
+            if (dish == null)
+            {
+                return false;
+            }
+
+            dish.SaleStatus = saleStatus;
+            dish.IsAvailable = saleStatus == DishSaleStatuses.OnSale;
+            dish.UpdatedAt = DateTime.Now;
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task ApplyChangesAsync(Dish dish, DishCreateUpdateDto dto)
+        {
+            var category = await ResolveCategoryAsync(dto);
+
+            dish.Name = dto.Name.Trim();
+            dish.CategoryId = category?.Id;
+            dish.Category = category?.Name ?? dto.Category.Trim();
+            dish.Price = dto.Price;
+            dish.ImagePath = string.IsNullOrWhiteSpace(dto.ImagePath) ? null : dto.ImagePath.Trim();
+            dish.SpicyLevel = dto.SpicyLevel;
+            dish.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
+            dish.SortOrder = dto.SortOrder;
+            dish.SaleStatus = string.IsNullOrWhiteSpace(dto.SaleStatus) ? DishSaleStatuses.OnSale : dto.SaleStatus.Trim();
+            dish.IsAvailable = dto.IsAvailable && dish.SaleStatus == DishSaleStatuses.OnSale;
+        }
+
+        private async Task<DishCategory?> ResolveCategoryAsync(DishCreateUpdateDto dto)
+        {
+            if (dto.CategoryId.HasValue)
+            {
+                var categoryEntity = await _db.DishCategories.FirstOrDefaultAsync(c => c.Id == dto.CategoryId.Value && c.IsEnabled);
+                if (categoryEntity == null)
+                {
+                    throw new InvalidOperationException("ÊâÄÈÄâËèúÂìÅÂàÜÁ±ª‰∏çÂ≠òÂú®ÊàñÂ∑≤ÂÅúÁî®„ÄÇ");
+                }
+
+                return categoryEntity;
+            }
+
+            var categoryName = dto.Category.Trim();
+            if (string.IsNullOrWhiteSpace(categoryName))
+            {
+                throw new InvalidOperationException("ËèúÂìÅÂàÜÁ±ª‰∏çËÉΩ‰∏∫Á©∫„ÄÇ");
+            }
+
+            return await _db.DishCategories.FirstOrDefaultAsync(c => c.Name == categoryName && c.IsEnabled);
+        }
+
+        private static DishDto MapToDto(Dish dish)
+        {
             return new DishDto
             {
                 Id = dish.Id,
                 Name = dish.Name,
+                CategoryId = dish.CategoryId,
                 Category = dish.Category,
                 Price = dish.Price,
                 ImagePath = dish.ImagePath,
                 SpicyLevel = dish.SpicyLevel,
                 IsAvailable = dish.IsAvailable,
-                Description = dish.Description
+                Description = dish.Description,
+                SaleStatus = dish.SaleStatus,
+                SortOrder = dish.SortOrder,
+                DeletedAt = dish.DeletedAt,
+                DeleteReason = dish.DeleteReason
             };
         }
 
-        public async Task<bool> UpdateAsync(int id, DishCreateUpdateDto dto)
+        private static System.Linq.Expressions.Expression<Func<Dish, DishDto>> MapExpression()
         {
-            //÷ª∏¸–¬Œ¥…æ≥˝µƒ≤À∆∑
-            var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
-            if (dish == null) return false;
-            dish.Name = dto.Name;
-            dish.Category = dto.Category;
-            dish.Price = dto.Price;
-            dish.ImagePath = dto.ImagePath;
-            dish.SpicyLevel = dto.SpicyLevel;
-            dish.IsAvailable = dto.IsAvailable;
-            dish.Description = dto.Description;
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        //¬ﬂº≠…æ≥˝£∫Ωˆ±Íº«IsDeleted=true
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
-            if (dish == null) return false;
-            dish.IsDeleted = true; //±Íº«Œ™“—…æ≥˝
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        //ŒÔ¿Ì…æ≥˝,÷±Ω”…æ≥˝ ˝æ›ø‚º«¬º
-        public async Task<bool> HardDeleteAsync(int id)
-        {
-            var dish = await _db.Dishes.FindAsync(id);
-            if (dish == null) return false;
-            _db.Dishes.Remove(dish);
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        //ª÷∏¥¬ﬂº≠…æ≥˝µƒ≤À∆∑
-        public async Task<bool> RestoreDeletedAsync(int id)
-        {
-            var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == id && d.IsDeleted);
-            if (dish == null) return false;
-
-            dish.IsDeleted = false; //ª÷∏¥
-            await _db.SaveChangesAsync();
-            return true;
+            return dish => new DishDto
+            {
+                Id = dish.Id,
+                Name = dish.Name,
+                CategoryId = dish.CategoryId,
+                Category = dish.Category,
+                Price = dish.Price,
+                ImagePath = dish.ImagePath,
+                SpicyLevel = dish.SpicyLevel,
+                IsAvailable = dish.IsAvailable,
+                Description = dish.Description,
+                SaleStatus = dish.SaleStatus,
+                SortOrder = dish.SortOrder,
+                DeletedAt = dish.DeletedAt,
+                DeleteReason = dish.DeleteReason
+            };
         }
     }
 }

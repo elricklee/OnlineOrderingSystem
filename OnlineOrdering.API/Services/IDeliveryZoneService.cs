@@ -8,6 +8,7 @@ namespace OnlineOrdering.API.Services
         Task<DeliveryZoneDto?> GetByIdAsync(int id);
         Task<DeliveryZoneDto> CreateAsync(DeliveryZoneCreateUpdateDto dto);
         Task<bool> UpdateAsync(int id, DeliveryZoneCreateUpdateDto dto);
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DisableAsync(int id);
+        Task<bool> RestoreAsync(int id);
     }
 }

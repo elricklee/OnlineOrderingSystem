@@ -12,7 +12,8 @@ namespace ClientCustomer
         private readonly List<DishDto> _allDishes = new();
         private readonly List<CartItem> _cart = new();
 
-        private string _selectedCategory = "全部";
+        private const string AllCategoryText = "菜品总览";
+        private string _selectedCategory = AllCategoryText;
         private bool _eventsBound;
 
         private static readonly Color PrimaryColor = Color.FromArgb(255, 109, 0);
@@ -62,13 +63,6 @@ namespace ClientCustomer
             }
 
             _eventsBound = true;
-            btnSearch.Click += BtnSearch_Click;
-            btnRefresh.Click += BtnRefresh_Click;
-            btnBack.Click += BtnBack_Click;
-            btnCheckOrder.Click += BtnCheckOrder_Click;
-            btnViewCart.Click += BtnViewCart_Click;
-            btnCheckout.Click += BtnCheckout_Click;
-            btnGetRecommend.Click += BtnGetRecommend_Click;
             txtSearch.KeyDown += TxtSearch_KeyDown;
         }
 
@@ -82,6 +76,12 @@ namespace ClientCustomer
                 lblTitle.Text = $"珞珈线上点餐系统 - 欢迎，{Program.CurrentUser.RealName ?? Program.CurrentUser.Username}";
                 btnCheckOrder.Text = "我的订单";
             }
+            else if (Program.IsGuestMode)
+            {
+                lblTitle.Text = "珞珈线上点餐系统 - 游客浏览";
+                btnCheckOrder.Text = "游客说明";
+                btnBack.Text = "返回登录";
+            }
             else
             {
                 btnCheckOrder.Text = "查订单";
@@ -93,6 +93,7 @@ namespace ClientCustomer
             btnViewCart.Text = "购物车";
             btnCheckout.Text = "去结算";
             btnGetRecommend.Text = "获取推荐";
+            btnLogout.Text = Program.IsGuestMode ? "退出游客" : Program.CurrentUser == null ? "退出" : "退出登录";
             lblAITitle.Text = "AI 推荐";
             lblAIText.Text = "先挑几道菜，AI 会帮你推荐更搭配的组合。";
             lblAIText.ForeColor = TextSecondaryColor;
@@ -103,9 +104,18 @@ namespace ClientCustomer
             StyleActionButton(btnRefresh, Color.White, PrimaryDarkColor);
             StyleActionButton(btnBack, Color.White, PrimaryDarkColor);
             StyleActionButton(btnCheckOrder, Color.White, PrimaryDarkColor);
+            StyleActionButton(btnLogout, Color.White, PrimaryDarkColor);
             StyleActionButton(btnViewCart, PrimaryColor, Color.White);
             StyleActionButton(btnCheckout, Color.FromArgb(44, 62, 80), Color.White);
             StyleActionButton(btnGetRecommend, Color.FromArgb(46, 125, 50), Color.White);
+
+            if (Program.IsGuestMode)
+            {
+                btnViewCart.Enabled = false;
+                btnCheckout.Enabled = false;
+                btnCheckOrder.Enabled = true;
+                lblAIText.Text = "游客模式下可以浏览菜品和查看推荐，登录后才能加入购物车并下单。";
+            }
         }
 
         private static void StyleActionButton(UIButton button, Color fillColor, Color foreColor)
@@ -122,6 +132,12 @@ namespace ClientCustomer
             if (_session.OrderType == "DineIn")
             {
                 lblOrderInfo.Text = $"[堂食 · 桌号：{_session.TableNumber ?? "未选择"}]";
+                return;
+            }
+
+            if (_session.OrderType == "Browse")
+            {
+                lblOrderInfo.Text = "[游客浏览模式 · 仅可查看菜品]";
                 return;
             }
 
@@ -166,9 +182,9 @@ namespace ClientCustomer
                 .ToList();
 
             categoryFlow.Controls.Clear();
-            categoryFlow.WrapContents = true;
+            categoryFlow.WrapContents = false;
 
-            CreateCategoryButton("全部", true);
+            CreateCategoryButton(AllCategoryText, true);
             foreach (var category in categoryList)
             {
                 CreateCategoryButton(category, false);
@@ -218,10 +234,10 @@ namespace ClientCustomer
         {
             var card = new Panel
             {
-                Width = 220,
-                Height = 310,
+                Width = 244,
+                Height = 330,
                 BackColor = SurfaceColor,
-                Margin = new Padding(8)
+                Margin = new Padding(10)
             };
 
             card.Paint += (_, e) =>
@@ -233,8 +249,8 @@ namespace ClientCustomer
 
             var pictureBox = new PictureBox
             {
-                Size = new Size(200, 100),
-                Location = new Point(10, 10),
+                Size = new Size(220, 112),
+                Location = new Point(12, 12),
                 SizeMode = PictureBoxSizeMode.Zoom,
                 BackColor = Color.FromArgb(248, 248, 248)
             };
@@ -245,18 +261,19 @@ namespace ClientCustomer
                 Text = dish.Name,
                 Font = new Font("微软雅黑", 11F, FontStyle.Bold),
                 ForeColor = TextColor,
-                Location = new Point(10, 118),
-                Size = new Size(200, 26),
+                Location = new Point(12, 132),
+                Size = new Size(220, 28),
+                AutoEllipsis = true,
                 TagString = null
             };
 
             var lblPrice = new UILabel
             {
                 Text = $"¥{dish.Price:0.##}",
-                Font = new Font("微软雅黑", 14F, FontStyle.Bold),
+                Font = new Font("微软雅黑", 15F, FontStyle.Bold),
                 ForeColor = PrimaryColor,
-                Location = new Point(10, 146),
-                Size = new Size(90, 26),
+                Location = new Point(12, 162),
+                Size = new Size(112, 30),
                 TagString = null
             };
 
@@ -265,48 +282,53 @@ namespace ClientCustomer
                 Text = GetSpicyDisplay(dish.SpicyLevel),
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = dish.SpicyLevel > 0 ? DangerColor : SuccessColor,
-                Location = new Point(105, 150),
-                Size = new Size(105, 22),
+                Location = new Point(128, 166),
+                Size = new Size(104, 24),
                 TextAlign = ContentAlignment.MiddleRight,
                 TagString = null
             };
 
+            var description = string.IsNullOrWhiteSpace(dish.Description) || dish.Description.Trim() == "空"
+                ? string.Empty
+                : $"  {dish.Description.Trim()}";
+
             var lblDesc = new UILabel
             {
-                Text = TruncateText(dish.Description ?? string.Empty, 20),
+                Text = $"分类：{dish.Category}{description}",
                 Font = new Font("微软雅黑", 8.5F),
-                ForeColor = TextSecondaryColor,
-                Location = new Point(10, 176),
-                Size = new Size(200, 22),
+                ForeColor = PrimaryDarkColor,
+                Location = new Point(12, 198),
+                Size = new Size(220, 24),
+                AutoEllipsis = true,
                 TagString = null
             };
 
             var lblQuantity = new UILabel
             {
-                Text = "数量",
+                Text = "数量：",
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = TextSecondaryColor,
-                Location = new Point(10, 210),
-                Size = new Size(40, 22),
+                Location = new Point(12, 236),
+                Size = new Size(72, 26),
                 TagString = null
             };
 
             var quantityInput = new NumericUpDown
             {
                 Font = new Font("微软雅黑", 10F),
-                Location = new Point(55, 206),
+                Location = new Point(86, 232),
                 Minimum = 1,
                 Maximum = 99,
                 Value = 1,
-                Size = new Size(60, 30),
+                Size = new Size(72, 30),
                 TextAlign = HorizontalAlignment.Center
             };
 
             var btnAdd = new UIButton
             {
                 Text = "加入购物车",
-                Size = new Size(200, 36),
-                Location = new Point(10, 248),
+                Size = new Size(220, 38),
+                Location = new Point(12, 276),
                 Font = new Font("微软雅黑", 10F, FontStyle.Bold),
                 FillColor = PrimaryColor,
                 RectColor = PrimaryColor,
@@ -316,6 +338,14 @@ namespace ClientCustomer
                 TagString = null
             };
             btnAdd.Click += (_, _) => AddToCart(dish, (int)quantityInput.Value);
+
+            if (Program.IsGuestMode)
+            {
+                btnAdd.Enabled = false;
+                btnAdd.Text = "登录后可下单";
+                btnAdd.FillColor = Color.FromArgb(189, 189, 189);
+                btnAdd.RectColor = Color.FromArgb(189, 189, 189);
+            }
 
             card.Controls.AddRange(
                 new Control[]
@@ -391,6 +421,12 @@ namespace ClientCustomer
 
         private void AddToCart(DishDto dish, int quantity)
         {
+            if (Program.IsGuestMode)
+            {
+                UIMessageTip.ShowWarning("游客模式仅支持浏览菜品，请先登录后再下单。");
+                return;
+            }
+
             var existingItem = _cart.FirstOrDefault(c => c.DishId == dish.Id);
             if (existingItem != null)
             {
@@ -413,6 +449,12 @@ namespace ClientCustomer
 
         private void UpdateCartBar()
         {
+            if (Program.IsGuestMode)
+            {
+                lblCartSummary.Text = "游客模式：当前仅可浏览菜品，登录后可加入购物车并下单";
+                return;
+            }
+
             if (_cart.Count == 0)
             {
                 lblCartSummary.Text = "购物车：空";
@@ -466,7 +508,7 @@ namespace ClientCustomer
         {
             IEnumerable<DishDto> filtered = _allDishes;
 
-            if (_selectedCategory != "全部")
+            if (_selectedCategory != AllCategoryText)
             {
                 filtered = filtered.Where(d => d.Category == _selectedCategory);
             }
@@ -519,7 +561,7 @@ namespace ClientCustomer
 
         private void BtnBack_Click(object? sender, EventArgs e)
         {
-            DialogResult = DialogResult.Retry;
+            DialogResult = Program.IsGuestMode ? DialogResult.Abort : DialogResult.Retry;
             Close();
         }
 
@@ -530,11 +572,23 @@ namespace ClientCustomer
                 using var orderHistoryForm = new OrderHistoryForm(Program.CurrentUser.Id);
                 orderHistoryForm.ShowDialog(this);
             }
+            else if (Program.IsGuestMode)
+            {
+                MessageBox.Show("游客模式仅支持浏览菜品，不支持购物车、下单和个人订单查询。", "游客说明", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             else
             {
                 using var orderStatusForm = new OrderStatusForm();
                 orderStatusForm.ShowDialog(this);
             }
+        }
+
+        private void BtnLogout_Click(object? sender, EventArgs e)
+        {
+            Program.CurrentUser = null;
+            Program.IsGuestMode = false;
+            DialogResult = DialogResult.Abort;
+            Close();
         }
 
         private void BtnViewCart_Click(object? sender, EventArgs e)
@@ -549,6 +603,12 @@ namespace ClientCustomer
 
         private void OpenCartDialog()
         {
+            if (Program.IsGuestMode)
+            {
+                UIMessageTip.ShowWarning("游客模式不能加入购物车或结算，请先登录。");
+                return;
+            }
+
             if (_cart.Count == 0)
             {
                 UIMessageTip.ShowWarning("购物车为空，请先选择菜品");

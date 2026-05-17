@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineOrdering.API.DTOs;
+using OnlineOrdering.API.Models;
+using OnlineOrdering.API.Security;
 using OnlineOrdering.API.Services;
 using System.Threading.Tasks;
 
@@ -7,6 +9,7 @@ namespace OnlineOrdering.API.Controllers
 {
 	[Route("api/statistics")]
 	[ApiController]
+	[RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
 	public class StatisticsController : ControllerBase
 	{
 		private readonly IStatisticsService _statisticsService;

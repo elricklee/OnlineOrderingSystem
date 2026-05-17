@@ -12,7 +12,7 @@ namespace ClientAdmin.Models
 
         public int OrderId { get; set; }
 
-        public int DishId { get; set; }
+        public int? DishId { get; set; }
 
         public string DishName { get; set; } = "";
 

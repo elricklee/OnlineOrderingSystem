@@ -1,12 +1,14 @@
 using ClientCustomer.Models;
 using Sunny.UI;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace ClientCustomer
 {
     public partial class CartForm : UIForm
     {
+        private static readonly Regex PhoneRegex = new("^1[3-9]\\d{9}$", RegexOptions.Compiled);
         private readonly List<CartItem> _cart;
         private readonly OrderSession _session;
         private readonly List<DeliveryZoneDto> _deliveryZones = new();
@@ -108,6 +110,7 @@ namespace ClientCustomer
                 _deliveryZones.Clear();
                 _deliveryZones.AddRange(zones.OrderBy(zone => zone.SortOrder).ThenBy(zone => zone.DisplayName));
                 BindProvinces();
+                SelectDeliveryZoneFromSession();
                 UpdateTotals();
             }
             catch (Exception ex)
@@ -168,6 +171,42 @@ namespace ClientCustomer
             if (comboBox.Items.Count > 0)
             {
                 comboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void SelectDeliveryZoneFromSession()
+        {
+            DeliveryZoneDto? selectedZone = null;
+
+            if (_session.DeliveryZoneId != null)
+            {
+                selectedZone = _deliveryZones.FirstOrDefault(zone => zone.Id == _session.DeliveryZoneId);
+            }
+
+            if (selectedZone == null && !string.IsNullOrWhiteSpace(_session.DeliveryRegion))
+            {
+                selectedZone = _deliveryZones.FirstOrDefault(zone =>
+                    string.Equals(zone.DisplayName, _session.DeliveryRegion, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals($"{zone.Province} {zone.City} {zone.District}", _session.DeliveryRegion, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (selectedZone == null)
+            {
+                return;
+            }
+
+            SelectComboText(cmbDeliveryProvince, selectedZone.Province);
+            SelectComboText(cmbDeliveryCity, selectedZone.City);
+            SelectComboText(cmbDeliveryDistrict, selectedZone.District);
+            UpdateSelectedDeliveryZone();
+        }
+
+        private static void SelectComboText(UIComboBox comboBox, string text)
+        {
+            var index = comboBox.Items.IndexOf(text);
+            if (index >= 0)
+            {
+                comboBox.SelectedIndex = index;
             }
         }
 
@@ -330,8 +369,8 @@ namespace ClientCustomer
                 var orderCreate = new OrderCreateDto
                 {
                     UserId = Program.CurrentUser?.Id,
-                    CustomerName = _session.OrderType == "DineIn" ? $"桌号{_session.TableNumber}" : "外卖顾客",
-                    Phone = _session.Phone ?? string.Empty,
+                    CustomerName = GetCurrentCustomerName(),
+                    Phone = _session.Phone ?? Program.CurrentUser?.Phone ?? string.Empty,
                     OrderType = _session.OrderType,
                     TableNumber = _session.TableNumber,
                     DiningTableId = _session.DiningTableId,
@@ -406,6 +445,18 @@ namespace ClientCustomer
                 return false;
             }
 
+            if (string.IsNullOrWhiteSpace(_session.Phone))
+            {
+                errorMessage = "请填写手机号后再提交订单。";
+                return false;
+            }
+
+            if (!PhoneRegex.IsMatch(_session.Phone))
+            {
+                errorMessage = "手机号格式不正确，请输入11位大陆手机号。";
+                return false;
+            }
+
             return true;
         }
 
@@ -413,6 +464,21 @@ namespace ClientCustomer
         {
             var text = value?.Trim();
             return string.IsNullOrWhiteSpace(text) ? null : text;
+        }
+
+        private string GetCurrentCustomerName()
+        {
+            if (!string.IsNullOrWhiteSpace(Program.CurrentUser?.RealName))
+            {
+                return Program.CurrentUser.RealName.Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(Program.CurrentUser?.Username))
+            {
+                return Program.CurrentUser.Username.Trim();
+            }
+
+            return _session.OrderType == "DineIn" ? $"桌号{_session.TableNumber}" : "外卖顾客";
         }
 
         private static string GetStatusText(string status)
@@ -426,7 +492,7 @@ namespace ClientCustomer
                 "Delivering" => "配送中",
                 "Completed" => "已完成",
                 "Cancelled" => "已取消",
-                _ => status
+                _ => "未知状态"
             };
         }
 

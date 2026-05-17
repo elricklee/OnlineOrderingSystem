@@ -24,6 +24,7 @@ partial class OrderStatusForm
         lblHint = new Sunny.UI.UILabel();
         txtOrderId = new Sunny.UI.UITextBox();
         btnQuery = new Sunny.UI.UIButton();
+        btnClose = new Sunny.UI.UIButton();
         grpOrderInfo = new Sunny.UI.UIGroupBox();
         lblOrderId = new Sunny.UI.UILabel();
         lblOrderType = new Sunny.UI.UILabel();
@@ -69,6 +70,7 @@ partial class OrderStatusForm
         queryPanel.Controls.Add(lblHint);
         queryPanel.Controls.Add(txtOrderId);
         queryPanel.Controls.Add(btnQuery);
+        queryPanel.Controls.Add(btnClose);
         queryPanel.Dock = DockStyle.Fill;
         queryPanel.FillColor = Color.FromArgb(250, 250, 250);
         queryPanel.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -122,6 +124,22 @@ partial class OrderStatusForm
         btnQuery.Text = "查询";
         btnQuery.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         btnQuery.Click += BtnQuery_Click;
+        // 
+        // btnClose
+        // 
+        btnClose.Cursor = Cursors.Hand;
+        btnClose.FillColor = Color.FromArgb(158, 158, 158);
+        btnClose.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+        btnClose.Location = new Point(535, 14);
+        btnClose.MinimumSize = new Size(1, 1);
+        btnClose.Name = "btnClose";
+        btnClose.Radius = 6;
+        btnClose.RectColor = Color.FromArgb(158, 158, 158);
+        btnClose.Size = new Size(110, 36);
+        btnClose.TabIndex = 3;
+        btnClose.Text = "关闭";
+        btnClose.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        btnClose.Click += BtnClose_Click;
         // 
         // grpOrderInfo
         // 
@@ -340,6 +358,7 @@ partial class OrderStatusForm
     private Sunny.UI.UILabel lblHint;
     private Sunny.UI.UITextBox txtOrderId;
     private Sunny.UI.UIButton btnQuery;
+    private Sunny.UI.UIButton btnClose;
     private Sunny.UI.UIGroupBox grpOrderInfo;
     private Sunny.UI.UILabel lblOrderId;
     private Sunny.UI.UILabel lblOrderType;

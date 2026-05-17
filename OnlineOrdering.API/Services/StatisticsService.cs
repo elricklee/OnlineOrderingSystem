@@ -25,10 +25,11 @@ namespace OnlineOrdering.API.Services
             return await _db.OrderItems
                 .AsNoTracking()
                 .Where(item => filteredOrders.Select(order => order.Id).Contains(item.OrderId))
+                .Where(item => item.DishId.HasValue)
                 .GroupBy(o => new { o.DishId, o.DishName, o.Price })
                 .Select(g => new TopDishDto
                 {
-                    DishId = g.Key.DishId,
+                    DishId = g.Key.DishId!.Value,
                     DishName = g.Key.DishName,
                     TotalQuantity = g.Sum(x => x.Quantity),
                     TotalRevenue = g.Sum(x => x.Quantity * x.Price)
@@ -56,7 +57,7 @@ namespace OnlineOrdering.API.Services
 
         private IQueryable<Order> FilterOrders(IQueryable<Order> query, DateTime? startDate, DateTime? endDate)
         {
-            query = query.Where(order => order.Status == "Completed");
+            query = query.Where(order => order.Status == OrderStatuses.Completed);
 
             if (startDate.HasValue)
             {

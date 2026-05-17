@@ -23,6 +23,8 @@ partial class LoginForm
         btnLogin = new Sunny.UI.UIButton();
         btnRegister = new Sunny.UI.UIButton();
         btnGuest = new Sunny.UI.UIButton();
+        btnChangePassword = new Sunny.UI.UIButton();
+        btnForgotPassword = new Sunny.UI.UIButton();
         panelMain = new Sunny.UI.UIPanel();
         panelMain.SuspendLayout();
         SuspendLayout();
@@ -129,8 +131,40 @@ partial class LoginForm
         btnGuest.RectColor = Color.FromArgb(117, 117, 117);
         btnGuest.Size = new Size(200, 36);
         btnGuest.TabIndex = 7;
-        btnGuest.Text = "游客模式点餐";
+        btnGuest.Text = "游客浏览菜品";
         btnGuest.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        // 
+        // btnChangePassword
+        // 
+        btnChangePassword.Cursor = Cursors.Hand;
+        btnChangePassword.FillColor = Color.White;
+        btnChangePassword.Font = new Font("微软雅黑", 10F);
+        btnChangePassword.ForeColor = Color.FromArgb(255, 109, 0);
+        btnChangePassword.Location = new Point(60, 322);
+        btnChangePassword.MinimumSize = new Size(1, 1);
+        btnChangePassword.Name = "btnChangePassword";
+        btnChangePassword.Radius = 8;
+        btnChangePassword.RectColor = Color.FromArgb(255, 109, 0);
+        btnChangePassword.Size = new Size(160, 34);
+        btnChangePassword.TabIndex = 8;
+        btnChangePassword.Text = "修改密码";
+        btnChangePassword.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+        // 
+        // btnForgotPassword
+        // 
+        btnForgotPassword.Cursor = Cursors.Hand;
+        btnForgotPassword.FillColor = Color.White;
+        btnForgotPassword.Font = new Font("微软雅黑", 10F);
+        btnForgotPassword.ForeColor = Color.FromArgb(51, 122, 183);
+        btnForgotPassword.Location = new Point(230, 322);
+        btnForgotPassword.MinimumSize = new Size(1, 1);
+        btnForgotPassword.Name = "btnForgotPassword";
+        btnForgotPassword.Radius = 8;
+        btnForgotPassword.RectColor = Color.FromArgb(51, 122, 183);
+        btnForgotPassword.Size = new Size(160, 34);
+        btnForgotPassword.TabIndex = 9;
+        btnForgotPassword.Text = "忘记密码";
+        btnForgotPassword.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         // 
         // panelMain
         // 
@@ -142,6 +176,8 @@ partial class LoginForm
         panelMain.Controls.Add(btnLogin);
         panelMain.Controls.Add(btnRegister);
         panelMain.Controls.Add(btnGuest);
+        panelMain.Controls.Add(btnChangePassword);
+        panelMain.Controls.Add(btnForgotPassword);
         panelMain.Dock = DockStyle.Fill;
         panelMain.FillColor = Color.White;
         panelMain.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -149,7 +185,7 @@ partial class LoginForm
         panelMain.Margin = new Padding(4, 5, 4, 5);
         panelMain.MinimumSize = new Size(1, 1);
         panelMain.Name = "panelMain";
-        panelMain.Size = new Size(480, 360);
+        panelMain.Size = new Size(480, 382);
         panelMain.TabIndex = 0;
         panelMain.Text = null;
         panelMain.TextAlignment = ContentAlignment.MiddleCenter;
@@ -158,7 +194,7 @@ partial class LoginForm
         // 
         AutoScaleMode = AutoScaleMode.None;
         BackColor = Color.White;
-        ClientSize = new Size(480, 360);
+        ClientSize = new Size(480, 382);
         Controls.Add(panelMain);
         Font = new Font("微软雅黑", 10F);
         FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -179,5 +215,7 @@ partial class LoginForm
     private Sunny.UI.UIButton btnLogin;
     private Sunny.UI.UIButton btnRegister;
     private Sunny.UI.UIButton btnGuest;
+    private Sunny.UI.UIButton btnChangePassword;
+    private Sunny.UI.UIButton btnForgotPassword;
     private Sunny.UI.UIPanel panelMain;
 }

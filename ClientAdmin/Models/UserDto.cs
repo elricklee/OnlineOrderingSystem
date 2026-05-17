@@ -31,21 +31,6 @@ public class UserDto
 
 public class UpdateUserRequest
 {
-    [JsonPropertyName("realName")]
-    public string? RealName { get; set; }
-
-    [JsonPropertyName("phone")]
-    public string? Phone { get; set; }
-
-    [JsonPropertyName("address")]
-    public string? Address { get; set; }
-
     [JsonPropertyName("isActive")]
     public bool IsActive { get; set; }
-}
-
-public class ResetPasswordRequest
-{
-    [JsonPropertyName("newPassword")]
-    public string NewPassword { get; set; } = string.Empty;
 }

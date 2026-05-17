@@ -14,31 +14,53 @@ namespace ClientCustomer
         {
             ApplicationConfiguration.Initialize();
 
-            using (var loginForm = new LoginForm())
+            var restartLogin = true;
+            while (restartLogin)
             {
-                if (loginForm.ShowDialog() != DialogResult.OK)
+                restartLogin = false;
+
+                using (var loginForm = new LoginForm())
                 {
-                    return;
+                    if (loginForm.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    CurrentUser = loginForm.LoggedInUser;
+                    IsGuestMode = loginForm.IsGuestMode;
                 }
 
-                CurrentUser = loginForm.LoggedInUser;
-                IsGuestMode = loginForm.IsGuestMode;
-            }
-
-            bool restartOrderType = true;
-            while (restartOrderType)
-            {
-                restartOrderType = false;
-
-                using (var orderTypeForm = new OrderTypeForm())
+                if (IsGuestMode)
                 {
-                    if (orderTypeForm.ShowDialog() == DialogResult.OK)
+                    using var guestForm = new Form1(new OrderSession { OrderType = "Browse" });
+                    var guestResult = guestForm.ShowDialog();
+                    if (guestResult == DialogResult.Abort)
                     {
-                        var mainForm = new Form1(orderTypeForm.Session);
+                        restartLogin = true;
+                    }
+                    continue;
+                }
 
-                        if (mainForm.ShowDialog() == DialogResult.Retry)
+                bool restartOrderType = true;
+                while (restartOrderType)
+                {
+                    restartOrderType = false;
+
+                    using (var orderTypeForm = new OrderTypeForm())
+                    {
+                        if (orderTypeForm.ShowDialog() == DialogResult.OK)
                         {
-                            restartOrderType = true;
+                            var mainForm = new Form1(orderTypeForm.Session);
+                            var mainResult = mainForm.ShowDialog();
+
+                            if (mainResult == DialogResult.Retry)
+                            {
+                                restartOrderType = true;
+                            }
+                            else if (mainResult == DialogResult.Abort)
+                            {
+                                restartLogin = true;
+                            }
                         }
                     }
                 }

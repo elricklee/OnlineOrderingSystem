@@ -1,4 +1,4 @@
-using OnlineOrdering.API.DTOs;
+ï»¿using OnlineOrdering.API.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,11 +7,13 @@ namespace OnlineOrdering.API.Services
     public interface IDishService
     {
         Task<List<DishDto>> GetAllAsync();
+        Task<List<DishDto>> GetAvailableAsync();
+        Task<List<DishDto>> GetRecycleBinAsync();
         Task<DishDto?> GetByIdAsync(int id);
         Task<DishDto> CreateAsync(DishCreateUpdateDto dto);
         Task<bool> UpdateAsync(int id, DishCreateUpdateDto dto);
-        Task<bool> DeleteAsync(int id);//Âß¼­É¾³ý
-        Task<bool> HardDeleteAsync(int id); //ÎïÀíÉ¾³ý
-        Task<bool> RestoreDeletedAsync(int id);//»Ö¸´Âß¼­É¾³ý
+        Task<bool> DeleteAsync(int id, DishDeleteDto? dto);
+        Task<bool> RestoreDeletedAsync(int id);
+        Task<bool> UpdateSaleStatusAsync(int id, string saleStatus);
     }
 }

@@ -12,8 +12,8 @@ using OnlineOrdering.API.Data;
 namespace OnlineOrdering.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260516063947_AddOrderStatusFields")]
-    partial class AddOrderStatusFields
+    [Migration("20260517073425_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,14 +37,24 @@ namespace OnlineOrdering.API.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DeletedByUserId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("DeliveryFee")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("District")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Province")
@@ -69,6 +79,18 @@ namespace OnlineOrdering.API.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CurrentOccupiedSeats")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DeletedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("tinyint(1)");
@@ -107,6 +129,21 @@ namespace OnlineOrdering.API.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeleteReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DeletedByUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
@@ -124,14 +161,56 @@ namespace OnlineOrdering.API.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("SaleStatus")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
 
                     b.Property<int>("SpicyLevel")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Dishes");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.DishCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("DishCategories");
                 });
 
             modelBuilder.Entity("OnlineOrdering.API.Models.Order", b =>
@@ -168,7 +247,8 @@ namespace OnlineOrdering.API.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("DeliveryFee")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("DeliveryPersonName")
                         .HasColumnType("longtext");
@@ -182,6 +262,9 @@ namespace OnlineOrdering.API.Migrations
                     b.Property<int?>("DeliveryZoneId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DinerCount")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DiningTableId")
                         .HasColumnType("int");
 
@@ -193,6 +276,10 @@ namespace OnlineOrdering.API.Migrations
 
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
+
+                    b.Property<string>("OrderNo")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("OrderType")
                         .IsRequired()
@@ -215,8 +302,15 @@ namespace OnlineOrdering.API.Migrations
                     b.Property<string>("TableNumber")
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("TableSessionId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
@@ -226,6 +320,11 @@ namespace OnlineOrdering.API.Migrations
                     b.HasIndex("DeliveryZoneId");
 
                     b.HasIndex("DiningTableId");
+
+                    b.HasIndex("OrderNo")
+                        .IsUnique();
+
+                    b.HasIndex("TableSessionId");
 
                     b.HasIndex("UserId");
 
@@ -240,7 +339,10 @@ namespace OnlineOrdering.API.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DishId")
+                    b.Property<string>("DishCategorySnapshot")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("DishId")
                         .HasColumnType("int");
 
                     b.Property<string>("DishName")
@@ -251,16 +353,105 @@ namespace OnlineOrdering.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DishId");
+
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.OrderStatusHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("FromStatus")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OperatorRole")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("OperatorUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ToStatus")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderStatusHistories");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.TableSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("ClosedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DiningTableId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OpenedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("OpenedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PartySize")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SessionNo")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiningTableId");
+
+                    b.HasIndex("SessionNo")
+                        .IsUnique();
+
+                    b.ToTable("TableSessions");
                 });
 
             modelBuilder.Entity("OnlineOrdering.API.Models.User", b =>
@@ -309,7 +500,20 @@ namespace OnlineOrdering.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Username")
+                        .IsUnique();
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.Dish", b =>
+                {
+                    b.HasOne("OnlineOrdering.API.Models.DishCategory", "CategoryEntity")
+                        .WithMany("Dishes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CategoryEntity");
                 });
 
             modelBuilder.Entity("OnlineOrdering.API.Models.Order", b =>
@@ -324,26 +528,63 @@ namespace OnlineOrdering.API.Migrations
                         .HasForeignKey("DiningTableId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("OnlineOrdering.API.Models.TableSession", "TableSession")
+                        .WithMany("Orders")
+                        .HasForeignKey("TableSessionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("OnlineOrdering.API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("DeliveryZone");
 
                     b.Navigation("DiningTable");
+
+                    b.Navigation("TableSession");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("OnlineOrdering.API.Models.OrderItem", b =>
                 {
+                    b.HasOne("OnlineOrdering.API.Models.Dish", "Dish")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("DishId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("OnlineOrdering.API.Models.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Dish");
+
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.OrderStatusHistory", b =>
+                {
+                    b.HasOne("OnlineOrdering.API.Models.Order", "Order")
+                        .WithMany("StatusHistories")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.TableSession", b =>
+                {
+                    b.HasOne("OnlineOrdering.API.Models.DiningTable", "DiningTable")
+                        .WithMany("TableSessions")
+                        .HasForeignKey("DiningTableId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DiningTable");
                 });
 
             modelBuilder.Entity("OnlineOrdering.API.Models.DeliveryZone", b =>
@@ -354,11 +595,35 @@ namespace OnlineOrdering.API.Migrations
             modelBuilder.Entity("OnlineOrdering.API.Models.DiningTable", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("TableSessions");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.Dish", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.DishCategory", b =>
+                {
+                    b.Navigation("Dishes");
                 });
 
             modelBuilder.Entity("OnlineOrdering.API.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("StatusHistories");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.TableSession", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("OnlineOrdering.API.Models.User", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

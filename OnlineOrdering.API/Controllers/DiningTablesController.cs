@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineOrdering.API.DTOs;
+using OnlineOrdering.API.Models;
+using OnlineOrdering.API.Security;
 using OnlineOrdering.API.Services;
 
 namespace OnlineOrdering.API.Controllers
@@ -16,6 +18,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpGet]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -29,6 +32,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpGet("available")]
+        [RequireClientRole(UserRoles.Customer)]
         public async Task<IActionResult> GetAvailable()
         {
             try
@@ -42,6 +46,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -56,6 +61,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpPost]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Create(DiningTableCreateUpdateDto dto)
         {
             try
@@ -74,6 +80,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Update(int id, DiningTableCreateUpdateDto dto)
         {
             try
@@ -92,11 +99,12 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var ok = await _service.DeleteAsync(id);
+                var ok = await _service.DisableAsync(id);
                 return ok ? NoContent() : NotFound();
             }
             catch (InvalidOperationException ex)
@@ -106,6 +114,44 @@ namespace OnlineOrdering.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"删除餐桌失败：{ex.Message}" });
+            }
+        }
+
+        [HttpPut("{id}/disable")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+        public async Task<IActionResult> Disable(int id)
+        {
+            try
+            {
+                var ok = await _service.DisableAsync(id);
+                return ok ? NoContent() : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"停用餐桌失败：{ex.Message}" });
+            }
+        }
+
+        [HttpPut("{id}/restore")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
+        public async Task<IActionResult> Restore(int id)
+        {
+            try
+            {
+                var ok = await _service.RestoreAsync(id);
+                return ok ? NoContent() : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"恢复餐桌失败：{ex.Message}" });
             }
         }
     }

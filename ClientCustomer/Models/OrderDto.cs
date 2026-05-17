@@ -7,6 +7,9 @@ namespace ClientCustomer.Models
         [JsonProperty("id")]
         public int Id { get; set; }
 
+        [JsonProperty("orderNo")]
+        public string OrderNo { get; set; } = "";
+
         [JsonProperty("userId")]
         public int? UserId { get; set; }
 
@@ -24,6 +27,12 @@ namespace ClientCustomer.Models
 
         [JsonProperty("diningTableId")]
         public int? DiningTableId { get; set; }
+
+        [JsonProperty("tableSessionId")]
+        public int? TableSessionId { get; set; }
+
+        [JsonProperty("tableSessionNo")]
+        public string? TableSessionNo { get; set; }
 
         [JsonProperty("address")]
         public string? Address { get; set; }
@@ -62,13 +71,16 @@ namespace ClientCustomer.Models
         public int Id { get; set; }
 
         [JsonProperty("dishId")]
-        public int DishId { get; set; }
+        public int? DishId { get; set; }
 
         [JsonProperty("dishName")]
         public string DishName { get; set; } = "";
 
         [JsonProperty("price")]
         public decimal Price { get; set; }
+
+        [JsonProperty("dishCategorySnapshot")]
+        public string? DishCategorySnapshot { get; set; }
 
         [JsonProperty("quantity")]
         public int Quantity { get; set; }

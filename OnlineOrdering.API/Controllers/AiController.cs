@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineOrdering.API.DTOs;
+using OnlineOrdering.API.Models;
+using OnlineOrdering.API.Security;
 using OnlineOrdering.API.Services;
 
 namespace OnlineOrdering.API.Controllers
@@ -16,6 +18,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpGet("suggest-operation")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> GetOperationSuggestions([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null, [FromQuery] int topCount = 5)
         {
             try
@@ -34,6 +37,7 @@ namespace OnlineOrdering.API.Controllers
         }
 
         [HttpPost("suggest-operation")]
+        [RequireClientRole(UserRoles.Admin, UserRoles.SuperAdmin)]
         public async Task<IActionResult> GetOperationSuggestions([FromBody] AiOperationSuggestRequestDto dto)
         {
             try

@@ -231,7 +231,7 @@ partial class OrderTypeForm
         lblAddress.Name = "lblAddress";
         lblAddress.Size = new Size(112, 27);
         lblAddress.TabIndex = 3;
-        lblAddress.Text = "配送地址：";
+        lblAddress.Text = "配送区域 *：";
         // 
         // cmbProvince
         // 
@@ -275,7 +275,7 @@ partial class OrderTypeForm
         lblAddressDetail.Name = "lblAddressDetail";
         lblAddressDetail.Size = new Size(112, 27);
         lblAddressDetail.TabIndex = 10;
-        lblAddressDetail.Text = "详细地址：";
+        lblAddressDetail.Text = "详细地址 *：";
         // 
         // txtAddress
         // 
@@ -296,7 +296,7 @@ partial class OrderTypeForm
         lblCustomerPhone.Name = "lblCustomerPhone";
         lblCustomerPhone.Size = new Size(92, 27);
         lblCustomerPhone.TabIndex = 12;
-        lblCustomerPhone.Text = "手机号：";
+        lblCustomerPhone.Text = "手机号 *：";
         // 
         // txtCustomerPhone
         // 
