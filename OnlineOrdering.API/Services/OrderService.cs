@@ -20,19 +20,13 @@ namespace OnlineOrdering.API.Services
                 TableNumber = dto.TableNumber,
                 Address = dto.Address,
                 DeliveryFee = dto.DeliveryFee,
-                Note = dto.Note,
-                IsDeleted = false //新增时默认未删除
+                Note = dto.Note
             };
 
             decimal total = 0;
             foreach (var item in dto.OrderItems)
             {
-                //下单时校验菜品是否未删除且可用
-                var dish = await _db.Dishes.FirstOrDefaultAsync(d => d.Id == item.DishId && !d.IsDeleted && d.IsAvailable);
-                if (dish == null)
-                {
-                    throw new KeyNotFoundException($"菜品ID {item.DishId} 不存在、已删除或不可用");
-                }
+                var dish = await _db.Dishes.FindAsync(item.DishId);
                 var orderItem = new OrderItem
                 {
                     DishId = item.DishId,
@@ -52,8 +46,7 @@ namespace OnlineOrdering.API.Services
 
         public async Task<OrderDto?> UpdateOrderStatusAsync(int id, string status)
         {
-            var order = await _db.Orders.Include(x => x.OrderItems)
-                .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+            var order = await _db.Orders.Include(x => x.OrderItems).FirstOrDefaultAsync(x => x.Id == id);
             if (order == null) return null;
             order.Status = status;
             await _db.SaveChangesAsync();
@@ -62,50 +55,14 @@ namespace OnlineOrdering.API.Services
 
         public async Task<List<OrderDto>> GetAllOrdersAsync()
         {
-            var list = await _db.Orders.Include(x => x.OrderItems)
-                .Where(o => !o.IsDeleted)
-                .ToListAsync();
+            var list = await _db.Orders.Include(x => x.OrderItems).ToListAsync();
             return list.Select(MapToDto).ToList();
         }
 
         public async Task<OrderDto?> GetOrderByIdAsync(int id)
         {
-            var order = await _db.Orders.Include(x => x.OrderItems)
-                .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+            var order = await _db.Orders.Include(x => x.OrderItems).FirstOrDefaultAsync(x => x.Id == id);
             return order == null ? null : MapToDto(order);
-        }
-
-        //逻辑删除订单
-        public async Task<bool> DeleteOrderAsync(int id)
-        {
-            var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted);
-            if (order == null) return false;
-            order.IsDeleted = true; //标记为已删除
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        //物理删除订单
-        public async Task<bool> HardDeleteOrderAsync(int id)
-        {
-            var order = await _db.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == id);
-            if (order == null) return false;
-            //先删除订单项，再删除订单
-            _db.OrderItems.RemoveRange(order.OrderItems);
-            _db.Orders.Remove(order);
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        //恢复逻辑删除
-        public async Task<bool> RestoreOrderAsync(int id)
-        {
-            var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id && o.IsDeleted);
-            if (order == null) return false;
-
-            order.IsDeleted = false;
-            await _db.SaveChangesAsync();
-            return true;
         }
 
         private OrderDto MapToDto(Order order)

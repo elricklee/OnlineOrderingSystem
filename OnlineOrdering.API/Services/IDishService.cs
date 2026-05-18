@@ -10,8 +10,6 @@ namespace OnlineOrdering.API.Services
         Task<DishDto?> GetByIdAsync(int id);
         Task<DishDto> CreateAsync(DishCreateUpdateDto dto);
         Task<bool> UpdateAsync(int id, DishCreateUpdateDto dto);
-        Task<bool> DeleteAsync(int id);//Âß¼­É¾³ý
-        Task<bool> HardDeleteAsync(int id); //ÎïÀíÉ¾³ý
-        Task<bool> RestoreDeletedAsync(int id);//»Ö¸´Âß¼­É¾³ý
+        Task<bool> DeleteAsync(int id);
     }
 }

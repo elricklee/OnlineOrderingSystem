@@ -43,9 +43,6 @@ namespace OnlineOrdering.API.Migrations
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -81,9 +78,6 @@ namespace OnlineOrdering.API.Migrations
 
                     b.Property<decimal>("DeliveryFee")
                         .HasColumnType("decimal(65,30)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
