@@ -211,6 +211,12 @@ public partial class OrderHistoryForm : Form
             dgvOrderItems.Columns["DishName"].FillWeight = 100;
         }
 
+        if (dgvOrderItems.Columns["DishCategorySnapshot"] != null)
+        {
+            dgvOrderItems.Columns["DishCategorySnapshot"].HeaderText = "类型";
+            dgvOrderItems.Columns["DishCategorySnapshot"].FillWeight = 50;
+        }
+
         if (dgvOrderItems.Columns["Price"] != null)
         {
             dgvOrderItems.Columns["Price"].HeaderText = "单价";
