@@ -43,6 +43,20 @@ namespace ClientAdmin
             InitOrderManagement();
             InitStatisticsPage();
             InitAiPage();
+
+            FixLayoutAnchors(tabMain);
+        }
+
+        private void FixLayoutAnchors(Control parent)
+        {
+            foreach (Control ctrl in parent.Controls)
+            {
+                if (ctrl.Anchor == AnchorStyles.None && ctrl.Dock != DockStyle.Fill && ctrl is Sunny.UI.UIPanel)
+                {
+                    ctrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+                }
+                FixLayoutAnchors(ctrl);
+            }
         }
 
         private void InitDishGrid()
@@ -53,6 +67,20 @@ namespace ClientAdmin
             dgvDishes.MultiSelect = false;
             dgvDishes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
+            dgvDishes.Columns.Clear();
+            dgvDishes.Columns.Add("Id", "编号");
+            dgvDishes.Columns.Add("Name", "菜品名称");
+            dgvDishes.Columns.Add("Category", "分类");
+            dgvDishes.Columns.Add("Price", "价格");
+            dgvDishes.Columns.Add("ImagePath", "图片路径");
+            dgvDishes.Columns.Add("SpicyLevel", "辣度");
+            dgvDishes.Columns.Add("IsAvailable", "是否可售");
+            dgvDishes.Columns.Add("Description", "描述");
+
+            foreach (DataGridViewColumn col in dgvDishes.Columns)
+                col.DataPropertyName = col.Name;
+
+            dgvDishes.Columns["Price"].DefaultCellStyle.Format = "F2";
 
             cmbSpicyLevel.Items.Clear();
             cmbSpicyLevel.Items.Add("0 - 不辣");
@@ -171,10 +199,8 @@ namespace ClientAdmin
             {
                 var dishes = await ApiHelper.GetListAsync<DishDto>("api/Dishes");
 
-                dgvDishes.DataSource = null;
-                dgvDishes.DataSource = dishes;
-
-                SetDishGridHeaders();
+                dgvDishes.AutoGenerateColumns = false;
+                dgvDishes.DataSource = dishes ?? new System.Collections.Generic.List<DishDto>();
             }
             catch (Exception ex)
             {
@@ -478,11 +504,50 @@ namespace ClientAdmin
             dgvOrders.MultiSelect = false;
             dgvOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
+            dgvOrders.Columns.Clear();
+            dgvOrders.Columns.Add("Id", "订单编号");
+            dgvOrders.Columns.Add("CustomerName", "顾客姓名");
+            dgvOrders.Columns.Add("Phone", "电话");
+            dgvOrders.Columns.Add("Address", "配送地址");
+            dgvOrders.Columns.Add("TotalAmount", "总金额");
+            dgvOrders.Columns.Add("Status", "订单状态");
+            dgvOrders.Columns.Add("CreatedAt", "创建时间");
+            dgvOrders.Columns.Add("OrderType", "订单类型");
+            dgvOrders.Columns.Add("TableNumber", "桌号");
+            dgvOrders.Columns.Add("DeliveryFee", "配送费");
+
+            foreach (DataGridViewColumn col in dgvOrders.Columns)
+                col.DataPropertyName = col.Name;
+
+            dgvOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "F2";
+            dgvOrders.Columns["DeliveryFee"].DefaultCellStyle.Format = "F2";
+            dgvOrders.Columns["CreatedAt"].DefaultCellStyle.Format = "yyyy-MM-dd HH:mm:ss";
+
+            if (dgvOrders.Columns["OrderItems"] != null)
+                dgvOrders.Columns["OrderItems"].Visible = false;
+
+            if (dgvOrders.Columns["Note"] != null)
+                dgvOrders.Columns["Note"].Visible = false;
+
             dgvOrderItems.ReadOnly = true;
             dgvOrderItems.AllowUserToAddRows = false;
             dgvOrderItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvOrderItems.MultiSelect = false;
             dgvOrderItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            dgvOrderItems.Columns.Clear();
+            dgvOrderItems.Columns.Add("Id", "明细编号");
+            dgvOrderItems.Columns.Add("DishId", "菜品编号");
+            dgvOrderItems.Columns.Add("DishName", "菜品名称");
+            dgvOrderItems.Columns.Add("Price", "单价");
+            dgvOrderItems.Columns.Add("Quantity", "数量");
+            dgvOrderItems.Columns.Add("Subtotal", "小计");
+
+            foreach (DataGridViewColumn col in dgvOrderItems.Columns)
+                col.DataPropertyName = col.Name;
+
+            dgvOrderItems.Columns["Price"].DefaultCellStyle.Format = "F2";
+            dgvOrderItems.Columns["Subtotal"].DefaultCellStyle.Format = "F2";
 
             cmbOrderStatus.Items.Clear();
             cmbOrderStatus.Items.Add("待处理");
@@ -521,10 +586,8 @@ namespace ClientAdmin
             {
                 var orders = await ApiHelper.GetListAsync<OrderDto>("api/Orders");
 
-                dgvOrders.DataSource = null;
-                dgvOrders.DataSource = orders;
-
-                SetOrderGridHeaders();
+                dgvOrders.AutoGenerateColumns = false;
+                dgvOrders.DataSource = orders ?? new System.Collections.Generic.List<OrderDto>();
 
                 dgvOrderItems.DataSource = null;
                 selectedOrderId = null;
@@ -551,7 +614,10 @@ namespace ClientAdmin
                 dgvOrders.Columns["Address"].HeaderText = "配送地址";
 
             if (dgvOrders.Columns["TotalAmount"] != null)
+            {
                 dgvOrders.Columns["TotalAmount"].HeaderText = "总金额";
+                dgvOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "F2";
+            }
 
             if (dgvOrders.Columns["Status"] != null)
                 dgvOrders.Columns["Status"].HeaderText = "订单状态";
@@ -576,7 +642,10 @@ namespace ClientAdmin
                 dgvOrders.Columns["Note"].Visible = false;
 
             if (dgvOrders.Columns["DeliveryFee"] != null)
+            {
                 dgvOrders.Columns["DeliveryFee"].HeaderText = "配送费";
+                dgvOrders.Columns["DeliveryFee"].DefaultCellStyle.Format = "F2";
+            }
         }
 
         private void SetOrderItemGridHeaders()
@@ -585,7 +654,7 @@ namespace ClientAdmin
                 dgvOrderItems.Columns["Id"].HeaderText = "明细编号";
 
             if (dgvOrderItems.Columns["OrderId"] != null)
-                dgvOrderItems.Columns["OrderId"].HeaderText = "订单编号";
+                dgvOrderItems.Columns["OrderId"].Visible = false;
 
             if (dgvOrderItems.Columns["DishId"] != null)
                 dgvOrderItems.Columns["DishId"].HeaderText = "菜品编号";
@@ -594,13 +663,19 @@ namespace ClientAdmin
                 dgvOrderItems.Columns["DishName"].HeaderText = "菜品名称";
 
             if (dgvOrderItems.Columns["Price"] != null)
+            {
                 dgvOrderItems.Columns["Price"].HeaderText = "单价";
+                dgvOrderItems.Columns["Price"].DefaultCellStyle.Format = "F2";
+            }
 
             if (dgvOrderItems.Columns["Quantity"] != null)
                 dgvOrderItems.Columns["Quantity"].HeaderText = "数量";
 
             if (dgvOrderItems.Columns["Subtotal"] != null)
+            {
                 dgvOrderItems.Columns["Subtotal"].HeaderText = "小计";
+                dgvOrderItems.Columns["Subtotal"].DefaultCellStyle.Format = "F2";
+            }
         }
 
         private async void btnLoadOrders_Click(object sender, EventArgs e)
@@ -655,10 +730,8 @@ namespace ClientAdmin
 
         private void BindOrderItems(OrderDto order)
         {
-            dgvOrderItems.DataSource = null;
-            dgvOrderItems.DataSource = order.OrderItems;
-
-            SetOrderItemGridHeaders();
+            dgvOrderItems.AutoGenerateColumns = false;
+            dgvOrderItems.DataSource = order.OrderItems ?? new System.Collections.Generic.List<OrderItemDto>();
         }
 
         private async void btnUpdateOrderStatus_Click(object sender, EventArgs e)
@@ -737,12 +810,30 @@ namespace ClientAdmin
             dgvTopDishes.MultiSelect = false;
             dgvTopDishes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
+            dgvTopDishes.Columns.Clear();
+            dgvTopDishes.Columns.Add("DishId", "菜品编号");
+            dgvTopDishes.Columns.Add("DishName", "菜品名称");
+            dgvTopDishes.Columns.Add("TotalQuantity", "销量");
+            dgvTopDishes.Columns.Add("TotalRevenue", "销售额");
+
+            foreach (DataGridViewColumn col in dgvTopDishes.Columns)
+                col.DataPropertyName = col.Name;
+
+            dgvTopDishes.Columns["TotalRevenue"].DefaultCellStyle.Format = "F2";
+
             dgvRevenueStatistics.ReadOnly = true;
             dgvRevenueStatistics.AllowUserToAddRows = false;
             dgvRevenueStatistics.AllowUserToDeleteRows = false;
             dgvRevenueStatistics.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvRevenueStatistics.MultiSelect = false;
             dgvRevenueStatistics.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            dgvRevenueStatistics.Columns.Clear();
+            dgvRevenueStatistics.Columns.Add("Metric", "统计项");
+            dgvRevenueStatistics.Columns.Add("Value", "数值");
+
+            foreach (DataGridViewColumn col in dgvRevenueStatistics.Columns)
+                col.DataPropertyName = col.Name;
 
             dtpStatisticsStart.Value = DateTime.Today.AddDays(-7);
             dtpStatisticsEnd.Value = DateTime.Today;
@@ -824,26 +915,11 @@ namespace ClientAdmin
         private void BindTopDishes(System.Collections.Generic.List<TopDishStatDto> topDishes)
         {
             currentTopDishes = topDishes;
-            dgvTopDishes.DataSource = null;
-            dgvTopDishes.DataSource = topDishes;
+            dgvTopDishes.AutoGenerateColumns = false;
+            dgvTopDishes.DataSource = topDishes ?? new System.Collections.Generic.List<TopDishStatDto>();
 
             lblChartPlaceholder.Visible = topDishes.Count == 0;
             panelTopDishesChart.Invalidate();
-
-            if (dgvTopDishes.Columns["DishId"] != null)
-                dgvTopDishes.Columns["DishId"].HeaderText = "菜品编号";
-
-            if (dgvTopDishes.Columns["DishName"] != null)
-                dgvTopDishes.Columns["DishName"].HeaderText = "菜品名称";
-
-            if (dgvTopDishes.Columns["TotalQuantity"] != null)
-                dgvTopDishes.Columns["TotalQuantity"].HeaderText = "销量";
-
-            if (dgvTopDishes.Columns["TotalRevenue"] != null)
-            {
-                dgvTopDishes.Columns["TotalRevenue"].HeaderText = "销售额";
-                dgvTopDishes.Columns["TotalRevenue"].DefaultCellStyle.Format = "0.00";
-            }
         }
 
         private void BindRevenueStatistics(RevenueStatDto revenue)
@@ -851,18 +927,12 @@ namespace ClientAdmin
             var rows = new[]
             {
                 new StatisticsGridRow("总订单数", revenue.TotalOrderCount.ToString()),
-                new StatisticsGridRow("总销售额", $"{revenue.TotalRevenue:0.00} 元"),
-                new StatisticsGridRow("平均客单价", $"{revenue.AverageOrderAmount:0.00} 元")
+                new StatisticsGridRow("总销售额", $"{revenue.TotalRevenue:F2} 元"),
+                new StatisticsGridRow("平均客单价", $"{revenue.AverageOrderAmount:F2} 元")
             };
 
-            dgvRevenueStatistics.DataSource = null;
+            dgvRevenueStatistics.AutoGenerateColumns = false;
             dgvRevenueStatistics.DataSource = rows.ToList();
-
-            if (dgvRevenueStatistics.Columns["Metric"] != null)
-                dgvRevenueStatistics.Columns["Metric"].HeaderText = "统计项";
-
-            if (dgvRevenueStatistics.Columns["Value"] != null)
-                dgvRevenueStatistics.Columns["Value"].HeaderText = "数值";
         }
 
         private void UpdateStatisticsSummary(System.Collections.Generic.List<TopDishStatDto> topDishes, RevenueStatDto revenue)

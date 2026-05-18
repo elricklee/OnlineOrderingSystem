@@ -28,6 +28,10 @@ partial class OrderTypeForm
         picDelivery = new PictureBox();
         lblAddress = new Label();
         txtAddress = new TextBox();
+        cmbProvince = new ComboBox();
+        cmbCity = new ComboBox();
+        cmbDistrict = new ComboBox();
+        lblProvince = new Label();
         btnConfirm = new Sunny.UI.UIButton();
         panelDineIn.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)picDineIn).BeginInit();
@@ -120,6 +124,10 @@ partial class OrderTypeForm
         // 
         panelDelivery.BackColor = Color.White;
         panelDelivery.BorderStyle = BorderStyle.FixedSingle;
+        panelDelivery.Controls.Add(cmbDistrict);
+        panelDelivery.Controls.Add(cmbCity);
+        panelDelivery.Controls.Add(cmbProvince);
+        panelDelivery.Controls.Add(lblProvince);
         panelDelivery.Controls.Add(lblDeliveryDesc);
         panelDelivery.Controls.Add(lblDeliveryTitle);
         panelDelivery.Controls.Add(picDelivery);
@@ -184,6 +192,46 @@ partial class OrderTypeForm
         txtAddress.Size = new Size(400, 34);
         txtAddress.TabIndex = 4;
         // 
+        // lblProvince
+        // 
+        lblProvince.AutoSize = true;
+        lblProvince.Enabled = false;
+        lblProvince.Font = new Font("微软雅黑", 10F);
+        lblProvince.Location = new Point(21, 240);
+        lblProvince.Name = "lblProvince";
+        lblProvince.Size = Size.Empty;
+        lblProvince.TabIndex = 5;
+        // 
+        // cmbProvince
+        // 
+        cmbProvince.DropDownStyle = ComboBoxStyle.DropDownList;
+        cmbProvince.Enabled = false;
+        cmbProvince.Font = new Font("微软雅黑", 9F);
+        cmbProvince.Location = new Point(21, 268);
+        cmbProvince.Name = "cmbProvince";
+        cmbProvince.Size = new Size(80, 30);
+        cmbProvince.TabIndex = 6;
+        // 
+        // cmbCity
+        // 
+        cmbCity.DropDownStyle = ComboBoxStyle.DropDownList;
+        cmbCity.Enabled = false;
+        cmbCity.Font = new Font("微软雅黑", 9F);
+        cmbCity.Location = new Point(109, 268);
+        cmbCity.Name = "cmbCity";
+        cmbCity.Size = new Size(80, 30);
+        cmbCity.TabIndex = 7;
+        // 
+        // cmbDistrict
+        // 
+        cmbDistrict.DropDownStyle = ComboBoxStyle.DropDownList;
+        cmbDistrict.Enabled = false;
+        cmbDistrict.Font = new Font("微软雅黑", 9F);
+        cmbDistrict.Location = new Point(197, 268);
+        cmbDistrict.Name = "cmbDistrict";
+        cmbDistrict.Size = new Size(80, 30);
+        cmbDistrict.TabIndex = 8;
+        // 
         // btnConfirm
         // 
         btnConfirm.Cursor = Cursors.Hand;
@@ -239,5 +287,9 @@ partial class OrderTypeForm
     private System.Windows.Forms.Label lblDeliveryDesc;
     private System.Windows.Forms.Label lblAddress;
     private System.Windows.Forms.TextBox txtAddress;
+    private System.Windows.Forms.ComboBox cmbProvince;
+    private System.Windows.Forms.ComboBox cmbCity;
+    private System.Windows.Forms.ComboBox cmbDistrict;
+    private System.Windows.Forms.Label lblProvince;
     private Sunny.UI.UIButton btnConfirm;
 }

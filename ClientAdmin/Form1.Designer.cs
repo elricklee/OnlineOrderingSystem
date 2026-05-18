@@ -233,7 +233,7 @@ partial class Form1
         // 
         // layoutDishEdit
         // 
-        layoutDishEdit.Anchor = AnchorStyles.None;
+        layoutDishEdit.Dock = DockStyle.Fill;
         layoutDishEdit.ColumnCount = 6;
         layoutDishEdit.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 163F));
         layoutDishEdit.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 31.57895F));
@@ -260,7 +260,7 @@ partial class Form1
         layoutDishEdit.Controls.Add(lblPicture, 4, 2);
         layoutDishEdit.Controls.Add(lblSpicyCondition, 0, 2);
         layoutDishEdit.Controls.Add(cmbSpicyLevel, 1, 2);
-        layoutDishEdit.Location = new Point(58, 30);
+        layoutDishEdit.Location = new Point(0, 0);
         layoutDishEdit.Name = "layoutDishEdit";
         layoutDishEdit.RowCount = 5;
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 52F));
@@ -268,7 +268,6 @@ partial class Form1
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 41F));
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 61F));
         layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 54F));
-        layoutDishEdit.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
         layoutDishEdit.Size = new Size(1105, 299);
         layoutDishEdit.TabIndex = 0;
         layoutDishEdit.TagString = null;
@@ -978,13 +977,13 @@ partial class Form1
         // 
         // layoutStatisticsPage
         // 
-        layoutStatisticsPage.Anchor = AnchorStyles.None;
+        layoutStatisticsPage.Dock = DockStyle.Fill;
         layoutStatisticsPage.ColumnCount = 1;
         layoutStatisticsPage.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         layoutStatisticsPage.Controls.Add(layoutStatisticsTop, 0, 0);
         layoutStatisticsPage.Controls.Add(layoutStatisticsSummary, 0, 1);
         layoutStatisticsPage.Controls.Add(layoutStatisticsMain, 0, 2);
-        layoutStatisticsPage.Location = new Point(-512, -293);
+        layoutStatisticsPage.Location = new Point(0, 0);
         layoutStatisticsPage.Name = "layoutStatisticsPage";
         layoutStatisticsPage.Padding = new Padding(10);
         layoutStatisticsPage.RowCount = 3;
