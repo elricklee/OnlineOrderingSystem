@@ -88,6 +88,7 @@ project.fragment.lock.json
 artifacts/
 .artifacts/
 .codex-dotnet/
+.dotnet-home/
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
