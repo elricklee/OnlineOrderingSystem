@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- Disable NuGet vulnerability audit warnings in offline/local builds. -->
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'ClientAdmin'">
+    <!-- WinForms DataGridView columns are populated after binding, which triggers noisy nullable warnings. -->
+    <NoWarn>$(NoWarn);CS8602;CS0169;CS0414</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'ClientCustomer'">
+    <!-- WinForms DataGridView columns are populated after binding, which triggers noisy nullable warnings. -->
+    <NoWarn>$(NoWarn);CS8602</NoWarn>
+  </PropertyGroup>
+</Project>

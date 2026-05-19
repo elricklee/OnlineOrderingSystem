@@ -73,6 +73,7 @@ namespace ClientAdmin
             cmbSaleStatus.Items.Add("停售");
             cmbSaleStatus.Items.Add("缺货");
             cmbSaleStatus.SelectedIndex = 0;
+            cmbDishCategory.DropDownStyle = UIDropDownStyle.DropDownList;
 
             txtImagePath.ReadOnly = true;
 
@@ -80,8 +81,6 @@ namespace ClientAdmin
             picDishImage.SizeMode = PictureBoxSizeMode.Zoom;
             picDishImage.BorderStyle = BorderStyle.FixedSingle;
             picDishImage.Cursor = Cursors.Hand;
-
-
         }
 
         private int GetSelectedSpicyLevel()
@@ -119,6 +118,30 @@ namespace ClientAdmin
                 "OutOfStock" or "缺货" => 2,
                 _ => 0
             };
+        }
+
+        private string GetCurrentDishCategoryName()
+        {
+            if (cmbDishCategory.SelectedItem is DishCategoryOption option)
+            {
+                return option.Value.Name.Trim();
+            }
+
+            return cmbDishCategory.Text.Trim();
+        }
+
+        private void RebindDishCategoryOptions(int? selectedCategoryId = null, string? selectedCategoryName = null)
+        {
+            cmbDishCategory.Items.Clear();
+            foreach (var category in _dishCategories
+                         .Where(category => category.IsEnabled)
+                         .OrderBy(category => category.SortOrder)
+                         .ThenBy(category => category.Name))
+            {
+                cmbDishCategory.Items.Add(new DishCategoryOption(category));
+            }
+
+            SelectDishCategory(selectedCategoryId, selectedCategoryName);
         }
 
         private void SetSelectedSpicyLevel(int spicyLevel)
@@ -356,7 +379,7 @@ namespace ClientAdmin
                 {
                     Name = txtDishName.Text.Trim(),
                     CategoryId = GetSelectedDishCategoryId(),
-                    Category = txtCategory.Text.Trim(),
+                    Category = GetCurrentDishCategoryName(),
                     Price = price,
                     ImagePath = txtImagePath.Text.Trim(),
                     SpicyLevel = GetSelectedSpicyLevel(),
@@ -399,7 +422,7 @@ namespace ClientAdmin
                     Id = selectedDishId.Value,
                     Name = txtDishName.Text.Trim(),
                     CategoryId = GetSelectedDishCategoryId(),
-                    Category = txtCategory.Text.Trim(),
+                    Category = GetCurrentDishCategoryName(),
                     Price = price,
                     ImagePath = txtImagePath.Text.Trim(),
                     SpicyLevel = GetSelectedSpicyLevel(),
@@ -528,7 +551,6 @@ namespace ClientAdmin
             selectedDishId = dish.Id;
 
             txtDishName.Text = dish.Name;
-            txtCategory.Text = dish.Category;
             txtPrice.Text = dish.Price.ToString("0.00");
 
             txtImagePath.Text = dish.ImagePath ?? "";
@@ -551,7 +573,7 @@ namespace ClientAdmin
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(txtCategory.Text))
+            if (string.IsNullOrWhiteSpace(GetCurrentDishCategoryName()))
             {
                 MessageBox.Show("请输入菜品分类");
                 return false;
@@ -577,11 +599,11 @@ namespace ClientAdmin
             selectedDishId = null;
 
             txtDishName.Text = string.Empty;
-            txtCategory.Text = string.Empty;
             txtPrice.Text = string.Empty;
             txtImagePath.Text = string.Empty;
             txtDescription.Text = string.Empty;
             cmbDishCategory.SelectedIndex = -1;
+            cmbDishCategory.Text = string.Empty;
 
             SetSelectedSpicyLevel(0);
             SetSelectedSaleStatus("OnSale");
@@ -1647,14 +1669,6 @@ namespace ClientAdmin
 
         private void BindManagementEvents()
         {
-            cmbDishCategory.TextChanged += (_, _) =>
-            {
-                if (txtCategory.Text != cmbDishCategory.Text)
-                {
-                    txtCategory.Text = cmbDishCategory.Text;
-                }
-            };
-
             btnLoadDeliveryZones.Click += async (_, _) => await LoadDeliveryZonesAsync();
             btnAddDeliveryZone.Click += async (_, _) => await AddDeliveryZoneAsync();
             btnUpdateDeliveryZone.Click += async (_, _) => await UpdateDeliveryZoneAsync();
@@ -1730,45 +1744,29 @@ namespace ClientAdmin
 
         private async Task RefreshDishCategoriesAsync()
         {
+            var currentCategoryId = GetSelectedDishCategoryId();
+            var currentCategoryName = GetCurrentDishCategoryName();
+
             try
             {
                 _dishCategories = await ApiHelper.GetDishCategoriesAsync();
-
-                if (_dishCategories.Count == 0)
-                {
-                    var dishes = await ApiHelper.GetListAsync<DishDto>("api/dishes");
-                    _dishCategories = _defaultCategories
-                        .Concat(dishes.Select(dish => dish.Category))
-                        .Where(category => !string.IsNullOrWhiteSpace(category))
-                        .Distinct()
-                        .Select((name, index) => new DishCategoryDto
-                        {
-                            Id = index + 1,
-                            Name = name,
-                            SortOrder = index + 1,
-                            IsEnabled = true
-                        })
-                        .ToList();
-                }
-
-                var currentCategoryId = GetSelectedDishCategoryId();
-                var currentCategoryName = txtCategory.Text.Trim();
-                cmbDishCategory.Items.Clear();
-                foreach (var category in _dishCategories.OrderBy(category => category.SortOrder).ThenBy(category => category.Name))
-                {
-                    cmbDishCategory.Items.Add(new DishCategoryOption(category));
-                }
-
-                SelectDishCategory(currentCategoryId, currentCategoryName);
             }
             catch
             {
+                return;
             }
+
+            RebindDishCategoryOptions(currentCategoryId, currentCategoryName);
         }
 
         private int? GetSelectedDishCategoryId()
         {
-            return cmbDishCategory.SelectedItem is DishCategoryOption option ? option.Value.Id : null;
+            if (cmbDishCategory.SelectedItem is not DishCategoryOption option)
+            {
+                return null;
+            }
+
+            return option.Value.Id > 0 ? option.Value.Id : null;
         }
 
         private void SelectDishCategory(int? categoryId, string? categoryName)
@@ -1786,7 +1784,6 @@ namespace ClientAdmin
                      (!categoryId.HasValue && string.Equals(option.Value.Name, categoryName, StringComparison.Ordinal))))
                 {
                     cmbDishCategory.SelectedIndex = index;
-                    txtCategory.Text = option.Value.Name;
                     return;
                 }
             }

@@ -63,7 +63,6 @@ partial class Form1
         uiLabel2 = new Sunny.UI.UILabel();
         txtPrice = new Sunny.UI.UITextBox();
         cmbDishCategory = new Sunny.UI.UIComboBox();
-        txtCategory = new Sunny.UI.UITextBox();
         lblImagePath = new Sunny.UI.UILabel();
         txtImagePath = new Sunny.UI.UITextBox();
         btnChooseImage = new Sunny.UI.UIButton();
@@ -216,7 +215,6 @@ partial class Form1
         panelDishTop.SuspendLayout();
         grpDishEdit.SuspendLayout();
         layoutDishEdit.SuspendLayout();
-        cmbDishCategory.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)picDishImage).BeginInit();
         ((System.ComponentModel.ISupportInitialize)dgvDishes).BeginInit();
         tabOrders.SuspendLayout();
@@ -496,7 +494,6 @@ partial class Form1
         // cmbDishCategory
         // 
         cmbDishCategory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-        cmbDishCategory.Controls.Add(txtCategory);
         cmbDishCategory.DataSource = null;
         cmbDishCategory.FillColor = Color.White;
         cmbDishCategory.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -512,23 +509,6 @@ partial class Form1
         cmbDishCategory.TabIndex = 20;
         cmbDishCategory.TextAlignment = ContentAlignment.MiddleLeft;
         cmbDishCategory.Watermark = "";
-        // 
-        // txtCategory
-        // 
-        txtCategory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-        txtCategory.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        txtCategory.Location = new Point(4, 0);
-        txtCategory.Margin = new Padding(4, 5, 4, 5);
-        txtCategory.MinimumSize = new Size(1, 16);
-        txtCategory.Name = "txtCategory";
-        txtCategory.Padding = new Padding(5);
-        txtCategory.Radius = 1;
-        txtCategory.ShowText = false;
-        txtCategory.Size = new Size(257, 42);
-        txtCategory.TabIndex = 6;
-        txtCategory.TextAlignment = ContentAlignment.MiddleLeft;
-        txtCategory.Visible = false;
-        txtCategory.Watermark = "";
         // 
         // lblImagePath
         // 
@@ -794,7 +774,7 @@ partial class Form1
         tabOrders.Controls.Add(layoutOrderPage);
         tabOrders.Location = new Point(0, 40);
         tabOrders.Name = "tabOrders";
-        tabOrders.Size = new Size(1592, 1005);
+        tabOrders.Size = new Size(200, 60);
         tabOrders.TabIndex = 1;
         tabOrders.Text = "订单管理";
         tabOrders.UseVisualStyleBackColor = true;
@@ -813,7 +793,7 @@ partial class Form1
         layoutOrderPage.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
         layoutOrderPage.RowStyles.Add(new RowStyle(SizeType.Percent, 65F));
         layoutOrderPage.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
-        layoutOrderPage.Size = new Size(1592, 1005);
+        layoutOrderPage.Size = new Size(200, 60);
         layoutOrderPage.TabIndex = 0;
         layoutOrderPage.TagString = null;
         // 
@@ -828,7 +808,7 @@ partial class Form1
         panelOrderTop.Name = "panelOrderTop";
         panelOrderTop.Padding = new Padding(2);
         panelOrderTop.ShowText = false;
-        panelOrderTop.Size = new Size(1584, 60);
+        panelOrderTop.Size = new Size(192, 60);
         panelOrderTop.TabIndex = 0;
         panelOrderTop.Text = "uiFlowLayoutPanel1";
         panelOrderTop.TextAlignment = ContentAlignment.MiddleCenter;
@@ -838,7 +818,7 @@ partial class Form1
         btnLoadOrders.Anchor = AnchorStyles.None;
         btnLoadOrders.FillColor = Color.FromArgb(51, 122, 183);
         btnLoadOrders.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-        btnLoadOrders.Location = new Point(690, 5);
+        btnLoadOrders.Location = new Point(-6, 5);
         btnLoadOrders.MinimumSize = new Size(1, 1);
         btnLoadOrders.Name = "btnLoadOrders";
         btnLoadOrders.Radius = 8;
@@ -861,7 +841,7 @@ partial class Form1
         layoutOrderMain.Name = "layoutOrderMain";
         layoutOrderMain.RowCount = 1;
         layoutOrderMain.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        layoutOrderMain.Size = new Size(1586, 601);
+        layoutOrderMain.Size = new Size(194, 1);
         layoutOrderMain.TabIndex = 1;
         layoutOrderMain.TagString = null;
         // 
@@ -910,7 +890,7 @@ partial class Form1
         dgvOrders.RowsDefaultCellStyle = dataGridViewCellStyle10;
         dgvOrders.RowTemplate.Height = 34;
         dgvOrders.SelectedIndex = -1;
-        dgvOrders.Size = new Size(995, 595);
+        dgvOrders.Size = new Size(116, 1);
         dgvOrders.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvOrders.TabIndex = 0;
         dgvOrders.CellClick += dgvOrders_CellClick;
@@ -933,12 +913,12 @@ partial class Form1
         grpOrderDetail.Controls.Add(panelOrderActions);
         grpOrderDetail.Dock = DockStyle.Fill;
         grpOrderDetail.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpOrderDetail.Location = new Point(1005, 5);
+        grpOrderDetail.Location = new Point(126, 5);
         grpOrderDetail.Margin = new Padding(4, 5, 4, 5);
         grpOrderDetail.MinimumSize = new Size(1, 1);
         grpOrderDetail.Name = "grpOrderDetail";
         grpOrderDetail.Padding = new Padding(0, 32, 0, 0);
-        grpOrderDetail.Size = new Size(577, 591);
+        grpOrderDetail.Size = new Size(64, 1);
         grpOrderDetail.TabIndex = 1;
         grpOrderDetail.Text = "订单详情";
         grpOrderDetail.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1006,7 +986,7 @@ partial class Form1
         txtOrderNote.ReadOnly = true;
         txtOrderNote.ShowScrollBar = true;
         txtOrderNote.ShowText = false;
-        txtOrderNote.Size = new Size(308, 66);
+        txtOrderNote.Size = new Size(1, 66);
         txtOrderNote.TabIndex = 12;
         txtOrderNote.TextAlignment = ContentAlignment.TopLeft;
         txtOrderNote.Watermark = "";
@@ -1034,7 +1014,7 @@ partial class Form1
         txtOrderAddress.ReadOnly = true;
         txtOrderAddress.ShowScrollBar = true;
         txtOrderAddress.ShowText = false;
-        txtOrderAddress.Size = new Size(308, 64);
+        txtOrderAddress.Size = new Size(1, 64);
         txtOrderAddress.TabIndex = 13;
         txtOrderAddress.TextAlignment = ContentAlignment.TopLeft;
         txtOrderAddress.Watermark = "";
@@ -1248,12 +1228,12 @@ partial class Form1
         grpOrderItems.Controls.Add(dgvOrderItems);
         grpOrderItems.Dock = DockStyle.Fill;
         grpOrderItems.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-        grpOrderItems.Location = new Point(4, 682);
+        grpOrderItems.Location = new Point(4, 69);
         grpOrderItems.Margin = new Padding(4, 5, 4, 5);
         grpOrderItems.MinimumSize = new Size(1, 1);
         grpOrderItems.Name = "grpOrderItems";
         grpOrderItems.Padding = new Padding(0, 32, 0, 0);
-        grpOrderItems.Size = new Size(1584, 318);
+        grpOrderItems.Size = new Size(192, 1);
         grpOrderItems.TabIndex = 2;
         grpOrderItems.Text = "订单明细";
         grpOrderItems.TextAlignment = ContentAlignment.MiddleLeft;
@@ -1303,7 +1283,7 @@ partial class Form1
         dgvOrderItems.RowsDefaultCellStyle = dataGridViewCellStyle15;
         dgvOrderItems.RowTemplate.Height = 34;
         dgvOrderItems.SelectedIndex = -1;
-        dgvOrderItems.Size = new Size(1584, 286);
+        dgvOrderItems.Size = new Size(192, 0);
         dgvOrderItems.StripeOddColor = Color.FromArgb(235, 243, 255);
         dgvOrderItems.TabIndex = 0;
         // 
@@ -3007,8 +2987,6 @@ partial class Form1
         panelDishTop.ResumeLayout(false);
         grpDishEdit.ResumeLayout(false);
         layoutDishEdit.ResumeLayout(false);
-        cmbDishCategory.ResumeLayout(false);
-        cmbDishCategory.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)picDishImage).EndInit();
         ((System.ComponentModel.ISupportInitialize)dgvDishes).EndInit();
         tabOrders.ResumeLayout(false);
@@ -3075,7 +3053,6 @@ partial class Form1
     private TabPage tabStatistics;
     private TabPage tabAi;
     private Sunny.UI.UITextBox txtPrice;
-    private Sunny.UI.UITextBox txtCategory;
     private Sunny.UI.UIDataGridView dgvDishes;
     private Sunny.UI.UITableLayoutPanel layoutDishPage;
     private Sunny.UI.UIFlowLayoutPanel panelDishTop;
