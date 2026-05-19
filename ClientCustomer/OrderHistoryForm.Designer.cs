@@ -89,9 +89,10 @@ partial class OrderHistoryForm
         lblOrderId.ForeColor = Color.FromArgb(51, 51, 51);
         lblOrderId.Location = new Point(15, 35);
         lblOrderId.Name = "lblOrderId";
-        lblOrderId.Size = new Size(240, 26);
+        lblOrderId.Size = new Size(200, 26);
         lblOrderId.TabIndex = 0;
         lblOrderId.Text = "订单编号：";
+        lblOrderId.AutoEllipsis = false;
         //
         // lblOrderType
         //

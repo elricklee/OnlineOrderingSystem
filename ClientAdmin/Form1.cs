@@ -699,6 +699,58 @@ namespace ClientAdmin
             ClearOrderDetail();
 
             dgvOrders.CellFormatting += DgvOrders_CellFormatting;
+
+            InitOrderGridColumns();
+        }
+
+        private void InitOrderGridColumns()
+        {
+            dgvOrders.Columns.Clear();
+
+            var columns = new (string Name, string HeaderText, int FillWeight, int MinWidth)[]
+            {
+                ("OrderNo", "业务单号", 120, 150),
+                ("Id", "内部编号", 50, 70),
+                ("OrderType", "类型", 50, 80),
+                ("TableNumber", "桌号", 50, 80),
+                ("TableSessionNo", "桌次", 115, 150),
+                ("CustomerName", "顾客", 60, 90),
+                ("Phone", "电话", 80, 120),
+                ("Address", "配送地址", 180, 220),
+                ("TotalAmount", "总金额", 70, 90),
+                ("Status", "状态", 60, 90),
+                ("CreatedAt", "下单时间", 80, 130)
+            };
+
+            for (int i = 0; i < columns.Length; i++)
+            {
+                var (name, headerText, fillWeight, minWidth) = columns[i];
+                var col = new DataGridViewTextBoxColumn
+                {
+                    Name = name,
+                    HeaderText = headerText,
+                    FillWeight = fillWeight,
+                    MinimumWidth = minWidth,
+                    DisplayIndex = i
+                };
+
+                if (name == "TotalAmount")
+                {
+                    col.DefaultCellStyle.Format = "C2";
+                }
+                else if (name == "CreatedAt")
+                {
+                    col.DefaultCellStyle.Format = "MM-dd HH:mm";
+                }
+                else if (name == "Address")
+                {
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                }
+
+                dgvOrders.Columns.Add(col);
+            }
+
+            PrepareAdminGrid(dgvOrders);
         }
 
         private void DgvOrders_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
@@ -725,6 +777,7 @@ namespace ClientAdmin
             {
                 var orders = await ApiHelper.GetListAsync<OrderDto>("api/Orders");
 
+                dgvOrders.Columns.Clear();
                 dgvOrders.DataSource = null;
                 dgvOrders.DataSource = orders;
 
@@ -1325,7 +1378,6 @@ namespace ClientAdmin
             dgvTopDishes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvTopDishes.MultiSelect = false;
             dgvTopDishes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            PrepareAdminGrid(dgvTopDishes);
 
             dgvRevenueStatistics.ReadOnly = true;
             dgvRevenueStatistics.AllowUserToAddRows = false;
@@ -1333,7 +1385,6 @@ namespace ClientAdmin
             dgvRevenueStatistics.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvRevenueStatistics.MultiSelect = false;
             dgvRevenueStatistics.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            PrepareAdminGrid(dgvRevenueStatistics);
 
             dtpStatisticsStart.Value = DateTime.Today.AddDays(-7);
             dtpStatisticsEnd.Value = DateTime.Today;
@@ -1341,7 +1392,85 @@ namespace ClientAdmin
             panelTopDishesChart.Paint += panelTopDishesChart_Paint;
             panelTopDishesChart.Resize += (_, _) => panelTopDishesChart.Invalidate();
 
+            InitStatisticsGridColumns();
             ResetStatisticsDisplay();
+        }
+
+        private void InitStatisticsGridColumns()
+        {
+            // 初始化热销菜品排行表格
+            dgvTopDishes.Columns.Clear();
+
+            var topDishColumns = new (string Name, string HeaderText, int FillWeight, int MinWidth)[]
+            {
+                ("DishId", "菜品编号", 80, 100),
+                ("DishName", "菜品名称", 120, 150),
+                ("TotalQuantity", "销量", 80, 100),
+                ("TotalRevenue", "销售额", 100, 120)
+            };
+
+            for (int i = 0; i < topDishColumns.Length; i++)
+            {
+                var (name, headerText, fillWeight, minWidth) = topDishColumns[i];
+                var col = new DataGridViewTextBoxColumn
+                {
+                    Name = name,
+                    HeaderText = headerText,
+                    FillWeight = fillWeight,
+                    MinimumWidth = minWidth,
+                    DisplayIndex = i
+                };
+
+                if (name == "TotalRevenue")
+                {
+                    col.DefaultCellStyle.Format = "0.00";
+                }
+
+                dgvTopDishes.Columns.Add(col);
+            }
+
+            PrepareAdminGrid(dgvTopDishes);
+
+            // 初始化营收统计表格
+            dgvRevenueStatistics.Columns.Clear();
+
+            var revenueColumns = new (string Name, string HeaderText, int FillWeight, int MinWidth)[]
+            {
+                ("Metric", "统计项", 120, 150),
+                ("Value", "数值", 120, 150)
+            };
+
+            for (int i = 0; i < revenueColumns.Length; i++)
+            {
+                var (name, headerText, fillWeight, minWidth) = revenueColumns[i];
+                var col = new DataGridViewTextBoxColumn
+                {
+                    Name = name,
+                    HeaderText = headerText,
+                    FillWeight = fillWeight,
+                    MinimumWidth = minWidth,
+                    DisplayIndex = i
+                };
+
+                dgvRevenueStatistics.Columns.Add(col);
+            }
+
+            PrepareAdminGrid(dgvRevenueStatistics);
+
+            // 添加默认行
+            var defaultStats = new[]
+            {
+                new { Metric = "总订单数", Value = "0" },
+                new { Metric = "总销售额", Value = "0.00 元" },
+                new { Metric = "平均客单价", Value = "0.00 元" }
+            };
+
+            foreach (var stat in defaultStats)
+            {
+                var row = new DataGridViewRow();
+                row.CreateCells(dgvRevenueStatistics, stat.Metric, stat.Value);
+                dgvRevenueStatistics.Rows.Add(row);
+            }
         }
 
         private void InitAiPage()
@@ -1415,6 +1544,8 @@ namespace ClientAdmin
         private void BindTopDishes(System.Collections.Generic.List<TopDishStatDto> topDishes)
         {
             currentTopDishes = topDishes;
+
+            dgvTopDishes.Columns.Clear();
             dgvTopDishes.DataSource = null;
             dgvTopDishes.DataSource = topDishes;
 
@@ -1446,6 +1577,7 @@ namespace ClientAdmin
                 new StatisticsGridRow("平均客单价", $"{revenue.AverageOrderAmount:0.00} 元")
             };
 
+            dgvRevenueStatistics.Columns.Clear();
             dgvRevenueStatistics.DataSource = null;
             dgvRevenueStatistics.DataSource = rows.ToList();
 
@@ -1676,6 +1808,8 @@ namespace ClientAdmin
             btnRestoreDeliveryZone.Click += async (_, _) => await RestoreDeliveryZoneAsync();
             dgvDeliveryZones.CellClick += DeliveryZonesGrid_CellClick;
 
+            InitDeliveryZoneGridColumns();
+
             btnLoadDiningTables.Click += async (_, _) => await LoadDiningTablesAsync();
             btnAddDiningTable.Click += async (_, _) => await AddDiningTableAsync();
             btnUpdateDiningTable.Click += async (_, _) => await UpdateDiningTableAsync();
@@ -1688,6 +1822,8 @@ namespace ClientAdmin
             btnUpdateUser.Click += async (_, _) => await UpdateUserAsync();
             dgvUsers.CellClick += UsersGrid_CellClick;
             dgvUsers.CellFormatting += UsersGrid_CellFormatting;
+
+            InitUserGridColumns();
 
             AttachGridTooltips(dgvDishes);
             AttachGridTooltips(dgvOrders);
@@ -1791,9 +1927,58 @@ namespace ClientAdmin
             cmbDishCategory.Text = categoryName ?? string.Empty;
         }
 
+        private void InitDeliveryZoneGridColumns()
+        {
+            dgvDeliveryZones.ReadOnly = true;
+            dgvDeliveryZones.AllowUserToAddRows = false;
+            dgvDeliveryZones.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvDeliveryZones.MultiSelect = false;
+            dgvDeliveryZones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            var columns = new (string Name, string HeaderText, int FillWeight, int MinWidth)[]
+            {
+                ("Id", "编号", 45, 60),
+                ("Province", "省份", 80, 100),
+                ("City", "城市", 80, 100),
+                ("District", "区县", 80, 100),
+                ("DeliveryFee", "配送费", 70, 90),
+                ("IsActive", "启用配送", 60, 80),
+                ("SortOrder", "排序", 55, 70),
+                ("DisplayName", "显示名称", 160, 220)
+            };
+
+            for (int i = 0; i < columns.Length; i++)
+            {
+                var (name, headerText, fillWeight, minWidth) = columns[i];
+                var col = new DataGridViewTextBoxColumn
+                {
+                    Name = name,
+                    HeaderText = headerText,
+                    FillWeight = fillWeight,
+                    MinimumWidth = minWidth,
+                    DisplayIndex = i
+                };
+
+                if (name == "DeliveryFee")
+                {
+                    col.DefaultCellStyle.Format = "0.00";
+                }
+                else if (name == "DisplayName")
+                {
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                }
+
+                dgvDeliveryZones.Columns.Add(col);
+            }
+
+            PrepareAdminGrid(dgvDeliveryZones);
+        }
+
         private async Task LoadDeliveryZonesAsync()
         {
             var zones = await ApiHelper.GetListAsync<DeliveryZoneDto>("api/deliveryzones");
+
+            dgvDeliveryZones.Columns.Clear();
             dgvDeliveryZones.DataSource = null;
             dgvDeliveryZones.DataSource = zones;
             SetDeliveryZoneGridHeaders();
@@ -2210,9 +2395,58 @@ namespace ClientAdmin
         private async Task LoadUsersAsync()
         {
             var users = await ApiHelper.GetListAsync<UserDto>("api/users");
+
+            dgvUsers.Columns.Clear();
             dgvUsers.DataSource = null;
             dgvUsers.DataSource = users;
             SetUserGridHeaders();
+        }
+
+        private void InitUserGridColumns()
+        {
+            dgvUsers.ReadOnly = true;
+            dgvUsers.AllowUserToAddRows = false;
+            dgvUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvUsers.MultiSelect = false;
+            dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            var columns = new (string Name, string HeaderText, int FillWeight, int MinWidth)[]
+            {
+                ("Id", "编号", 45, 60),
+                ("Username", "用户名", 90, 110),
+                ("Role", "角色", 80, 90),
+                ("RealName", "姓名", 90, 100),
+                ("Phone", "电话", 110, 120),
+                ("Address", "地址", 180, 260),
+                ("CreatedAt", "创建时间", 100, 135),
+                ("IsActive", "启用", 60, 80)
+            };
+
+            for (int i = 0; i < columns.Length; i++)
+            {
+                var (name, headerText, fillWeight, minWidth) = columns[i];
+                var col = new DataGridViewTextBoxColumn
+                {
+                    Name = name,
+                    HeaderText = headerText,
+                    FillWeight = fillWeight,
+                    MinimumWidth = minWidth,
+                    DisplayIndex = i
+                };
+
+                if (name == "Address")
+                {
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                }
+                else if (name == "CreatedAt")
+                {
+                    col.DefaultCellStyle.Format = "yyyy-MM-dd HH:mm";
+                }
+
+                dgvUsers.Columns.Add(col);
+            }
+
+            PrepareAdminGrid(dgvUsers);
         }
 
         private void SetUserGridHeaders()
@@ -2254,16 +2488,17 @@ namespace ClientAdmin
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgv.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
             dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-            dgv.ColumnHeadersHeight = 42;
-            dgv.RowTemplate.Height = 40;
-            dgv.RowTemplate.MinimumHeight = 40;
+            dgv.ColumnHeadersHeight = 52;
+            dgv.RowTemplate.Height = 46;
+            dgv.RowTemplate.MinimumHeight = 46;
             dgv.DefaultCellStyle.WrapMode = DataGridViewTriState.False;
             dgv.RowsDefaultCellStyle.WrapMode = DataGridViewTriState.False;
             dgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dgv.DefaultCellStyle.Padding = new Padding(4, 6, 4, 6);
+            dgv.DefaultCellStyle.Padding = new Padding(5, 10, 5, 10);
             dgv.DefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
             dgv.RowsDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
             dgv.ColumnHeadersDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
+            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(8, 10, 8, 10);
             dgv.RowHeadersDefaultCellStyle.Font = new Font("微软雅黑", 10F, FontStyle.Regular);
         }
 

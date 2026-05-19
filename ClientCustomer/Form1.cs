@@ -235,7 +235,7 @@ namespace ClientCustomer
             var card = new Panel
             {
                 Width = 244,
-                Height = 330,
+                Height = 355,
                 BackColor = SurfaceColor,
                 Margin = new Padding(10)
             };
@@ -270,10 +270,10 @@ namespace ClientCustomer
             var lblPrice = new UILabel
             {
                 Text = $"¥{dish.Price:0.##}",
-                Font = new Font("微软雅黑", 15F, FontStyle.Bold),
+                Font = new Font("微软雅黑", 14F, FontStyle.Bold),
                 ForeColor = PrimaryColor,
-                Location = new Point(12, 162),
-                Size = new Size(112, 30),
+                Location = new Point(12, 164),
+                Size = new Size(100, 32),
                 TagString = null
             };
 
@@ -282,8 +282,8 @@ namespace ClientCustomer
                 Text = GetSpicyDisplay(dish.SpicyLevel),
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = dish.SpicyLevel > 0 ? DangerColor : SuccessColor,
-                Location = new Point(128, 166),
-                Size = new Size(104, 24),
+                Location = new Point(116, 168),
+                Size = new Size(116, 26),
                 TextAlign = ContentAlignment.MiddleRight,
                 TagString = null
             };
@@ -297,8 +297,8 @@ namespace ClientCustomer
                 Text = $"分类：{dish.Category}{description}",
                 Font = new Font("微软雅黑", 8.5F),
                 ForeColor = PrimaryDarkColor,
-                Location = new Point(12, 198),
-                Size = new Size(220, 24),
+                Location = new Point(12, 200),
+                Size = new Size(220, 26),
                 AutoEllipsis = true,
                 TagString = null
             };
@@ -308,7 +308,7 @@ namespace ClientCustomer
                 Text = "数量：",
                 Font = new Font("微软雅黑", 9F),
                 ForeColor = TextSecondaryColor,
-                Location = new Point(12, 236),
+                Location = new Point(12, 238),
                 Size = new Size(72, 26),
                 TagString = null
             };
@@ -316,7 +316,7 @@ namespace ClientCustomer
             var quantityInput = new NumericUpDown
             {
                 Font = new Font("微软雅黑", 10F),
-                Location = new Point(86, 232),
+                Location = new Point(86, 234),
                 Minimum = 1,
                 Maximum = 99,
                 Value = 1,
@@ -328,7 +328,7 @@ namespace ClientCustomer
             {
                 Text = "加入购物车",
                 Size = new Size(220, 38),
-                Location = new Point(12, 276),
+                Location = new Point(12, 300),
                 Font = new Font("微软雅黑", 10F, FontStyle.Bold),
                 FillColor = PrimaryColor,
                 RectColor = PrimaryColor,
@@ -692,6 +692,16 @@ namespace ClientCustomer
 
         private void dishFlowPanel_Paint(object sender, PaintEventArgs e)
         {
+        }
+
+        private void cartBarPanel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void aiPanel_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

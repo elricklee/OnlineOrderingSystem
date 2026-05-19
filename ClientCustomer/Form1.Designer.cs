@@ -26,6 +26,7 @@ partial class Form1
         btnCheckOrder = new Sunny.UI.UIButton();
         btnLogout = new Sunny.UI.UIButton();
         dishAreaPanel = new Panel();
+        dishFlowPanel = new FlowLayoutPanel();
         categoryPanel = new Sunny.UI.UIPanel();
         lblCategoryTitle = new Sunny.UI.UILabel();
         categoryFlow = new FlowLayoutPanel();
@@ -35,7 +36,6 @@ partial class Form1
         btnCategoryStaple = new Sunny.UI.UIButton();
         btnCategoryDrink = new Sunny.UI.UIButton();
         btnCategorySoup = new Sunny.UI.UIButton();
-        dishFlowPanel = new FlowLayoutPanel();
         lblNoDish = new Sunny.UI.UILabel();
         cartBarPanel = new Sunny.UI.UIPanel();
         lblCartSummary = new Sunny.UI.UILabel();
@@ -123,7 +123,7 @@ partial class Form1
         // txtSearch
         // 
         txtSearch.Font = new Font("微软雅黑", 10F);
-        txtSearch.Location = new Point(700, 12);
+        txtSearch.Location = new Point(640, 12);
         txtSearch.Margin = new Padding(4, 5, 4, 5);
         txtSearch.MinimumSize = new Size(1, 16);
         txtSearch.Name = "txtSearch";
@@ -140,7 +140,7 @@ partial class Form1
         btnSearch.FillColor = Color.White;
         btnSearch.Font = new Font("微软雅黑", 10F);
         btnSearch.ForeColor = Color.FromArgb(255, 109, 0);
-        btnSearch.Location = new Point(940, 12);
+        btnSearch.Location = new Point(877, 12);
         btnSearch.MinimumSize = new Size(1, 1);
         btnSearch.Name = "btnSearch";
         btnSearch.Radius = 6;
@@ -157,7 +157,7 @@ partial class Form1
         btnRefresh.FillColor = Color.White;
         btnRefresh.Font = new Font("微软雅黑", 10F);
         btnRefresh.ForeColor = Color.FromArgb(255, 109, 0);
-        btnRefresh.Location = new Point(1025, 12);
+        btnRefresh.Location = new Point(974, 12);
         btnRefresh.MinimumSize = new Size(1, 1);
         btnRefresh.Name = "btnRefresh";
         btnRefresh.Radius = 6;
@@ -174,7 +174,7 @@ partial class Form1
         btnBack.FillColor = Color.White;
         btnBack.Font = new Font("微软雅黑", 10F);
         btnBack.ForeColor = Color.FromArgb(255, 109, 0);
-        btnBack.Location = new Point(1110, 12);
+        btnBack.Location = new Point(1073, 12);
         btnBack.MinimumSize = new Size(1, 1);
         btnBack.Name = "btnBack";
         btnBack.Radius = 6;
@@ -191,31 +191,31 @@ partial class Form1
         btnCheckOrder.FillColor = Color.FromArgb(255, 255, 255);
         btnCheckOrder.Font = new Font("微软雅黑", 10F);
         btnCheckOrder.ForeColor = Color.FromArgb(255, 109, 0);
-        btnCheckOrder.Location = new Point(1185, 12);
+        btnCheckOrder.Location = new Point(1160, 12);
         btnCheckOrder.MinimumSize = new Size(1, 1);
         btnCheckOrder.Name = "btnCheckOrder";
         btnCheckOrder.Radius = 6;
         btnCheckOrder.RectColor = Color.White;
-        btnCheckOrder.Size = new Size(100, 36);
+        btnCheckOrder.Size = new Size(90, 36);
         btnCheckOrder.TabIndex = 4;
-        btnCheckOrder.Text = "查询订单";
+        btnCheckOrder.Text = "我的订单";
         btnCheckOrder.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         btnCheckOrder.Click += BtnCheckOrder_Click;
         // 
         // btnLogout
-        // 
+        //
         btnLogout.Cursor = Cursors.Hand;
         btnLogout.FillColor = Color.White;
         btnLogout.Font = new Font("微软雅黑", 10F);
         btnLogout.ForeColor = Color.FromArgb(255, 109, 0);
-        btnLogout.Location = new Point(1295, 12);
+        btnLogout.Location = new Point(1268, 12);
         btnLogout.MinimumSize = new Size(1, 1);
         btnLogout.Name = "btnLogout";
         btnLogout.Radius = 6;
         btnLogout.RectColor = Color.White;
-        btnLogout.Size = new Size(73, 36);
+        btnLogout.Size = new Size(90, 36);
         btnLogout.TabIndex = 7;
-        btnLogout.Text = "退出";
+        btnLogout.Text = "退出登录";
         btnLogout.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         btnLogout.Click += BtnLogout_Click;
         // 
@@ -231,6 +231,18 @@ partial class Form1
         dishAreaPanel.Size = new Size(1372, 610);
         dishAreaPanel.TabIndex = 1;
         // 
+        // dishFlowPanel
+        // 
+        dishFlowPanel.AutoScroll = true;
+        dishFlowPanel.BackColor = Color.FromArgb(250, 250, 250);
+        dishFlowPanel.Dock = DockStyle.Fill;
+        dishFlowPanel.Location = new Point(185, 0);
+        dishFlowPanel.Name = "dishFlowPanel";
+        dishFlowPanel.Padding = new Padding(15, 10, 10, 10);
+        dishFlowPanel.Size = new Size(1187, 610);
+        dishFlowPanel.TabIndex = 2;
+        dishFlowPanel.Paint += dishFlowPanel_Paint;
+        // 
         // categoryPanel
         // 
         categoryPanel.Controls.Add(lblCategoryTitle);
@@ -240,7 +252,8 @@ partial class Form1
         categoryPanel.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         categoryPanel.Location = new Point(0, 0);
         categoryPanel.Margin = new Padding(0);
-        categoryPanel.MinimumSize = new Size(1, 1);
+        categoryPanel.MaximumSize = new Size(220, 2000);
+        categoryPanel.MinimumSize = new Size(160, 200);
         categoryPanel.Name = "categoryPanel";
         categoryPanel.Size = new Size(185, 610);
         categoryPanel.TabIndex = 0;
@@ -259,6 +272,7 @@ partial class Form1
         // 
         // categoryFlow
         // 
+        categoryFlow.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         categoryFlow.AutoScroll = true;
         categoryFlow.BackColor = Color.White;
         categoryFlow.Controls.Add(btnCategoryAll);
@@ -267,7 +281,6 @@ partial class Form1
         categoryFlow.Controls.Add(btnCategoryStaple);
         categoryFlow.Controls.Add(btnCategoryDrink);
         categoryFlow.Controls.Add(btnCategorySoup);
-        categoryFlow.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         categoryFlow.FlowDirection = FlowDirection.TopDown;
         categoryFlow.Location = new Point(0, 55);
         categoryFlow.Name = "categoryFlow";
@@ -383,18 +396,6 @@ partial class Form1
         btnCategorySoup.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
         btnCategorySoup.Click += CategoryButton_Click;
         // 
-        // dishFlowPanel
-        // 
-        dishFlowPanel.AutoScroll = true;
-        dishFlowPanel.BackColor = Color.FromArgb(250, 250, 250);
-        dishFlowPanel.Dock = DockStyle.Fill;
-        dishFlowPanel.Location = new Point(185, 0);
-        dishFlowPanel.Name = "dishFlowPanel";
-        dishFlowPanel.Padding = new Padding(15, 10, 10, 10);
-        dishFlowPanel.Size = new Size(1187, 610);
-        dishFlowPanel.TabIndex = 2;
-        dishFlowPanel.Paint += dishFlowPanel_Paint;
-        // 
         // lblNoDish
         // 
         lblNoDish.Font = new Font("微软雅黑", 14F);
@@ -476,12 +477,13 @@ partial class Form1
         aiPanel.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
         aiPanel.Location = new Point(0, 741);
         aiPanel.Margin = new Padding(0);
-        aiPanel.MinimumSize = new Size(1, 1);
+        aiPanel.MinimumSize = new Size(1, 120);
         aiPanel.Name = "aiPanel";
-        aiPanel.Size = new Size(1378, 110);
+        aiPanel.Size = new Size(1378, 120);
         aiPanel.TabIndex = 3;
         aiPanel.Text = null;
         aiPanel.TextAlignment = ContentAlignment.MiddleCenter;
+        aiPanel.Click += aiPanel_Click;
         // 
         // lblAITitle
         // 
@@ -498,9 +500,9 @@ partial class Form1
         // 
         lblAIText.Font = new Font("微软雅黑", 10F);
         lblAIText.ForeColor = Color.FromArgb(117, 117, 117);
-        lblAIText.Location = new Point(112, 12);
+        lblAIText.Location = new Point(126, 0);
         lblAIText.Name = "lblAIText";
-        lblAIText.Size = new Size(960, 82);
+        lblAIText.Size = new Size(1094, 61);
         lblAIText.TabIndex = 1;
         lblAIText.Text = "选择菜品后，点击获取AI推荐";
         // 
@@ -509,7 +511,7 @@ partial class Form1
         btnGetRecommend.Cursor = Cursors.Hand;
         btnGetRecommend.FillColor = Color.FromArgb(76, 175, 80);
         btnGetRecommend.Font = new Font("微软雅黑", 10F);
-        btnGetRecommend.Location = new Point(1098, 22);
+        btnGetRecommend.Location = new Point(1250, 24);
         btnGetRecommend.MinimumSize = new Size(1, 1);
         btnGetRecommend.Name = "btnGetRecommend";
         btnGetRecommend.Radius = 6;

@@ -1,10 +1,14 @@
 using ClientCustomer.Models;
+using System.ComponentModel;
 
 namespace ClientCustomer;
 
 public partial class LoginForm : Form
 {
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public UserDto? LoggedInUser { get; private set; }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool IsGuestMode { get; private set; }
 
     public LoginForm()

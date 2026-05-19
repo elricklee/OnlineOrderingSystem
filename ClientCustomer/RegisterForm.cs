@@ -1,4 +1,5 @@
 using ClientCustomer.Models;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace ClientCustomer;
@@ -8,6 +9,7 @@ public partial class RegisterForm : Form
     private static readonly Regex PhoneRegex = new("^1[3-9]\\d{9}$", RegexOptions.Compiled);
     private readonly List<DeliveryZoneDto> _deliveryZones = new();
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string RegisteredUsername { get; private set; } = string.Empty;
 
     public RegisterForm()
